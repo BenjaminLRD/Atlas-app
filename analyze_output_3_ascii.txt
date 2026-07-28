@@ -1,0 +1,3 @@
+ERROR|SYNTACTIC_ERROR|EXPECTED_TOKEN|C:\\Users\\Lalramdina\\Desktop\\workou\\aizawl_gym\\lib\\screens\\profile_screen.dart|610|6|1|Expected to find ')'.
+WARNING|STATIC_WARNING|UNUSED_IMPORT|C:\\Users\\Lalramdina\\Desktop\\workou\\aizawl_gym\\lib\\screens\\profile_screen.dart|3|8|26|Unused import: 'edit_profile_screen.dart'.
+WARNING|STATIC_WARNING|UNUSED_IMPORT|C:\\Users\\Lalramdina\\Desktop\\workou\\aizawl_gym\\lib\\screens\\profile_screen.dart|4|8|27|Unused import: 'notifications_screen.dart'.

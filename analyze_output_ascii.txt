@@ -1,0 +1,11 @@
+ERROR|COMPILE_TIME_ERROR|MISSING_REQUIRED_ARGUMENT|C:\\Users\\Lalramdina\\Desktop\\workou\\aizawl_gym\\lib\\screens\\edit_profile_screen.dart|656|24|16|The named parameter 'option1' is required, but there's no corresponding argument.
+ERROR|COMPILE_TIME_ERROR|MISSING_REQUIRED_ARGUMENT|C:\\Users\\Lalramdina\\Desktop\\workou\\aizawl_gym\\lib\\screens\\edit_profile_screen.dart|656|24|16|The named parameter 'option2' is required, but there's no corresponding argument.
+ERROR|COMPILE_TIME_ERROR|UNDEFINED_NAMED_PARAMETER|C:\\Users\\Lalramdina\\Desktop\\workou\\aizawl_gym\\lib\\screens\\edit_profile_screen.dart|659|19|2|The named parameter 'cm' isn't defined.
+ERROR|COMPILE_TIME_ERROR|UNDEFINED_NAMED_PARAMETER|C:\\Users\\Lalramdina\\Desktop\\workou\\aizawl_gym\\lib\\screens\\edit_profile_screen.dart|660|19|2|The named parameter 'ft' isn't defined.
+ERROR|COMPILE_TIME_ERROR|DUPLICATE_NAMED_ARGUMENT|C:\\Users\\Lalramdina\\Desktop\\workou\\aizawl_gym\\lib\\screens\\profile_screen.dart|178|7|5|The argument for the named parameter 'child' was already specified.
+ERROR|SYNTACTIC_ERROR|EXPECTED_TOKEN|C:\\Users\\Lalramdina\\Desktop\\workou\\aizawl_gym\\lib\\screens\\profile_screen.dart|397|6|1|Expected to find ')'.
+ERROR|SYNTACTIC_ERROR|EXPECTED_TOKEN|C:\\Users\\Lalramdina\\Desktop\\workou\\aizawl_gym\\lib\\screens\\profile_screen.dart|515|6|1|Expected to find ')'.
+ERROR|SYNTACTIC_ERROR|EXPECTED_TOKEN|C:\\Users\\Lalramdina\\Desktop\\workou\\aizawl_gym\\lib\\screens\\profile_screen.dart|608|6|1|Expected to find ')'.
+WARNING|STATIC_WARNING|UNUSED_IMPORT|C:\\Users\\Lalramdina\\Desktop\\workou\\aizawl_gym\\lib\\screens\\profile_screen.dart|3|8|26|Unused import: 'edit_profile_screen.dart'.
+WARNING|STATIC_WARNING|UNUSED_IMPORT|C:\\Users\\Lalramdina\\Desktop\\workou\\aizawl_gym\\lib\\screens\\profile_screen.dart|4|8|27|Unused import: 'notifications_screen.dart'.
+INFO|HINT|DEPRECATED_MEMBER_USE|C:\\Users\\Lalramdina\\Desktop\\workou\\aizawl_gym\\lib\\screens\\edit_profile_screen.dart|953|13|11|'activeColor' is deprecated and shouldn't be used. Use activeThumbColor instead. This feature was deprecated after v3.31.0-2.0.pre.
