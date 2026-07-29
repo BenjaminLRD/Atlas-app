@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../app_theme.dart';
-import '../data/local_storage.dart';
+import '../data/ai_chat_service.dart';
 
 class AiCoachChatScreen extends StatefulWidget {
   const AiCoachChatScreen({super.key});
@@ -10,6 +10,7 @@ class AiCoachChatScreen extends StatefulWidget {
 }
 
 class _AiCoachChatScreenState extends State<AiCoachChatScreen> {
+  late final AIChatService _chatService;
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   List<Map<String, dynamic>> _messages = [];
@@ -25,12 +26,13 @@ class _AiCoachChatScreenState extends State<AiCoachChatScreen> {
   @override
   void initState() {
     super.initState();
+    _chatService = AIChatService();
     _loadMessages();
   }
 
   void _loadMessages() {
     setState(() {
-      _messages = LocalStorage.getChatHistory();
+      _messages = _chatService.getChatHistory();
     });
     _scrollToBottom();
   }
@@ -58,46 +60,16 @@ class _AiCoachChatScreenState extends State<AiCoachChatScreen> {
     setState(() {
       _messages.add(userMsg);
     });
-    LocalStorage.saveChatHistory(_messages);
+    _chatService.saveChatHistory(_messages);
     _controller.clear();
     _scrollToBottom();
 
-    // Mock response based on input
-    Future.delayed(const Duration(seconds: 1), () {
-      String responseText = "That's a great request! Let me process that for you.";
-      List<String>? tags;
-      bool routineCard = false;
-
-      final lower = text.toLowerCase();
-      if (lower.contains("generate today's workout") || lower.contains("workout")) {
-        responseText = "I've generated Today's Hypertrophy Protocol for you. Let's make sure we hit the proper form on target compound lifts.";
-        tags = ['Hypertrophy Protocol', 'Compound Lifts'];
-      } else if (lower.contains("analyze my progress") || lower.contains("progress")) {
-        responseText = "Your metrics indicate consistency. You've completed 80% of your goals and your body fat is trending downwards nicely.";
-        tags = ['Consistent Trend', '80% Progress'];
-      } else if (lower.contains("diet") || lower.contains("protein") || lower.contains("improve my diet")) {
-        responseText = "To optimize recovery, make sure you hit your goal of 140g of protein. Focus on lean sources like chicken breast, eggs, and whey.";
-        tags = ['Diet Focus', '140g Target'];
-      } else if (lower.contains("replace") || lower.contains("exercise")) {
-        responseText = "Certainly. We can swap squats for Romanian Deadlifts or Leg Press to reduce knee loading while maintaining hypertrophy stimulus.";
-        routineCard = true;
-      } else if (lower.contains("form") || lower.contains("proper form")) {
-        responseText = "Keep your spine neutral, drive through your heels, and maintain tension throughout the eccentric phase of the lift.";
-        tags = ['Form Check', 'Neutral Spine'];
-      }
-
-      final botMsg = <String, dynamic>{
-        'sender': 'bot',
-        'text': responseText,
-      };
-      if (tags != null) botMsg['tags'] = tags;
-      if (routineCard) botMsg['routineCard'] = true;
-
+    _chatService.generateResponse(text).then((botResponse) {
       if (mounted) {
         setState(() {
-          _messages.add(botMsg);
+          _messages.add(botResponse.toJson());
         });
-        LocalStorage.saveChatHistory(_messages);
+        _chatService.saveChatHistory(_messages);
         _scrollToBottom();
       }
     });
@@ -139,8 +111,8 @@ class _AiCoachChatScreenState extends State<AiCoachChatScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh, color: AppColors.onSurface),
-            onPressed: () {
-              LocalStorage.saveChatHistory([]);
+            onPressed: () async {
+              await _chatService.clearChatHistory();
               _loadMessages();
             },
           ),

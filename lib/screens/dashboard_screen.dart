@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../app_theme.dart';
-import '../data/local_storage.dart';
+import '../data/nutrition_service.dart';
 import '../data/profile_provider.dart';
 import 'workout_session_screen.dart';
 import 'weekly_workout_plan_screen.dart';
@@ -29,6 +29,9 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  // Nutrition Service
+  late final NutritionService _nutritionService;
+
   // Protein State
   double _proteinConsumed = 0.0;
   double _proteinGoal = 140.0;
@@ -48,6 +51,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     super.initState();
+    _nutritionService = NutritionService();
     _profileProvider = ProfileProvider();
     _profileProvider.addListener(_onProfileChanged);
     _loadState();
@@ -68,8 +72,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void _loadState() {
     debugPrint('[DashboardScreen] _loadState() called');
     setState(() {
-      _proteinConsumed = LocalStorage.getProteinConsumed();
-      _proteinGoal = LocalStorage.getProteinGoal();
+      _proteinConsumed = _nutritionService.getProteinConsumed();
+      _proteinGoal = _nutritionService.getProteinGoal();
     });
     debugPrint('[DashboardScreen] _proteinConsumed assigned value: $_proteinConsumed');
   }
@@ -78,14 +82,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
     setState(() {
       _proteinConsumed += amount;
     });
-    await LocalStorage.saveProteinConsumed(_proteinConsumed);
+    await _nutritionService.saveProteinConsumed(_proteinConsumed);
   }
 
   void _resetProtein() async {
     setState(() {
       _proteinConsumed = 0;
     });
-    await LocalStorage.saveProteinConsumed(_proteinConsumed);
+    await _nutritionService.saveProteinConsumed(_proteinConsumed);
   }
 
   // --- Dynamic Mock Data Generator ---

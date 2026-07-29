@@ -1,16 +1,24 @@
 import 'package:flutter/foundation.dart';
-import 'local_storage.dart';
 import '../models/user_profile.dart';
+import 'profile_repository.dart';
 
 /// Global single source of truth for user profile data.
 /// All screens that display profile info should read from this provider.
 class ProfileProvider extends ChangeNotifier {
-  static final ProfileProvider _instance = ProfileProvider._internal();
-  factory ProfileProvider() => _instance;
-  ProfileProvider._internal() {
-    _userProfile = LocalStorage.getUserProfile();
+  static ProfileProvider _instance = ProfileProvider._internal(LocalProfileRepository());
+  
+  factory ProfileProvider([ProfileRepository? repository]) {
+    if (repository != null) {
+      _instance = ProfileProvider._internal(repository);
+    }
+    return _instance;
   }
 
+  ProfileProvider._internal(this._repository) {
+    _userProfile = _repository.getProfile();
+  }
+
+  final ProfileRepository _repository;
   late UserProfile _userProfile;
 
   UserProfile get userProfile => _userProfile;
@@ -65,27 +73,23 @@ class ProfileProvider extends ChangeNotifier {
     return parts.isNotEmpty ? parts[0] : name;
   }
 
-  /// Reload from local storage (e.g. on app resume)
+  /// Reload from repository (e.g. on app resume)
   void reload() {
-    _userProfile = LocalStorage.getUserProfile();
+    _userProfile = _repository.getProfile();
     notifyListeners();
   }
 
-  /// Update profile and persist to local storage
+  /// Update profile and persist via repository
   Future<void> update(dynamic newProfile) async {
-    if (newProfile is UserProfile) {
-      _userProfile = newProfile;
-    } else if (newProfile is Map<String, dynamic>) {
-      _userProfile = UserProfile.fromJson(newProfile);
-    }
-    await LocalStorage.saveUserProfile(_userProfile);
+    await _repository.saveProfile(newProfile);
+    _userProfile = _repository.getProfile();
     notifyListeners();
   }
 
-  /// Update a single field and persist
+  /// Update a single field and persist via repository
   Future<void> updateField(String key, dynamic value) async {
-    _userProfile[key] = value;
-    await LocalStorage.saveUserProfile(_userProfile);
+    await _repository.updateField(key, value);
+    _userProfile = _repository.getProfile();
     notifyListeners();
   }
 }

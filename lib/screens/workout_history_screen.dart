@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../app_theme.dart';
-import '../data/local_storage.dart';
+import '../data/workout_service.dart';
 import '../models/workout_history.dart';
 
 class WorkoutHistoryScreen extends StatefulWidget {
@@ -11,20 +11,19 @@ class WorkoutHistoryScreen extends StatefulWidget {
 }
 
 class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
+  late final WorkoutService _workoutService;
   late List<WorkoutHistory> _history;
 
   @override
   void initState() {
     super.initState();
+    _workoutService = WorkoutService();
     _loadHistory();
   }
 
   void _loadHistory() {
-    final history = LocalStorage.getWorkoutHistory();
-    // Sort newest workouts first
-    history.sort((a, b) => b.dateCompleted.compareTo(a.dateCompleted));
     setState(() {
-      _history = history;
+      _history = _workoutService.getWorkoutHistory();
     });
   }
 

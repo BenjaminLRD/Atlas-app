@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../app_theme.dart';
-import '../data/local_storage.dart';
+import '../data/notification_service.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -10,37 +10,31 @@ class NotificationsScreen extends StatefulWidget {
 }
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
+  late final NotificationService _notificationService;
   late List<Map<String, dynamic>> _notifications;
 
   @override
   void initState() {
     super.initState();
-    _notifications = LocalStorage.getNotifications();
+    _notificationService = NotificationService();
+    _notifications = _notificationService.getNotifications();
   }
 
   void _markAllAsRead() {
     setState(() {
-      for (var notification in _notifications) {
-        notification['isRead'] = true;
-      }
-      LocalStorage.saveNotifications(_notifications);
+      _notificationService.markAllAsRead(_notifications);
     });
   }
 
   void _removeNotification(String id) {
     setState(() {
-      _notifications.removeWhere((n) => n['id'] == id);
-      LocalStorage.saveNotifications(_notifications);
+      _notificationService.removeNotification(_notifications, id);
     });
   }
 
   void _toggleNotificationReadStatus(String id, bool isCurrentlyRead) {
     setState(() {
-      final index = _notifications.indexWhere((n) => n['id'] == id);
-      if (index != -1) {
-        _notifications[index]['isRead'] = !isCurrentlyRead;
-        LocalStorage.saveNotifications(_notifications);
-      }
+      _notificationService.toggleReadStatus(_notifications, id, isCurrentlyRead);
     });
   }
 

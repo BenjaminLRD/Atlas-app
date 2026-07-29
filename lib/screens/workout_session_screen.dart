@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../app_theme.dart';
-import '../data/local_storage.dart';
+import '../data/workout_service.dart';
 import '../models/active_workout_session.dart';
 import '../models/workout_history.dart';
 
@@ -32,6 +32,8 @@ class WorkoutSessionScreen extends StatefulWidget {
 }
 
 class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
+  late final WorkoutService _workoutService;
+
   final List<Exercise> _exercises = const [
     Exercise(
       name: 'Goblet Squats',
@@ -73,12 +75,13 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
   @override
   void initState() {
     super.initState();
+    _workoutService = WorkoutService();
     _loadOrCreateSession();
     _startTimer();
   }
 
   void _loadOrCreateSession() {
-    final saved = LocalStorage.getActiveSession();
+    final saved = _workoutService.getActiveSession();
     if (saved != null) {
       // Validate session workout identity to prevent cross-workout state corruption
       final savedWorkout = saved.workoutName;
@@ -117,7 +120,7 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
       isPaused: _isPaused,
       completedSets: _completedSets,
     );
-    LocalStorage.saveActiveSession(session);
+    _workoutService.saveActiveSession(session);
   }
 
   void _startTimer() {
@@ -142,10 +145,22 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
     _saveSession();
   }
 
-  void _startRestTimer() {
+  void _toggleSet(int setIndex) {
+    setState(() {
+      _completedSets[_currentIndex][setIndex] = !_completedSets[_currentIndex][setIndex];
+    });
+    _saveSession();
+
+    // Start rest timer automatically when set is completed
+    if (_completedSets[_currentIndex][setIndex]) {
+      _startRestTimer(60); // Default 60s rest
+    }
+  }
+
+  void _startRestTimer([int durationSeconds = 60]) {
     _restTimer?.cancel();
     setState(() {
-      _restSecondsRemaining = 60; // 60 seconds rest duration
+      _restSecondsRemaining = durationSeconds;
       _isResting = true;
     });
     _restTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -163,10 +178,12 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
 
   void _stopRestTimer() {
     _restTimer?.cancel();
-    setState(() {
-      _isResting = false;
-      _restSecondsRemaining = 0;
-    });
+    if (mounted) {
+      setState(() {
+        _isResting = false;
+        _restSecondsRemaining = 0;
+      });
+    }
   }
 
   void _nextExercise() {
@@ -193,7 +210,7 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
     _timer?.cancel();
     _restTimer?.cancel();
 
-    await LocalStorage.saveWorkoutCompletion(
+    await _workoutService.saveWorkoutCompletion(
       WorkoutHistory(
         workoutName: widget.workoutName,
         dateCompleted: DateTime.now(),
@@ -202,7 +219,7 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
         completionPercentage: _getCompletionPercentage(),
       ),
     );
-    await LocalStorage.clearActiveSession();
+    await _workoutService.clearActiveSession();
 
     if (!mounted) return;
 
@@ -400,13 +417,7 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
                           ),
                           value: isDone,
                           onChanged: (val) {
-                            setState(() {
-                              _completedSets[_currentIndex][setIdx] = val ?? false;
-                            });
-                            _saveSession();
-                            if (val == true) {
-                              _startRestTimer();
-                            }
+                            _toggleSet(setIdx);
                           },
                         ),
                       );
