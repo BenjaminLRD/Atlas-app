@@ -1,0 +1,263 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Zenith AI Trainer</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Hanken+Grotesk:wght@600;700;800&amp;family=JetBrains+Mono:wght@500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-container": "#f6d9d9",
+                    "error-container": "#ffdad6",
+                    "on-background": "#191c1b",
+                    "on-tertiary": "#ffffff",
+                    "surface-container": "#eceeec",
+                    "on-primary-fixed-variant": "#2d4e33",
+                    "tertiary": "#506352",
+                    "on-secondary-container": "#735d5e",
+                    "secondary-fixed": "#f9dcdc",
+                    "primary": "#44664a",
+                    "tertiary-container": "#869a87",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-fixed": "#0e1f12",
+                    "secondary-fixed-dim": "#dcc0c0",
+                    "on-secondary": "#ffffff",
+                    "on-surface": "#191c1b",
+                    "surface-container-low": "#f2f4f2",
+                    "inverse-surface": "#2e3130",
+                    "surface-dim": "#d8dad9",
+                    "tertiary-fixed": "#d3e8d2",
+                    "surface-container-high": "#e6e9e7",
+                    "on-primary-container": "#13341c",
+                    "secondary": "#6f5959",
+                    "on-surface-variant": "#424842",
+                    "surface-variant": "#e1e3e1",
+                    "tertiary-fixed-dim": "#b7ccb7",
+                    "on-secondary-fixed": "#271718",
+                    "surface-container-lowest": "#ffffff",
+                    "surface": "#f8faf8",
+                    "outline": "#727971",
+                    "on-tertiary-container": "#203223",
+                    "on-primary-fixed": "#00210b",
+                    "on-error": "#ffffff",
+                    "primary-fixed": "#c6ecc8",
+                    "on-error-container": "#93000a",
+                    "on-secondary-fixed-variant": "#564242",
+                    "primary-fixed-dim": "#aad0ad",
+                    "error": "#ba1a1a",
+                    "surface-bright": "#f8faf8",
+                    "surface-tint": "#44664a",
+                    "surface-container-highest": "#e1e3e1",
+                    "background": "#f8faf8",
+                    "inverse-primary": "#aad0ad",
+                    "inverse-on-surface": "#eff1ef",
+                    "primary-container": "#7a9e7e",
+                    "outline-variant": "#c2c8bf",
+                    "on-tertiary-fixed-variant": "#394b3b"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "20px",
+                    "stack-md": "24px",
+                    "margin-desktop": "64px",
+                    "stack-xs": "8px",
+                    "gutter": "16px",
+                    "unit": "4px",
+                    "stack-lg": "48px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Hanken Grotesk"],
+                    "label-caps": ["JetBrains Mono"],
+                    "body-md": ["Inter"],
+                    "headline-lg-mobile": ["Hanken Grotesk"],
+                    "headline-lg": ["Hanken Grotesk"],
+                    "data-display": ["JetBrains Mono"],
+                    "body-sm": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["32px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "data-display": ["20px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        @keyframes aura-pulse {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.15); opacity: 0.15; }
+        }
+        .ai-aura {
+            animation: aura-pulse 3s ease-in-out infinite;
+            background: radial-gradient(circle, #7a9e7e 0%, transparent 70%);
+        }
+        .message-bubble {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .message-bubble:hover {
+            transform: translateY(-2px);
+        }
+        body {
+            background-color: #f8faf8;
+            font-family: 'Inter', sans-serif;
+            color: #191c1b;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 backdrop-blur-xl bg-surface/70 flex justify-between items-center px-6 h-16 w-full">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional high-resolution close-up portrait of an athletic trainer with a serene expression. The lighting is soft and natural, typical of a high-end light-mode fitness app. The background is a blurred minimalist gym with sage green and white tones, reflecting the Zenith brand's disciplined serenity and professional performance minimalist aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhyQKpwDANDzES6IdcwOjTf1yJaDBCS6B-V_dcWuh2tyhDX0uxdBc1UtBYZtCFXcwIBkb_9ylA7EUg2_Tn7Iu5wBVyfB9MWrv_9ls16AZGctXWf8M7A-L4-3om_BPcs549sgZG39NL5tWcJ5f6uqgB0i6tCIVT0qwTsIL9tyt3EzXRI--6qjb4SdipYMU01zCURTll53Taf4MshUxsLQuBCA4fBKJHR6y2mwCuh_K2U9ZI_ddPf3JoTEAdKi5FFfu6FGiArs3ZVW35J3s">
+</div>
+<h1 class="font-headline-md text-headline-md tracking-tight text-primary">Aizawl Gym</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant hover:opacity-80 transition-opacity">notifications</button>
+</div>
+</header>
+<!-- Main Content: Conversational Interface -->
+<main class="flex-grow pt-24 pb-32 px-margin-mobile md:px-margin-desktop max-w-4xl mx-auto w-full flex flex-col">
+<!-- Welcome Section -->
+<div class="text-center mb-stack-lg">
+<div class="relative inline-block mb-4">
+<div class="absolute inset-0 rounded-full ai-aura"></div>
+<div class="relative w-20 h-20 bg-primary-container rounded-full flex items-center justify-center border-4 border-surface-container-lowest shadow-sm overflow-hidden">
+<span class="material-symbols-outlined text-4xl text-on-primary-container" style="font-variation-settings: &quot;FILL&quot; 1;">smart_toy</span>
+</div>
+</div>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Good morning, Zothana.</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">Ready to refine your discipline today?</p>
+</div>
+<!-- Chat Feed -->
+<div class="space-y-stack-md flex-grow">
+<!-- Bot Message -->
+<div class="flex items-start gap-4 max-w-[85%]">
+<div class="w-8 h-8 rounded-full bg-primary-container flex-shrink-0 flex items-center justify-center mt-1">
+<span class="material-symbols-outlined text-sm text-on-primary-container">smart_toy</span>
+</div>
+<div class="bg-surface-container-lowest border border-surface-variant p-4 rounded-xl rounded-tl-none shadow-sm message-bubble">
+<p class="font-body-md text-body-md text-on-surface">I've reviewed your biometric data from yesterday's recovery cycle. Your heart rate variability is up by 8%, suggesting you're ready for a higher-intensity session today.</p>
+<div class="mt-4 flex flex-wrap gap-2">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed px-3 py-1 rounded-full font-label-caps text-label-caps">High Intensity Recommended</span>
+<span class="bg-surface-container text-on-surface-variant px-3 py-1 rounded-full font-label-caps text-label-caps">Restorative Focus</span>
+</div>
+</div>
+</div>
+<!-- User Message -->
+<div class="flex items-start gap-4 flex-row-reverse max-w-[85%] ml-auto">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex-shrink-0 flex items-center justify-center mt-1">
+<span class="material-symbols-outlined text-sm text-on-secondary-container">person</span>
+</div>
+<div class="bg-primary text-on-primary p-4 rounded-xl rounded-tr-none shadow-sm message-bubble">
+<p class="font-body-md text-body-md">Thanks, Coach. I'm feeling a bit tight in my hip flexors after sitting all day. Should I adjust the warmup?</p>
+</div>
+</div>
+<!-- Bot Message (Workout Advice) -->
+<div class="flex items-start gap-4 max-w-[85%]">
+<div class="w-8 h-8 rounded-full bg-primary-container flex-shrink-0 flex items-center justify-center mt-1">
+<span class="material-symbols-outlined text-sm text-on-primary-container">smart_toy</span>
+</div>
+<div class="bg-surface-container-lowest border border-surface-variant p-4 rounded-xl rounded-tl-none shadow-sm message-bubble">
+<p class="font-body-md text-body-md text-on-surface mb-3">Absolutely. Let's integrate 5 minutes of "90/90 Hip Switches" and "Pigeon Pose" into your session. Precision in mobility prevents injury in performance.</p>
+<div class="border border-outline-variant rounded-lg p-3 flex items-center gap-3 bg-surface-container-low">
+<div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center border border-outline-variant">
+<span class="material-symbols-outlined text-primary">fitness_center</span>
+</div>
+<div>
+<p class="font-label-caps text-label-caps text-primary uppercase">Suggested Routine</p>
+<p class="font-body-md text-body-md font-semibold">Mobility Correction A</p>
+</div>
+<button class="ml-auto material-symbols-outlined text-primary">play_circle</button>
+</div>
+</div>
+</div>
+<!-- Bot Message (Nutrition) -->
+<div class="flex items-start gap-4 max-w-[85%]">
+<div class="w-8 h-8 rounded-full bg-primary-container flex-shrink-0 flex items-center justify-center mt-1">
+<span class="material-symbols-outlined text-sm text-on-primary-container">smart_toy</span>
+</div>
+<div class="bg-surface-container-lowest border border-surface-variant p-4 rounded-xl rounded-tl-none shadow-sm message-bubble">
+<p class="font-body-md text-body-md text-on-surface">Also, don't forget your post-workout hydration. Since today's session is more intense, aim for 20g of clean protein within 45 minutes of finishing to maximize muscle protein synthesis.</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Input Bar -->
+<div class="fixed bottom-24 left-0 right-0 px-margin-mobile md:px-margin-desktop z-40">
+<div class="max-w-4xl mx-auto">
+<div class="bg-surface-container-lowest border rounded-full px-6 py-3 flex items-center gap-3 shadow-lg backdrop-blur-xl border-surface-variant">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">add_circle</button>
+<input class="flex-grow bg-transparent border-none focus:ring-0 font-body-md text-on-surface placeholder-outline text-body-md h-10" placeholder="Ask Aizawl Gym AI..." type="text">
+<button class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center hover:opacity-90 transition-all scale-95 active:scale-90">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</div>
+</div>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-md z-50 rounded-full backdrop-blur-xl bg-surface/70 shadow-[0_20px_40px_rgba(85,98,77,0.06)] flex justify-around items-center p-2">
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label text-xs font-medium font-label-caps">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">fitness_center</span>
+<span class="font-label text-xs font-medium font-label-caps">Workouts</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary text-on-primary rounded-full w-12 h-12 transition-all duration-400" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">smart_toy</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label text-xs font-medium font-label-caps">Profile</span>
+</a>
+</nav>
+<!-- Floating Atmosphere Elements -->
+<div class="fixed top-20 right-[-10%] w-96 h-96 bg-primary/5 rounded-full blur-[100px] pointer-events-none -z-10"></div>
+<div class="fixed bottom-40 left-[-10%] w-72 h-72 bg-tertiary/5 rounded-full blur-[80px] pointer-events-none -z-10"></div>
+<script>
+        // Simple Micro-interaction for input focus
+        const input = document.querySelector('input');
+        const container = input.closest('.shadow-lg');
+        
+        input.addEventListener('focus', () => {
+            container.classList.add('border-primary');
+            container.classList.remove('border-surface-variant');
+        });
+
+        input.addEventListener('blur', () => {
+            container.classList.remove('border-primary');
+            container.classList.add('border-surface-variant');
+        });
+
+        // Mock "Sending" interaction
+        const sendBtn = document.querySelector('button .material-symbols-outlined:contains("send")')?.parentElement;
+        if (sendBtn) {
+            sendBtn.addEventListener('click', () => {
+                if (input.value.trim() !== "") {
+                    console.log("Sending:", input.value);
+                    input.value = "";
+                }
+            });
+        }
+    </script>
+
+
+</body></html>

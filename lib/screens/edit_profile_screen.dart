@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../app_theme.dart';
+import '../data/app_dependencies.dart';
 import '../data/profile_provider.dart';
 import 'payment_screen.dart';
 import '../widgets/profile_picture.dart';
@@ -13,6 +14,7 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
+  late final ProfileProvider _profileProvider;
   final _formKey = GlobalKey<FormState>();
   late Map<String, dynamic> _profile;
   late TextEditingController _nameController;
@@ -59,12 +61,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void initState() {
     super.initState();
+    _profileProvider = AppDependencies.instance.profileProvider;
     _loadProfile();
   }
 
   void _loadProfile() {
-    // Always read from the singleton provider — single source of truth
-    final profile = Map<String, dynamic>.from(ProfileProvider().profile);
+    // Always read from the provider — single source of truth
+    final profile = Map<String, dynamic>.from(_profileProvider.profile);
     setState(() {
       _profile = profile;
       _nameController = TextEditingController(text: profile['name'] ?? '');
@@ -89,7 +92,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           _profile['profilePic'] = image.path;
         });
         // Update provider → persists to LocalStorage + notifies all listeners
-        await ProfileProvider().updateField('profilePic', image.path);
+        await _profileProvider.updateField('profilePic', image.path);
       }
     } catch (e) {
       if (mounted) {
@@ -869,7 +872,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             _profile['subscription'] = 'Free';
           });
           // Update provider → persists to LocalStorage + notifies all listeners
-          ProfileProvider().update(_profile);
+          _profileProvider.update(_profile);
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
@@ -1105,7 +1108,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         _profile['weight'] = _weightController.text.trim();
 
         // Single call: persists to LocalStorage + notifies all listeners
-        await ProfileProvider().update(_profile);
+        await _profileProvider.update(_profile);
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(

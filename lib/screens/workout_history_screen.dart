@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../app_theme.dart';
+import '../data/app_dependencies.dart';
 import '../data/workout_service.dart';
 import '../models/workout_history.dart';
 
@@ -17,7 +18,7 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
   @override
   void initState() {
     super.initState();
-    _workoutService = WorkoutService();
+    _workoutService = AppDependencies.instance.workoutService;
     _loadHistory();
   }
 

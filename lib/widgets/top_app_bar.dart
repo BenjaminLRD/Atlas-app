@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../app_theme.dart';
+import '../data/app_dependencies.dart';
 import '../screens/edit_profile_screen.dart';
 import '../screens/notifications_screen.dart';
-import '../data/profile_provider.dart';
 import 'profile_picture.dart';
 
 class CustomTopAppBar extends StatelessWidget {
@@ -16,7 +16,7 @@ class CustomTopAppBar extends StatelessWidget {
       height: 64,
       padding: const EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
-        color: AppColors.surface.withValues(alpha: 0.7),
+        color: context.appSurface.withValues(alpha: 0.7),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -37,7 +37,7 @@ class CustomTopAppBar extends StatelessWidget {
             child: Row(
               children: [
                 ProfileImage(
-                  path: ProfileProvider().profilePic,
+                  path: AppDependencies.instance.profileProvider.profilePic,
                   size: 40,
                   iconSize: 20,
                 ),

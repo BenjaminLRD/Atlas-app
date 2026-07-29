@@ -1,0 +1,341 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Zenith Athletics | Workout Plan</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@600;700&amp;family=Inter:wght@400;500&amp;family=JetBrains+Mono:wght@500;600&amp;display=swap" rel="stylesheet">
+<!-- Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-container": "#f6d9d9",
+                    "error-container": "#ffdad6",
+                    "on-background": "#191c1b",
+                    "on-tertiary": "#ffffff",
+                    "surface-container": "#eceeec",
+                    "on-primary-fixed-variant": "#2d4e33",
+                    "tertiary": "#506352",
+                    "on-secondary-container": "#735d5e",
+                    "secondary-fixed": "#f9dcdc",
+                    "primary": "#44664a",
+                    "tertiary-container": "#869a87",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-fixed": "#0e1f12",
+                    "secondary-fixed-dim": "#dcc0c0",
+                    "on-secondary": "#ffffff",
+                    "on-surface": "#191c1b",
+                    "surface-container-low": "#f2f4f2",
+                    "inverse-surface": "#2e3130",
+                    "surface-dim": "#d8dad9",
+                    "tertiary-fixed": "#d3e8d2",
+                    "surface-container-high": "#e6e9e7",
+                    "on-primary-container": "#13341c",
+                    "secondary": "#6f5959",
+                    "on-surface-variant": "#424842",
+                    "surface-variant": "#e1e3e1",
+                    "tertiary-fixed-dim": "#b7ccb7",
+                    "on-secondary-fixed": "#271718",
+                    "surface-container-lowest": "#ffffff",
+                    "surface": "#f8faf8",
+                    "outline": "#727971",
+                    "on-tertiary-container": "#203223",
+                    "on-primary-fixed": "#00210b",
+                    "on-error": "#ffffff",
+                    "primary-fixed": "#c6ecc8",
+                    "on-error-container": "#93000a",
+                    "on-secondary-fixed-variant": "#564242",
+                    "primary-fixed-dim": "#aad0ad",
+                    "error": "#ba1a1a",
+                    "surface-bright": "#f8faf8",
+                    "surface-tint": "#44664a",
+                    "surface-container-highest": "#e1e3e1",
+                    "background": "#f8faf8",
+                    "inverse-primary": "#aad0ad",
+                    "inverse-on-surface": "#eff1ef",
+                    "primary-container": "#7a9e7e",
+                    "outline-variant": "#c2c8bf",
+                    "on-tertiary-fixed-variant": "#394b3b"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "20px",
+                    "stack-md": "24px",
+                    "margin-desktop": "64px",
+                    "stack-xs": "8px",
+                    "gutter": "16px",
+                    "unit": "4px",
+                    "stack-lg": "48px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Hanken Grotesk"],
+                    "label-caps": ["JetBrains Mono"],
+                    "body-md": ["Inter"],
+                    "headline-lg-mobile": ["Hanken Grotesk"],
+                    "headline-lg": ["Hanken Grotesk"],
+                    "data-display": ["JetBrains Mono"],
+                    "body-sm": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["32px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "data-display": ["20px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-nav-indicator {
+            box-shadow: inset 0 0 10px rgba(68, 102, 74, 0.1);
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 16px;
+        }
+        .scroll-hide::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 backdrop-blur-xl bg-surface/70 flex justify-between items-center px-6 h-16">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-fixed overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a healthy athlete with calm expression, soft studio lighting, high-performance minimalism aesthetic, using a soft sage and neutral color palette for a serene fitness brand identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC42DvbmNxO_sjvskOXiVWeK186o7jWbLVzRdkcmcID_kFfNqcXsabQZ6pKnpgZpILz2OVOjSb1mo4aB7FWjb8CNmE1vUkxEhx6txCdFhzvy_G70-hm7jpNHlZnqX7Yb3Co5GvuMMkw7a2GyfyxyZm1Dze9vu3yUt3vLOpLXW7QxZxItfmUti0U4XoiVEb9yA7wx-Zgx1xOLzAHniLIc-DHEjiNW_wqOt1Pc5_zqiSblLHSvphedN_jvcYHdw8lW7czBaeKilizRW2RtUg">
+</div>
+<span class="font-headline-md text-display-lg tracking-tight text-primary font-bold">Aizawl Gym</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-primary hover:opacity-80 transition-opacity">notifications</button>
+</div>
+</header>
+<main class="pt-24 pb-32 px-margin-mobile md:px-margin-desktop max-w-7xl mx-auto">
+<!-- Header Section -->
+<section class="mb-stack-lg">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<span class="font-label-caps text-label-caps text-tertiary uppercase tracking-widest">Active Program</span>
+<h1 class="font-headline-lg text-headline-lg md:text-headline-lg-mobile mt-2">Hybrid Strength II</h1>
+<p class="font-body-md text-on-surface-variant max-w-lg mt-2">Week 4: Peak Performance phase. Focus on disciplined breathing and technical integrity during high-intensity blocks.</p>
+</div>
+<div class="flex items-center gap-2 bg-surface-container rounded-full px-4 py-2 w-fit">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: &quot;FILL&quot; 1;">calendar_today</span>
+<span class="font-label-caps text-label-caps text-on-surface">Oct 14 - Oct 20</span>
+</div>
+</div>
+</section>
+<!-- Current Day Highlight (Bento Top) -->
+<section class="mb-stack-md">
+<div class="relative overflow-hidden rounded-xl border border-outline-variant bg-surface-container-lowest p-6 md:p-10">
+<div class="relative z-10 grid md:grid-cols-2 gap-8 items-center">
+<div>
+<div class="flex items-center gap-2 mb-4">
+<span class="bg-primary text-on-primary font-label-caps text-[10px] px-2 py-0.5 rounded">TODAY</span>
+<span class="text-tertiary font-label-caps text-label-caps">WEDNESDAY</span>
+</div>
+<h2 class="font-headline-md text-headline-md mb-2">Upper Body Flow &amp; Power</h2>
+<div class="flex gap-6 mb-8">
+<div class="flex flex-col">
+<span class="text-on-surface-variant text-xs uppercase font-label-caps">Duration</span>
+<span class="font-data-display text-data-display">65<span class="text-sm ml-1 font-body-md">min</span></span>
+</div>
+<div class="flex flex-col">
+<span class="text-on-surface-variant text-xs uppercase font-label-caps">Intensity</span>
+<span class="text-primary font-label-caps text-label-caps mt-1 px-3 py-0.5 rounded bg-primary-fixed">HIGH</span>
+</div>
+<div class="flex flex-col">
+<span class="text-on-surface-variant text-xs uppercase font-label-caps">Focus</span>
+<span class="font-body-sm text-body-sm mt-1">Hypertrophy</span>
+</div>
+</div>
+<button class="bg-primary text-on-primary px-8 py-3 rounded-full font-bold flex items-center gap-2 hover:opacity-90 transition-all active:scale-95">
+<span class="material-symbols-outlined">play_arrow</span>
+                            Start Workout
+                        </button>
+</div>
+<div class="hidden md:block">
+<div class="relative h-64 w-full rounded-xl overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover grayscale-[20%]" data-alt="High-performance minimalist gym setting with clean wooden floors and sage-colored workout equipment. Soft sunlight creates long shadows on a pristine wall. Professional, focused, and calm atmosphere reflecting an elite athletic environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9DmeYO6bCE4WdBA24W4zN3hiRaPvyhhJ-dNhUUFSYa9bX9kZ0F9lK93w62je8z20aoPU9OXqmeCIggSm75it-LlJgvTE9fo0vnN7OCBjDcC6dBr-IuO81I2iagbE7vgAuGiXLvv0MOerNS40AAbx2KXADu-a5xy6TAnTcSkeBXjWwS_cTv-saT7Bn0tQUfLjTZWQ8HwqOgCty62w5al4APSDRQ1_LMghgCPTqJWxl72E-3Gzs69NMXA">
+<div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Weekly Schedule List -->
+<section class="space-y-4">
+<h3 class="font-headline-md text-xl text-on-surface px-2">Weekly Schedule</h3>
+<div class="grid gap-3">
+<!-- Monday -->
+<div class="group flex items-center justify-between p-4 rounded-xl border border-outline-variant bg-surface hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="flex items-center gap-6">
+<div class="w-12 text-center">
+<span class="block font-label-caps text-[10px] text-tertiary">MON</span>
+<span class="block font-headline-md text-lg">14</span>
+</div>
+<div class="h-8 w-[1px] bg-outline-variant"></div>
+<div>
+<p class="font-bold text-on-surface">Lower Body Technical</p>
+<p class="text-sm text-on-surface-variant">Focus: Knee stability &amp; mobility</p>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<div class="hidden md:flex flex-col items-end">
+<span class="text-[10px] font-label-caps text-on-surface-variant uppercase">Time</span>
+<span class="font-data-display text-base">55m</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</div>
+<!-- Tuesday -->
+<div class="group flex items-center justify-between p-4 rounded-xl border border-outline-variant bg-surface hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="flex items-center gap-6">
+<div class="w-12 text-center">
+<span class="block font-label-caps text-[10px] text-tertiary">TUE</span>
+<span class="block font-headline-md text-lg">15</span>
+</div>
+<div class="h-8 w-[1px] bg-outline-variant"></div>
+<div>
+<p class="font-bold text-on-surface">Active Recovery: Zone 2</p>
+<p class="text-sm text-on-surface-variant">Light cycling or swimming</p>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<div class="hidden md:flex flex-col items-end">
+<span class="text-[10px] font-label-caps text-on-surface-variant uppercase">Time</span>
+<span class="font-data-display text-base">40m</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</div>
+<!-- Wednesday (Current) -->
+<div class="group flex items-center justify-between p-4 rounded-xl border-2 border-primary bg-primary-fixed/30 transition-colors cursor-pointer">
+<div class="flex items-center gap-6">
+<div class="w-12 text-center">
+<span class="block font-label-caps text-[10px] text-primary font-bold">WED</span>
+<span class="block font-headline-md text-lg text-primary">16</span>
+</div>
+<div class="h-8 w-[1px] bg-primary/30"></div>
+<div>
+<p class="font-bold text-on-primary-container">Upper Body Flow &amp; Power</p>
+<p class="text-sm text-on-primary-fixed-variant">Current Session</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="bg-primary text-on-primary rounded-full px-3 py-1 text-xs font-bold">ACTIVE</span>
+<span class="material-symbols-outlined text-primary">chevron_right</span>
+</div>
+</div>
+<!-- Thursday -->
+<div class="group flex items-center justify-between p-4 rounded-xl border border-outline-variant bg-surface hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="flex items-center gap-6">
+<div class="w-12 text-center">
+<span class="block font-label-caps text-[10px] text-tertiary">THU</span>
+<span class="block font-headline-md text-lg">17</span>
+</div>
+<div class="h-8 w-[1px] bg-outline-variant"></div>
+<div>
+<p class="font-bold text-on-surface">Rest &amp; Mindfulness</p>
+<p class="text-sm text-on-surface-variant">Complete recovery</p>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<div class="hidden md:flex flex-col items-end">
+<span class="text-[10px] font-label-caps text-on-surface-variant uppercase">Time</span>
+<span class="font-data-display text-base">—</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</div>
+<!-- Friday -->
+<div class="group flex items-center justify-between p-4 rounded-xl border border-outline-variant bg-surface hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="flex items-center gap-6">
+<div class="w-12 text-center">
+<span class="block font-label-caps text-[10px] text-tertiary">FRI</span>
+<span class="block font-headline-md text-lg">18</span>
+</div>
+<div class="h-8 w-[1px] bg-outline-variant"></div>
+<div>
+<p class="font-bold text-on-surface">Full Body Integrative</p>
+<p class="text-sm text-on-surface-variant">Compound movements</p>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<div class="hidden md:flex flex-col items-end">
+<span class="text-[10px] font-label-caps text-on-surface-variant uppercase">Time</span>
+<span class="font-data-display text-base">75m</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-md z-50 rounded-full backdrop-blur-xl bg-surface/70 shadow-[0_20px_40px_rgba(85,98,77,0.06)] flex justify-around items-center p-2">
+<!-- Dashboard -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary transition-colors scale-95 active:scale-90 transition-transform duration-400" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label text-xs font-medium">Dashboard</span>
+</a>
+<!-- Workouts (Active) -->
+<a class="flex flex-col items-center justify-center bg-primary text-on-primary rounded-full w-12 h-12 transition-all duration-400 scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">fitness_center</span>
+</a>
+<!-- AI Trainer -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary transition-colors scale-95 active:scale-90 transition-transform duration-400" href="#">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="font-label text-xs font-medium">AI Trainer</span>
+</a>
+<!-- Profile -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary transition-colors scale-95 active:scale-90 transition-transform duration-400" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label text-xs font-medium">Profile</span>
+</a>
+</nav>
+<!-- Micro-interaction: Hover glow effect script -->
+<script>
+        document.querySelectorAll('button, .group').forEach(el => {
+            el.addEventListener('mousedown', () => {
+                el.style.boxShadow = 'inset 0 0 12px rgba(68, 102, 74, 0.15)';
+            });
+            el.addEventListener('mouseup', () => {
+                el.style.boxShadow = 'none';
+            });
+        });
+
+        // Simple scroll observer for top bar transparency
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 10) {
+                header.classList.add('shadow-sm');
+            } else {
+                header.classList.remove('shadow-sm');
+            }
+        });
+    </script>
+
+
+</body></html>

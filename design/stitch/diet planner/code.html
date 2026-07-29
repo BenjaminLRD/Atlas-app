@@ -1,0 +1,330 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Add Food - iOS Style</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-surface-variant": "#4c4546",
+            "error": "#ba1a1a",
+            "on-error": "#ffffff",
+            "surface-dim": "#dadada",
+            "on-secondary": "#ffffff",
+            "surface-container": "#eeeeee",
+            "primary-fixed-dim": "#c6c6c6",
+            "on-tertiary-container": "#848484",
+            "on-primary-container": "#848484",
+            "inverse-on-surface": "#f1f1f1",
+            "surface-bright": "#f9f9f9",
+            "on-primary": "#ffffff",
+            "secondary-fixed": "#e3e2e7",
+            "tertiary-fixed-dim": "#c6c6c6",
+            "background": "#f9f9f9",
+            "outline-variant": "#cfc4c5",
+            "on-secondary-fixed-variant": "#46464b",
+            "secondary-container": "#e0dfe4",
+            "primary-fixed": "#e2e2e2",
+            "on-tertiary-fixed-variant": "#474747",
+            "surface-container-highest": "#e2e2e2",
+            "inverse-primary": "#c6c6c6",
+            "primary": "#000000",
+            "primary-container": "#1b1b1b",
+            "tertiary": "#000000",
+            "tertiary-container": "#1b1b1b",
+            "surface-tint": "#5e5e5e",
+            "on-secondary-fixed": "#1a1b1f",
+            "secondary-fixed-dim": "#c6c6cb",
+            "on-tertiary": "#ffffff",
+            "on-surface": "#1b1b1b",
+            "on-primary-fixed-variant": "#474747",
+            "surface-container-high": "#e8e8e8",
+            "surface-variant": "#e2e2e2",
+            "surface-container-lowest": "#ffffff",
+            "outline": "#7e7576",
+            "secondary": "#5d5e63",
+            "on-tertiary-fixed": "#1b1b1b",
+            "inverse-surface": "#303030",
+            "tertiary-fixed": "#e2e2e2",
+            "on-secondary-container": "#626267",
+            "on-error-container": "#93000a",
+            "on-primary-fixed": "#1b1b1b",
+            "surface-container-low": "#f3f3f3",
+            "on-background": "#1b1b1b",
+            "error-container": "#ffdad6",
+            "surface": "#ffffff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "column-gutter": "16px",
+            "base": "8px",
+            "stack-gap-md": "24px",
+            "container-padding-desktop": "32px",
+            "stack-gap-sm": "12px",
+            "stack-gap-lg": "40px",
+            "container-padding-mobile": "16px"
+          },
+          "fontFamily": {
+            "headline-md": ["Inter"],
+            "body-md": ["Inter"],
+            "label-sm": ["Inter"],
+            "headline-lg-mobile": ["Inter"],
+            "body-lg": ["Inter"],
+            "label-caps": ["Inter"],
+            "headline-lg": ["Inter"],
+            "display-metrics": ["Inter"]
+          },
+          "fontSize": {
+            "headline-md": ["22px", {"lineHeight": "28px", "fontWeight": "600"}],
+            "body-md": ["15px", {"lineHeight": "20px", "fontWeight": "400"}],
+            "label-sm": ["13px", {"lineHeight": "18px", "fontWeight": "500"}],
+            "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "700"}],
+            "body-lg": ["17px", {"lineHeight": "24px", "fontWeight": "400"}],
+            "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+            "headline-lg": ["34px", {"lineHeight": "41px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+            "display-metrics": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      background-color: #f2f2f7; /* iOS secondary background */
+    }
+    .ios-blur {
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .ios-shadow {
+      box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.05);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-0 md:p-8">
+<!-- iOS Style Modal Shell -->
+<div class="bg-surface w-full max-w-2xl min-h-screen md:min-h-0 md:h-[85vh] md:rounded-[40px] overflow-hidden flex flex-col relative ios-shadow bg-green-100/20">
+<!-- Top Bar (Sticky/Fixed Header) -->
+<header class="bg-surface/80 ios-blur sticky top-0 z-50 px-container-mobile py-4 flex flex-col gap-4 border-b border-outline-variant/10">
+<div class="flex items-center justify-between">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg tracking-tight">Add Food</h1>
+<button class="text-primary font-body-lg font-semibold hover:opacity-60 transition-opacity">Done</button>
+</div>
+<!-- Search Bar -->
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+<input class="w-full bg-surface-container border-none rounded-xl py-2.5 pl-10 pr-4 text-body-md focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-on-surface-variant/60 bg-green-100 bg-gradient-to-t from-green-100/50 to-yellow-400/10" placeholder="Search foods..." type="text">
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 overflow-y-auto custom-scrollbar p-container-mobile space-y-stack-gap-lg pb-32">
+<!-- Quick Add Categories -->
+<section>
+<div class="flex items-center justify-between mb-4">
+<h2 class="font-headline-md text-headline-md">Quick Add</h2>
+<button class="text-label-sm font-semibold text-on-surface-variant hover:text-primary">View All</button>
+</div>
+<div class="flex overflow-x-auto gap-4 pb-2 custom-scrollbar -mx-container-mobile px-container-mobile">
+<!-- Category Card -->
+<div class="flex-shrink-0 flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-16 h-16 rounded-2xl bg-surface-container flex items-center justify-center group-active:scale-95 transition-transform duration-200 bg-green-100 bg-gradient-to-t from-green-100/50 to-yellow-400/10">
+<span class="material-symbols-outlined text-[32px]">rice_bowl</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Rice</span>
+</div>
+<div class="flex-shrink-0 flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-16 h-16 rounded-2xl bg-surface-container flex items-center justify-center group-active:scale-95 transition-transform duration-200 bg-green-100 bg-gradient-to-t from-green-100/50 to-yellow-400/10">
+<span class="material-symbols-outlined text-[32px]">restaurant</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Chicken</span>
+</div>
+<div class="flex-shrink-0 flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-16 h-16 rounded-2xl bg-surface-container flex items-center justify-center group-active:scale-95 transition-transform duration-200 bg-green-100 bg-gradient-to-t from-green-100/50 to-yellow-400/10">
+<span class="material-symbols-outlined text-[32px]">egg</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Eggs</span>
+</div>
+<div class="flex-shrink-0 flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-16 h-16 rounded-2xl bg-surface-container flex items-center justify-center group-active:scale-95 transition-transform duration-200 bg-green-100 bg-gradient-to-t from-green-100/50 to-yellow-400/10">
+<span class="material-symbols-outlined text-[32px]">nutrition</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Fruits</span>
+</div>
+<div class="flex-shrink-0 flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-16 h-16 rounded-2xl bg-surface-container flex items-center justify-center group-active:scale-95 transition-transform duration-200 bg-green-100 bg-gradient-to-t from-green-100/50 to-yellow-400/10">
+<span class="material-symbols-outlined text-[32px]">grass</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Vegetables</span>
+</div>
+<div class="flex-shrink-0 flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-16 h-16 rounded-2xl bg-surface-container flex items-center justify-center group-active:scale-95 transition-transform duration-200 bg-green-100 bg-gradient-to-t from-green-100/50 to-yellow-400/10">
+<span class="material-symbols-outlined text-[32px]">blender</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Shakes</span>
+</div>
+</div>
+</section>
+<!-- Selection Interaction (Mocked State) -->
+<section class="bg-surface-container-low rounded-3xl p-5 border border-outline-variant/10 space-y-4 bg-green-100 bg-gradient-to-t from-green-100/50 to-yellow-400/10">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline-md text-headline-md">Greek Yogurt</h3>
+<p class="text-on-surface-variant font-body-md">Kirkland Signature, 100g</p>
+</div>
+<button class="bg-primary text-on-primary px-4 py-2 rounded-full font-label-sm font-bold active:scale-95 transition-transform">Add</button>
+</div>
+<div class="grid grid-cols-2 gap-4 py-4 border-y border-outline-variant/10">
+<div class="space-y-1">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Amount</label>
+<div class="flex items-center gap-3">
+<input class="w-20 bg-surface border-none rounded-lg text-center font-headline-md text-headline-md py-1 focus:ring-2 focus:ring-primary/20" type="text" value="150">
+<span class="font-body-lg text-on-surface-variant">g</span>
+</div>
+</div>
+<div class="flex flex-col justify-end items-end">
+<div class="text-right">
+<span class="font-display-metrics text-[32px] leading-none">88</span>
+<span class="font-label-caps text-label-caps ml-1">kcal</span>
+</div>
+</div>
+</div>
+<div class="flex justify-between items-center px-2">
+<div class="text-center">
+<div class="w-2 h-2 rounded-full bg-blue-500 mx-auto mb-1"></div>
+<p class="font-label-caps text-[10px] text-on-surface-variant">PRO</p>
+<p class="font-body-md font-bold">15g</p>
+</div>
+<div class="text-center">
+<div class="w-2 h-2 rounded-full bg-orange-400 mx-auto mb-1"></div>
+<p class="font-label-caps text-[10px] text-on-surface-variant">CARB</p>
+<p class="font-body-md font-bold">5g</p>
+</div>
+<div class="text-center">
+<div class="w-2 h-2 rounded-full bg-yellow-400 mx-auto mb-1"></div>
+<p class="font-label-caps text-[10px] text-on-surface-variant">FAT</p>
+<p class="font-body-md font-bold">0g</p>
+</div>
+</div>
+</section>
+<!-- Recent Foods -->
+<section>
+<h2 class="font-headline-md text-headline-md mb-4">Recent Foods</h2>
+<div class="bg-surface rounded-3xl overflow-hidden border border-outline-variant/10 bg-green-100/50 bg-gradient-to-t from-green-100/50 to-yellow-400/10">
+<div class="divide-y divide-outline-variant/10">
+<!-- List Item -->
+<button class="w-full flex items-center justify-between p-4 hover:bg-surface-container transition-colors text-left group">
+<div>
+<p class="font-body-lg font-semibold group-active:translate-x-1 transition-transform">Greek Yogurt</p>
+<p class="text-label-sm text-on-surface-variant">100g serving</p>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-body-md font-semibold">59 kcal</span>
+<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+</div>
+</button>
+<button class="w-full flex items-center justify-between p-4 hover:bg-surface-container transition-colors text-left group">
+<div>
+<p class="font-body-lg font-semibold group-active:translate-x-1 transition-transform">Almonds</p>
+<p class="text-label-sm text-on-surface-variant">Handful, 28g</p>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-body-md font-semibold">164 kcal</span>
+<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+</div>
+</button>
+<button class="w-full flex items-center justify-between p-4 hover:bg-surface-container transition-colors text-left group">
+<div>
+<p class="font-body-lg font-semibold group-active:translate-x-1 transition-transform">Grilled Salmon</p>
+<p class="text-label-sm text-on-surface-variant">Fillet, 150g</p>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-body-md font-semibold">312 kcal</span>
+<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+</div>
+</button>
+</div>
+</div>
+</section>
+<!-- Favorites -->
+<section>
+<div class="flex items-center justify-between mb-4">
+<h2 class="font-headline-md text-headline-md">Favorites</h2>
+<span class="material-symbols-outlined text-yellow-500" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="bg-surface p-4 rounded-3xl border border-outline-variant/10 flex items-center gap-4 hover:bg-surface-container-low cursor-pointer transition-colors bg-green-100/50 bg-gradient-to-t from-green-100/50 to-yellow-400/10">
+<div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-red-500">breakfast_dining</span>
+</div>
+<div>
+<p class="font-body-md font-bold">Morning Oats</p>
+<p class="text-label-sm text-on-surface-variant">420 kcal</p>
+</div>
+</div>
+<div class="bg-surface p-4 rounded-3xl border border-outline-variant/10 flex items-center gap-4 hover:bg-surface-container-low cursor-pointer transition-colors bg-green-100/50 bg-gradient-to-t from-green-100/50 to-yellow-400/10">
+<div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-green-600">lunch_dining</span>
+</div>
+<div>
+<p class="font-body-md font-bold">Quinoa Salad</p>
+<p class="text-label-sm text-on-surface-variant">380 kcal</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Custom Entry Fixed Button -->
+<div class="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-surface via-surface to-transparent pointer-events-none">
+<button class="pointer-events-auto w-full bg-primary-container text-on-primary-container py-4 rounded-2xl font-body-lg font-bold flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-transform">
+<span class="material-symbols-outlined">add_circle</span>
+        Add Custom Meal
+      </button>
+</div>
+</div>
+<script>
+    // Simple micro-interaction for the "Done" button to mimic iOS dismissal
+    document.querySelector('button.text-primary').addEventListener('click', () => {
+      const modal = document.querySelector('div.bg-surface');
+      modal.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+      modal.style.transform = 'translateY(100%)';
+      modal.style.opacity = '0';
+      setTimeout(() => {
+        modal.style.transform = 'translateY(0)';
+        modal.style.opacity = '1';
+        alert('Food session saved and modal "closed"');
+      }, 600);
+    });
+
+    // Real-time macro preview simulation logic
+    const amountInput = document.querySelector('input[value="150"]');
+    const kcalDisplay = document.querySelector('.font-display-metrics');
+    const proDisplay = document.querySelector('.text-center:nth-child(1) .font-body-md');
+    const carbDisplay = document.querySelector('.text-center:nth-child(2) .font-body-md');
+
+    amountInput.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value) || 0;
+      // Mock math: 88 kcal per 150g -> 0.586 kcal/g
+      kcalDisplay.textContent = Math.round(val * 0.586);
+      proDisplay.textContent = Math.round(val * 0.1) + 'g';
+      carbDisplay.textContent = Math.round(val * 0.03) + 'g';
+    });
+  </script>
+
+
+</body></html>

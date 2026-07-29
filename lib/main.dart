@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'app_theme.dart';
+import 'data/app_dependencies.dart';
 import 'data/local_storage.dart';
 import 'data/profile_provider.dart';
 import 'widgets/top_app_bar.dart';
 import 'widgets/ai_chat_button.dart';
 import 'screens/dashboard_screen.dart';
+import 'screens/diet_plan_screen.dart';
 import 'screens/workout_plan_screen.dart';
 import 'screens/profile_screen.dart';
 
@@ -14,8 +16,8 @@ import 'screens/login_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await LocalStorage.init();
-  // Initialize singleton provider
-  ProfileProvider();
+  // Initialize dependency composition root
+  AppDependencies.instance;
   runApp(const AizawlGymApp());
 }
 
@@ -27,6 +29,8 @@ class AizawlGymApp extends StatelessWidget {
     return MaterialApp(
       title: 'Aizawl Gym',
       theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system,
       debugShowCheckedModeBanner: false,
       home: LocalStorage.isLoggedIn() ? const MainShell() : const LoginScreen(),
     );
@@ -42,18 +46,20 @@ class MainShell extends StatefulWidget {
 
 class _MainShellState extends State<MainShell> {
   int _currentIndex = 0;
-  final _profileProvider = ProfileProvider();
+  final ProfileProvider _profileProvider = AppDependencies.instance.profileProvider;
 
   final List<Widget> _screens = const [
     DashboardScreen(),
+    DietPlanScreen(),
     WorkoutPlanScreen(),
     ProfileScreen(),
   ];
 
   final List<_NavItem> _navItems = const [
-    _NavItem(icon: Icons.dashboard, filledIcon: Icons.dashboard, label: 'Dashboard'),
-    _NavItem(icon: Icons.fitness_center, filledIcon: Icons.fitness_center, label: 'Workouts'),
-    _NavItem(icon: Icons.person, filledIcon: Icons.person, label: 'Profile'),
+    _NavItem(icon: Icons.dashboard_outlined, filledIcon: Icons.dashboard_rounded, label: 'Summary'),
+    _NavItem(icon: Icons.restaurant_outlined, filledIcon: Icons.restaurant_rounded, label: 'Diet Plan'),
+    _NavItem(icon: Icons.fitness_center_outlined, filledIcon: Icons.fitness_center_rounded, label: 'Workouts'),
+    _NavItem(icon: Icons.person_outline_rounded, filledIcon: Icons.person_rounded, label: 'Profile'),
   ];
 
   @override

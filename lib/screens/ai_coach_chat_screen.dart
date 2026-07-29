@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../app_theme.dart';
+import '../data/app_dependencies.dart';
 import '../data/ai_chat_service.dart';
 import '../models/chat_message.dart';
 
@@ -27,7 +28,7 @@ class _AiCoachChatScreenState extends State<AiCoachChatScreen> {
   @override
   void initState() {
     super.initState();
-    _chatService = AIChatService();
+    _chatService = AppDependencies.instance.aiChatService;
     _loadMessages();
   }
 

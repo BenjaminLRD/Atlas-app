@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../app_theme.dart';
+import '../data/app_dependencies.dart';
 import '../data/notification_service.dart';
 import '../models/notification_model.dart';
 
@@ -17,7 +18,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   @override
   void initState() {
     super.initState();
-    _notificationService = NotificationService();
+    _notificationService = AppDependencies.instance.notificationService;
     _notifications = _notificationService.getNotifications();
   }
 

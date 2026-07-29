@@ -1,0 +1,355 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Vitality - Personalized Fitness Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed-variant": "#46464b",
+                        "inverse-on-surface": "#f1f1f1",
+                        "surface-bright": "#f9f9f9",
+                        "inverse-primary": "#c6c6c6",
+                        "secondary-fixed-dim": "#c6c6cb",
+                        "outline-variant": "#cfc4c5",
+                        "on-primary-fixed-variant": "#474747",
+                        "surface": "#f9f9f9",
+                        "inverse-surface": "#303030",
+                        "surface-container": "#eeeeee",
+                        "primary": "#000000",
+                        "on-secondary-container": "#626267",
+                        "on-background": "#1b1b1b",
+                        "on-primary": "#ffffff",
+                        "primary-fixed": "#e2e2e2",
+                        "error": "#ba1a1a",
+                        "on-tertiary-container": "#848484",
+                        "tertiary": "#000000",
+                        "surface-tint": "#5e5e5e",
+                        "secondary": "#5d5e63",
+                        "surface-container-high": "#e8e8e8",
+                        "primary-container": "#1b1b1b",
+                        "on-error": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#e2e2e2",
+                        "on-tertiary-fixed-variant": "#474747",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed": "#1a1b1f",
+                        "on-primary-container": "#848484",
+                        "on-tertiary-fixed": "#1b1b1b",
+                        "on-primary-fixed": "#1b1b1b",
+                        "surface-dim": "#dadada",
+                        "tertiary-fixed-dim": "#c6c6c6",
+                        "background": "#f9f9f9",
+                        "surface-container-highest": "#e2e2e2",
+                        "on-error-container": "#93000a",
+                        "outline": "#7e7576",
+                        "tertiary-fixed": "#e2e2e2",
+                        "on-surface": "#1b1b1b",
+                        "on-surface-variant": "#4c4546",
+                        "primary-fixed-dim": "#c6c6c6",
+                        "surface-container-low": "#f3f3f3",
+                        "secondary-container": "#e0dfe4",
+                        "tertiary-container": "#1b1b1b",
+                        "secondary-fixed": "#e3e2e7",
+                        "error-container": "#ffdad6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-gap-md": "24px",
+                        "stack-gap-sm": "12px",
+                        "stack-gap-lg": "40px",
+                        "container-padding-mobile": "16px",
+                        "container-padding-desktop": "32px",
+                        "column-gutter": "16px",
+                        "base": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-metrics": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["34px", {"lineHeight": "41px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "700"}],
+                        "body-md": ["15px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-sm": ["13px", {"lineHeight": "18px", "fontWeight": "500"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-lg": ["17px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["22px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "display-metrics": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .ring-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            justify-items: center;
+            align-items: center;
+        }
+        .ring-track { fill: none; stroke-width: 12; opacity: 0.1; }
+        .ring-fill { fill: none; stroke-width: 12; stroke-linecap: round; transform: rotate(-90deg); transform-origin: center; transition: stroke-dashoffset 1s ease-out; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-background font-body-md text-on-background min-h-screen pb-24">
+<!-- Top App Bar -->
+<header class="flex flex-col pt-4 px-container-padding-mobile md:px-container-padding-desktop w-full max-w-7xl mx-auto">
+<div class="flex justify-between items-center mb-1">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="Close-up portrait of a fitness professional with a friendly smile, clean lighting, high resolution, minimalist aesthetic, in a modern health studio environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9AFTyua3LBkgP8zPvhscayOVQu3rmPeZKmb2CJXoiOs1yJcIuYEeTr0Kf2T251z4kZ6LvE1neo1x0OAZJCWPmyjCWecPpceZcAyqlUoDHxTidvnngzQBlvcF7PSXdSmewMaCopzEPIDfLVVtgxJLpUqJ1recUurcA7OFhNjL2EvyEpMeWxW26qOgERHngriyAnSSqgPk329W4RwsfVp_rWaZFGobrVLxfgsjXZvFILtp5mXFg1tkNrw">
+</div>
+<span class="font-headline-md text-headline-md text-primary">Aizawl Gym</span>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant hover:opacity-80 transition-opacity p-2 rounded-full hover:bg-surface-container-low" data-icon="notifications">notifications</button>
+</div>
+<div class="mt-4">
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest mb-1">THURSDAY, OCT 24</p>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-background">Good morning, Zothana</h1>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-container-padding-mobile md:px-container-padding-desktop mt-stack-gap-md space-y-stack-gap-md">
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-column-gutter">
+<!-- Main Action: Today's Workout -->
+<section class="md:col-span-8 bg-surface-container-lowest rounded-2xl p-6 shadow-sm flex flex-col justify-between min-h-[340px] relative overflow-hidden" style="background: linear-gradient(to top, rgba(187, 247, 208, 0.5), rgba(250, 204, 21, 0.1));">
+<div class="absolute top-0 right-0 w-64 h-64 opacity-10 pointer-events-none">
+
+</div>
+<div class="relative z-10">
+<div class="inline-flex items-center bg-primary text-on-primary px-3 py-1 rounded-full text-xs font-bold mb-4" style="background: linear-gradient(135deg, rgba(163, 230, 53, 0.6), rgba(250, 204, 21, 0.4)); color: rgb(27, 27, 27);">
+                        ACTIVE
+                    </div>
+<p class="text-on-surface-variant font-medium mb-2">Today's Protocol</p>
+<h2 class="font-display-metrics text-[32px] md:text-[40px] leading-tight mb-6">Leg Day - Hypertrophy</h2>
+<div class="flex gap-stack-gap-md mb-8">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-primary" data-icon="schedule">schedule</span>
+<span class="font-semibold">45 mins</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-primary" data-icon="local_fire_department">local_fire_department</span>
+<span class="font-semibold">320 kcal</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col sm:flex-row gap-4 relative z-10">
+<button class="bg-primary text-on-primary font-bold py-4 px-8 rounded-full flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all w-full sm:w-auto">
+                        Start Workout
+                        <span class="material-symbols-outlined text-xl" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+<button class="bg-surface-container-high text-on-surface font-semibold py-4 px-8 rounded-full hover:bg-surface-container-highest transition-colors w-full sm:w-auto">
+                        View Plan
+                    </button>
+</div>
+</section>
+<!-- Activity Rings Widget -->
+<section class="md:col-span-4 bg-surface-container-lowest rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center min-h-[340px]" style="background: linear-gradient(135deg, rgba(163, 230, 53, 0.15), rgba(250, 204, 21, 0.1));">
+<h3 class="font-headline-md text-headline-md text-center mb-6">Daily Activity</h3>
+<div class="relative ring-container w-48 h-48">
+<!-- Concentric Rings (Simplified SVG for clarity) -->
+<svg class="w-full h-full" viewBox="0 0 140 140">
+<!-- Outermost: Streak (Green) -->
+<circle class="ring-track" cx="70" cy="70" r="55" stroke="#4ade80"></circle>
+<circle class="ring-fill" cx="70" cy="70" r="55" stroke="#4ade80" stroke-dasharray="345.5" stroke-dashoffset="69.1"></circle>
+<!-- Middle: Calories (Red) -->
+<circle class="ring-track" cx="70" cy="70" r="41" stroke="#f87171"></circle>
+<circle class="ring-fill" cx="70" cy="70" r="41" stroke="#f87171" stroke-dasharray="257.6" stroke-dashoffset="51.5"></circle>
+<!-- Innermost: Protein (Blue) -->
+<circle class="ring-track" cx="70" cy="70" r="27" stroke="#60a5fa"></circle>
+<circle class="ring-fill" cx="70" cy="70" r="27" stroke="#60a5fa" stroke-dasharray="169.6" stroke-dashoffset="33.9"></circle>
+</svg>
+<div class="absolute flex flex-col items-center">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="bolt">bolt</span>
+</div>
+</div>
+<div class="grid grid-cols-3 w-full mt-6 gap-2">
+<div class="text-center">
+<div class="w-2 h-2 rounded-full bg-[#4ade80] mx-auto mb-1"></div>
+<p class="text-[10px] font-bold text-on-surface-variant">STREAK</p>
+</div>
+<div class="text-center">
+<div class="w-2 h-2 rounded-full bg-[#f87171] mx-auto mb-1"></div>
+<p class="text-[10px] font-bold text-on-surface-variant">CALORIES</p>
+</div>
+<div class="text-center">
+<div class="w-2 h-2 rounded-full bg-[#60a5fa] mx-auto mb-1"></div>
+<p class="text-[10px] font-bold text-on-surface-variant">PROTEIN</p>
+</div>
+</div>
+</section>
+<!-- AI Coach Report -->
+<section class="md:col-span-12 bg-surface-container rounded-2xl p-6 relative overflow-hidden" style="background: linear-gradient(135deg, rgba(163, 230, 53, 0.2), rgba(250, 204, 21, 0.15));">
+<div class="flex items-center gap-4 mb-4">
+<div class="bg-surface-container-lowest p-2 rounded-xl">
+<span class="material-symbols-outlined text-primary" data-icon="smart_toy">smart_toy</span>
+</div>
+<h3 class="font-headline-md text-headline-md">Daily Insight</h3>
+</div>
+<blockquote class="italic font-body-lg text-on-surface leading-relaxed max-w-3xl">
+                    "Recovery metrics look optimal today. Focus on controlled eccentrics during your squats to maximize tension and drive hypertrophy. Your nervous system is primed for a heavy session."
+                </blockquote>
+<div class="absolute bottom-4 right-6 text-on-surface-variant">
+<span class="material-symbols-outlined text-xl" data-icon="chat_bubble_outline">chat_bubble_outline</span>
+</div>
+</section>
+<!-- Health Metric Cards -->
+<section class="md:col-span-4 bg-surface-container-lowest rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow" style="background: linear-gradient(to top, rgba(187, 247, 208, 0.5), rgba(250, 204, 21, 0.1));">
+<div class="flex justify-between items-start mb-4">
+<div class="bg-error-container/20 p-2 rounded-xl text-error">
+<span class="material-symbols-outlined" data-icon="monitor_weight">monitor_weight</span>
+</div>
+<span class="text-error font-bold text-label-sm">-0.4 kg</span>
+</div>
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-1">CURRENT WEIGHT</p>
+<div class="flex items-baseline gap-1">
+<span class="font-display-metrics text-[32px]">68.2</span>
+<span class="text-on-surface-variant font-medium">kg</span>
+</div>
+</section>
+<section class="md:col-span-4 bg-surface-container-lowest rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow" style="background: linear-gradient(to top, rgba(187, 247, 208, 0.5), rgba(250, 204, 21, 0.1));">
+<div class="flex justify-between items-start mb-4">
+<div class="bg-secondary-container p-2 rounded-xl text-on-secondary-container">
+<span class="material-symbols-outlined" data-icon="footprint">footprint</span>
+</div>
+<span class="text-on-surface-variant font-bold text-label-sm">72%</span>
+</div>
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-1">DAILY STEPS</p>
+<div class="flex items-baseline gap-1">
+<span class="font-display-metrics text-[32px]">7,248</span>
+<span class="text-on-surface-variant font-medium">/ 10k</span>
+</div>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full mt-4">
+<div class="bg-primary h-full rounded-full w-[72%]"></div>
+</div>
+</section>
+<section class="md:col-span-4 bg-surface-container-lowest rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow" style="background: linear-gradient(to top, rgba(187, 247, 208, 0.5), rgba(250, 204, 21, 0.1));">
+<div class="flex justify-between items-start mb-4">
+<div class="bg-primary-fixed p-2 rounded-xl text-on-primary-fixed">
+<span class="material-symbols-outlined" data-icon="opacity">opacity</span>
+</div>
+<button class="material-symbols-outlined text-primary" data-icon="add_circle" style="font-variation-settings: 'FILL' 1;">add_circle</button>
+</div>
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-1">HYDRATION</p>
+<div class="flex items-baseline gap-1">
+<span class="font-display-metrics text-[32px]">1.8</span>
+<span class="text-on-surface-variant font-medium">L</span>
+</div>
+</section>
+<!-- Performance Trend Chart -->
+<section class="md:col-span-12 bg-surface-container-lowest rounded-2xl p-8 shadow-sm" style="background: linear-gradient(to top, rgba(187, 247, 208, 0.5), rgba(250, 204, 21, 0.1));">
+<div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+<div>
+<h3 class="font-headline-md text-headline-md">Performance Trend</h3>
+<p class="text-on-surface-variant">Last 7 days relative intensity</p>
+</div>
+<div class="bg-secondary-container px-4 py-2 rounded-full inline-flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="trending_up">trending_up</span>
+<span class="font-bold text-label-sm">12% this week</span>
+</div>
+</div>
+<div class="h-64 flex items-end justify-between gap-2 md:gap-4 px-2">
+<!-- Dynamic Bars -->
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full bg-surface-container-high rounded-t-xl h-[40%] group-hover:bg-primary transition-colors" style="transition: height 1s cubic-bezier(0.34, 1.56, 0.64, 1);"></div>
+<span class="text-[10px] font-bold text-on-surface-variant">MON</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full bg-surface-container-high rounded-t-xl h-[55%] group-hover:bg-primary transition-colors" style="transition: height 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s;"></div>
+<span class="text-[10px] font-bold text-on-surface-variant">TUE</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group relative">
+<div class="absolute -top-12 left-1/2 -translate-x-1/2 bg-primary text-on-primary text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity" style="transition: height 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s;">78%</div>
+<div class="w-full bg-primary rounded-t-xl h-[78%]" style="transition: height 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s;"></div>
+<span class="text-[10px] font-bold text-primary">WED</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full bg-surface-container-high rounded-t-xl h-[30%] group-hover:bg-primary transition-colors" style="transition: height 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s;"></div>
+<span class="text-[10px] font-bold text-on-surface-variant">THU</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full bg-surface-container-high rounded-t-xl h-[65%] group-hover:bg-primary transition-colors" style="transition: height 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s;"></div>
+<span class="text-[10px] font-bold text-on-surface-variant">FRI</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full bg-surface-container-high rounded-t-xl h-[85%] group-hover:bg-primary transition-colors" style="transition: height 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s;"></div>
+<span class="text-[10px] font-bold text-on-surface-variant">SAT</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full bg-surface-container-high rounded-t-xl h-[92%] group-hover:bg-primary transition-colors" style="transition: height 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.7s;"></div>
+<span class="text-[10px] font-bold text-on-surface-variant">SUN</span>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Bottom Navigation Bar (Mobile Anchor) -->
+<nav class="fixed bottom-0 left-0 right-0 flex justify-around items-center h-16 px-4 pb-safe bg-white/80 backdrop-blur-md shadow-lg rounded-t-xl z-50 md:hidden">
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim bg-secondary-container dark:bg-secondary-container rounded-full px-4 py-1" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-sm text-label-sm">Summary</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors px-2 py-1" href="#">
+<span class="material-symbols-outlined" data-icon="restaurant">restaurant</span>
+<span class="font-label-sm text-label-sm">Diet Plan</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors px-2 py-1" href="#">
+<span class="material-symbols-outlined" data-icon="fitness_center">fitness_center</span>
+<span class="font-label-sm text-label-sm">Activity</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors px-2 py-1" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+</nav>
+<!-- Floating Action Button for AI (Desktop Contextual) -->
+<div class="hidden md:block fixed bottom-8 right-8">
+<button class="w-16 h-16 bg-primary text-on-primary rounded-full flex items-center justify-center shadow-xl hover:scale-105 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-3xl" data-icon="smart_toy">smart_toy</span>
+</button>
+</div>
+<script>
+        // Micro-interactions for bars and rings
+        document.addEventListener('DOMContentLoaded', () => {
+            const bars = document.querySelectorAll('.group div');
+            bars.forEach((bar, index) => {
+                const height = bar.style.height;
+                bar.style.height = '0';
+                setTimeout(() => {
+                    bar.style.transition = `height 1s cubic-bezier(0.34, 1.56, 0.64, 1) ${index * 0.1}s`;
+                    bar.style.height = height;
+                }, 100);
+            });
+        });
+    </script>
+
+
+</body></html>

@@ -35,4 +35,9 @@ class WorkoutService {
   Future<void> saveWorkoutCompletion(WorkoutHistory entry) async {
     await _repository.saveWorkoutCompletion(entry);
   }
+
+  /// Alias for saving workout completion to history
+  Future<void> addHistory(WorkoutHistory entry) async {
+    await saveWorkoutCompletion(entry);
+  }
 }

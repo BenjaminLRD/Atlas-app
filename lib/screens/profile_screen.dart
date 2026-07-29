@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'edit_profile_screen.dart';
 import '../app_theme.dart';
+import '../data/app_dependencies.dart';
 import '../data/profile_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -77,7 +78,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _provider = ProfileProvider();
+    _provider = AppDependencies.instance.profileProvider;
     _provider.addListener(_onProfileChanged);
   }
 

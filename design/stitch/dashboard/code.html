@@ -1,0 +1,301 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Zenith Athletics | Dashboard</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@600;700&amp;family=Inter:wght@400;500&amp;family=JetBrains+Mono:wght@500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@100..900&amp;family=Inter:wght@100..900&amp;family=JetBrains+Mono:wght@100..900&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-container": "#f6d9d9",
+                    "error-container": "#ffdad6",
+                    "on-background": "#191c1b",
+                    "on-tertiary": "#ffffff",
+                    "surface-container": "#eceeec",
+                    "on-primary-fixed-variant": "#2d4e33",
+                    "tertiary": "#506352",
+                    "on-secondary-container": "#735d5e",
+                    "secondary-fixed": "#f9dcdc",
+                    "primary": "#44664a",
+                    "tertiary-container": "#869a87",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-fixed": "#0e1f12",
+                    "secondary-fixed-dim": "#dcc0c0",
+                    "on-secondary": "#ffffff",
+                    "on-surface": "#191c1b",
+                    "surface-container-low": "#f2f4f2",
+                    "inverse-surface": "#2e3130",
+                    "surface-dim": "#d8dad9",
+                    "tertiary-fixed": "#d3e8d2",
+                    "surface-container-high": "#e6e9e7",
+                    "on-primary-container": "#13341c",
+                    "secondary": "#6f5959",
+                    "on-surface-variant": "#424842",
+                    "surface-variant": "#e1e3e1",
+                    "tertiary-fixed-dim": "#b7ccb7",
+                    "on-secondary-fixed": "#271718",
+                    "surface-container-lowest": "#ffffff",
+                    "surface": "#f8faf8",
+                    "outline": "#727971",
+                    "on-tertiary-container": "#203223",
+                    "on-primary-fixed": "#00210b",
+                    "on-error": "#ffffff",
+                    "primary-fixed": "#c6ecc8",
+                    "on-error-container": "#93000a",
+                    "on-secondary-fixed-variant": "#564242",
+                    "primary-fixed-dim": "#aad0ad",
+                    "error": "#ba1a1a",
+                    "surface-bright": "#f8faf8",
+                    "surface-tint": "#44664a",
+                    "surface-container-highest": "#e1e3e1",
+                    "background": "#f8faf8",
+                    "inverse-primary": "#aad0ad",
+                    "inverse-on-surface": "#eff1ef",
+                    "primary-container": "#7a9e7e",
+                    "outline-variant": "#c2c8bf",
+                    "on-tertiary-fixed-variant": "#394b3b"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "20px",
+                    "stack-md": "24px",
+                    "margin-desktop": "64px",
+                    "stack-xs": "8px",
+                    "gutter": "16px",
+                    "unit": "4px",
+                    "stack-lg": "48px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Hanken Grotesk"],
+                    "label-caps": ["JetBrains Mono"],
+                    "body-md": ["Inter"],
+                    "headline-lg-mobile": ["Hanken Grotesk"],
+                    "headline-lg": ["Hanken Grotesk"],
+                    "data-display": ["JetBrains Mono"],
+                    "body-sm": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["32px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "data-display": ["20px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .active-nav-glow {
+            box-shadow: inset 0 0 10px rgba(68, 102, 74, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 backdrop-blur-xl bg-surface/70 flex justify-between items-center px-6 h-16 w-full">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional, soft-lit headshot of a healthy-looking young woman with a serene expression, set against a blurred minimalist studio background. The lighting is bright and clean, reflecting the Zenith Athletics high-performance minimalism aesthetic with soft sage and white tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBaR8nda7Fb1_7WRb97ZucE7L4_8pETytZ12fxSduG2Y2VBCgHp5OqXMgCY9hGYWkARnk1oOVYltus3VPwokB30Zs6hp8NOjpVlo_rieHJvxFTppaWTIYPMy4uao6fNBuBxlJ2s_ZWDngXyzZUeel8fHOnzfkM6BUvlBiXhj7OD1ND9Hrv8HU8kCrYkEUP89w2Eel0MdF-6KtuAFTozrHY6BSA97WiGfch7yzilLzKFbgx_3CPn0CSZpQCpB9olGoG5EtwTP61lnD2Ga0Q">
+</div>
+<h1 class="font-headline-md text-headline-md tracking-tight text-primary">Aizawl Gym</h1>
+</div>
+<button class="text-on-surface-variant hover:opacity-80 transition-opacity p-2">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</header>
+<main class="pt-24 pb-32 px-margin-mobile md:px-margin-desktop max-w-7xl mx-auto">
+<!-- Greeting Section -->
+<section class="mb-stack-md">
+<p class="font-label-caps text-label-caps text-tertiary uppercase mb-1">Thursday, Oct 24</p>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface">Good morning, Zothana</h2>
+</section>
+<!-- Daily Goal Bento Layout -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Main Workout Card -->
+<div class="md:col-span-8 bg-surface-container-lowest rounded-xl border border-outline-variant/30 p-6 flex flex-col justify-between min-h-[240px] relative overflow-hidden group" style="transform: perspective(1000px) rotateX(0deg) rotateY(0deg);">
+<div class="relative z-10">
+<div class="flex items-center gap-2 mb-4">
+<span class="bg-primary text-on-primary font-label-caps text-[10px] px-2 py-1 rounded-full uppercase tracking-widest">Active Goal</span>
+<span class="text-on-surface-variant font-body-sm text-body-sm">Today's Protocol</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2">Leg Day - Hypertrophy</h3>
+<div class="flex gap-4 mt-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="schedule">schedule</span>
+<span class="font-data-display text-data-display text-primary">45 mins</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary" data-icon="local_fire_department">local_fire_department</span>
+<span class="font-data-display text-data-display text-tertiary">320 kcal</span>
+</div>
+</div>
+</div>
+<div class="mt-6 flex gap-3 relative z-10">
+<button class="bg-primary text-on-primary font-body-md text-body-md px-6 py-3 rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2">
+                        Start Workout <span class="material-symbols-outlined text-sm" data-icon="play_arrow">play_arrow</span>
+</button>
+<button class="bg-secondary-container text-on-secondary-container font-body-md text-body-md px-6 py-3 rounded-lg hover:opacity-90 transition-opacity">
+                        View Plan
+                    </button>
+</div>
+<!-- Abstract decorative background shape -->
+<div class="absolute -right-16 -top-16 w-64 h-64 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-colors duration-700"></div>
+</div>
+<!-- AI Trainer Suggestion -->
+<div class="md:col-span-4 bg-surface-container rounded-xl p-6 flex flex-col backdrop-blur-xl border border-outline-variant/20 relative overflow-hidden">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-8 h-8 rounded-full bg-gradient-to-tr from-primary to-tertiary-container animate-pulse p-[2px]">
+<div class="w-full h-full bg-surface-container rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="smart_toy">smart_toy</span>
+</div>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Daily Report</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface italic leading-relaxed">
+                    "Recovery metrics look optimal today. Focus on controlled eccentrics during your squats to maximize tension."
+                </p>
+<div class="mt-auto pt-4 flex justify-end">
+<span class="material-symbols-outlined text-outline" data-icon="chat_bubble">chat_bubble</span>
+</div>
+</div>
+<!-- Mini Cards Grid -->
+<div class="md:col-span-12 grid grid-cols-1 sm:grid-cols-3 gap-gutter mt-stack-xs">
+<!-- Weight Card -->
+<div class="bg-surface-container-lowest border border-outline-variant/30 p-5 rounded-xl flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-secondary-container rounded-lg">
+<span class="material-symbols-outlined text-secondary" data-icon="monitor_weight">monitor_weight</span>
+</div>
+<span class="font-label-caps text-label-caps text-error">-0.4 kg</span>
+</div>
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Current Weight</p>
+<p class="font-data-display text-data-display text-on-surface">68.2 <span class="text-sm font-normal text-outline">kg</span></p>
+</div>
+</div>
+<!-- Steps Card -->
+<div class="bg-surface-container-lowest border border-outline-variant/30 p-5 rounded-xl flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-primary-fixed rounded-lg">
+<span class="material-symbols-outlined text-primary" data-icon="steps">steps</span>
+</div>
+<span class="font-label-caps text-label-caps text-primary">72%</span>
+</div>
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Daily Steps</p>
+<p class="font-data-display text-data-display text-on-surface">7,248 <span class="text-sm font-normal text-outline">/ 10k</span></p>
+</div>
+<div class="w-full h-1.5 bg-surface-variant rounded-full mt-3">
+<div class="h-full bg-primary rounded-full" style="width: 72%"></div>
+</div>
+</div>
+<!-- Water Card -->
+<div class="bg-surface-container-lowest border border-outline-variant/30 p-5 rounded-xl flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-tertiary-fixed rounded-lg">
+<span class="material-symbols-outlined text-tertiary" data-icon="water_drop">water_drop</span>
+</div>
+<button class="text-primary hover:scale-110 transition-transform">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+</button>
+</div>
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Hydration</p>
+<p class="font-data-display text-data-display text-on-surface">1.8 <span class="text-sm font-normal text-outline">L</span></p>
+</div>
+</div>
+</div>
+</div>
+<!-- Secondary Section: Performance Overview -->
+<section class="mt-stack-lg">
+<h4 class="font-headline-md text-headline-md text-on-surface mb-gutter">Performance Trend</h4>
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-6 h-64 flex items-center justify-center relative">
+<!-- Placeholder for actual chart -->
+<div class="absolute inset-0 flex items-end justify-around px-8 pb-12 opacity-30">
+<div class="w-12 bg-primary-container rounded-t-lg transition-all hover:h-40" style="height: 30%"></div>
+<div class="w-12 bg-primary-container rounded-t-lg" style="height: 45%"></div>
+<div class="w-12 bg-primary-container rounded-t-lg" style="height: 38%"></div>
+<div class="w-12 bg-primary-container rounded-t-lg" style="height: 60%"></div>
+<div class="w-12 bg-primary-container rounded-t-lg" style="height: 52%"></div>
+<div class="w-12 bg-primary-container rounded-t-lg" style="height: 75%"></div>
+<div class="w-12 bg-primary-container rounded-t-lg" style="height: 85%"></div>
+</div>
+<div class="relative z-10 text-center">
+<p class="font-body-md text-body-md text-outline">Focus and Consistency metrics are up 12% this week.</p>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-md z-50 rounded-full backdrop-blur-xl bg-surface/70 shadow-[0_20px_40px_rgba(85,98,77,0.06)] flex justify-around items-center p-2">
+<!-- Dashboard (Active) -->
+<a class="flex flex-col items-center justify-center bg-primary text-on-primary rounded-full w-12 h-12 transition-all duration-400 active-nav-glow scale-100" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard" style="font-variation-settings: &quot;FILL&quot; 1;">dashboard</span>
+</a>
+<!-- Workouts -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary transition-colors transition-transform scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="fitness_center">fitness_center</span>
+<span class="font-label text-xs font-medium">Workouts</span>
+</a>
+<!-- AI Trainer -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary transition-colors transition-transform scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+<span class="font-label text-xs font-medium">AI Trainer</span>
+</a>
+<!-- Profile -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary transition-colors transition-transform scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label text-xs font-medium">Profile</span>
+</a>
+</nav>
+<script>
+        // Micro-interactions for hydration button
+        const addWaterBtn = document.querySelector('[data-icon="add_circle"]').parentElement;
+        addWaterBtn.addEventListener('click', () => {
+            const waterVal = document.querySelector('.text-tertiary + div p');
+            // This is just a UI feedback mock
+            addWaterBtn.classList.add('scale-125', 'text-tertiary-container');
+            setTimeout(() => addWaterBtn.classList.remove('scale-125', 'text-tertiary-container'), 200);
+        });
+
+        // Simple parallax effect for the workout card
+        const workoutCard = document.querySelector('.group');
+        workoutCard.addEventListener('mousemove', (e) => {
+            const rect = workoutCard.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const moveX = (x - centerX) / 25;
+            const moveY = (y - centerY) / 25;
+            workoutCard.style.transform = `perspective(1000px) rotateX(${-moveY}deg) rotateY(${moveX}deg)`;
+        });
+        workoutCard.addEventListener('mouseleave', () => {
+            workoutCard.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
+        });
+    </script>
+
+
+</body></html>
