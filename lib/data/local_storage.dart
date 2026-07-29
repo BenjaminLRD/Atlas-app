@@ -1,6 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../models/user_profile.dart';
+import '../models/notification_model.dart';
+import '../models/chat_message.dart';
+import '../models/active_workout_session.dart';
 import '../models/workout_history.dart';
 
 class LocalStorage {
@@ -54,11 +58,12 @@ class LocalStorage {
   }
 
   // --- Workout Session ---
-  static Map<String, dynamic>? getActiveSession() {
+  static ActiveWorkoutSession? getActiveSession() {
     final str = _prefs?.getString('active_workout_session');
     if (str != null) {
       try {
-        return jsonDecode(str) as Map<String, dynamic>;
+        final decoded = jsonDecode(str) as Map<String, dynamic>;
+        return ActiveWorkoutSession.fromJson(decoded);
       } catch (_) {
         return null;
       }
@@ -66,8 +71,12 @@ class LocalStorage {
     return null;
   }
 
-  static Future<void> saveActiveSession(Map<String, dynamic> session) async {
-    await _prefs?.setString('active_workout_session', jsonEncode(session));
+  static Future<void> saveActiveSession(dynamic session) async {
+    if (session is ActiveWorkoutSession) {
+      await _prefs?.setString('active_workout_session', jsonEncode(session.toJson()));
+    } else if (session is Map<String, dynamic>) {
+      await _prefs?.setString('active_workout_session', jsonEncode(session));
+    }
   }
 
   static Future<void> clearActiveSession() async {
@@ -112,11 +121,12 @@ class LocalStorage {
   }
 
   // --- UI User Profile ---
-  static Map<String, dynamic> getUserProfile() {
+  static UserProfile getUserProfile() {
     final str = _prefs?.getString('user_profile');
     if (str != null) {
       try {
-        return jsonDecode(str) as Map<String, dynamic>;
+        final decoded = jsonDecode(str) as Map<String, dynamic>;
+        return UserProfile.fromJson(decoded);
       } catch (_) {
         return _getDefaultProfile();
       }
@@ -124,40 +134,27 @@ class LocalStorage {
     return _getDefaultProfile();
   }
 
-  static Future<void> saveUserProfile(Map<String, dynamic> profile) async {
-    await _prefs?.setString('user_profile', jsonEncode(profile));
+  static Future<void> saveUserProfile(dynamic profile) async {
+    if (profile is UserProfile) {
+      await _prefs?.setString('user_profile', jsonEncode(profile.toJson()));
+    } else if (profile is Map<String, dynamic>) {
+      await _prefs?.setString('user_profile', jsonEncode(profile));
+    }
   }
 
-  static Map<String, dynamic> _getDefaultProfile() {
-    return {
-      'name': 'Zothanmawia',
-      'email': 'zothana@aizawlgym.com',
-      'phone': '9876543210',
-      'dob': '1995-10-15',
-      'gender': 'Male',
-      'height': '175',
-      'weight': '68.2',
-      'fitnessGoal': 'Build Muscle',
-      'workoutExperience': 'Intermediate',
-      'preferredDays': ['Monday', 'Wednesday', 'Friday'],
-      'dietPreference': 'High Protein',
-      'massUnit': 'kg',
-      'lengthUnit': 'cm',
-      'subscription': 'Free',
-      'password': 'password123',
-      'privacy': 'Friends Only',
-      'notificationsEnabled': true,
-      'profilePic': '', // no default image — falls back to icon
-    };
+  static UserProfile _getDefaultProfile() {
+    return UserProfile.defaultProfile();
   }
 
-  // --- Notifications Model ---
-  static List<Map<String, dynamic>> getNotifications() {
+  // --- Notifications ---
+  static List<NotificationModel> getNotificationModels() {
     final str = _prefs?.getString('notifications_list');
     if (str != null) {
       try {
         final List<dynamic> decoded = jsonDecode(str);
-        return decoded.map((e) => Map<String, dynamic>.from(e)).toList();
+        return decoded
+            .map((e) => NotificationModel.fromJson(Map<String, dynamic>.from(e)))
+            .toList();
       } catch (_) {
         return _getDefaultNotifications();
       }
@@ -165,64 +162,80 @@ class LocalStorage {
     return _getDefaultNotifications();
   }
 
-  static Future<void> saveNotifications(List<Map<String, dynamic>> list) async {
-    await _prefs?.setString('notifications_list', jsonEncode(list));
+  static List<Map<String, dynamic>> getNotifications() {
+    return getNotificationModels().map((e) => e.toJson()).toList();
   }
 
-  static List<Map<String, dynamic>> _getDefaultNotifications() {
+  static Future<void> saveNotifications(dynamic list) async {
+    if (list is List<NotificationModel>) {
+      final jsonList = list.map((e) => e.toJson()).toList();
+      await _prefs?.setString('notifications_list', jsonEncode(jsonList));
+    } else if (list is List) {
+      final jsonList = list.map((e) {
+        if (e is NotificationModel) return e.toJson();
+        if (e is Map<String, dynamic>) return e;
+        return NotificationModel.fromJson(Map<String, dynamic>.from(e as Map)).toJson();
+      }).toList();
+      await _prefs?.setString('notifications_list', jsonEncode(jsonList));
+    }
+  }
+
+  static List<NotificationModel> _getDefaultNotifications() {
     return [
-      {
-        'id': '1',
-        'title': 'Workout Reminder',
-        'body': 'Your Wednesday leg workout protocol begins in 30 minutes! Get ready.',
-        'timestamp': '10 mins ago',
-        'isRead': false,
-      },
-      {
-        'id': '2',
-        'title': 'Protein Goal Reached',
-        'body': 'Impressive! You just reached your target consumption profile of 140g today.',
-        'timestamp': '2 hours ago',
-        'isRead': false,
-      },
-      {
-        'id': '3',
-        'title': 'Weekly Progress Report',
-        'body': 'Consistency score increased by 12%! Your analytics chart has been generated.',
-        'timestamp': '1 day ago',
-        'isRead': false,
-      },
-      {
-        'id': '4',
-        'title': 'New Workout Generated',
-        'body': 'AI Coach suggested a mobility block replacement for Goblet Squats.',
-        'timestamp': '2 days ago',
-        'isRead': true,
-      },
-      {
-        'id': '5',
-        'title': 'Subscription Renewal',
-        'body': 'Your Pro plan will renew automatically on July 15th.',
-        'timestamp': '4 days ago',
-        'isRead': true,
-      },
-      {
-        'id': '6',
-        'title': 'Personal Best Achieved',
-        'body': 'High intensity volume squat record unlocked: 120kg!',
-        'timestamp': '1 week ago',
-        'isRead': true,
-      },
+      NotificationModel(
+        id: '1',
+        title: 'Workout Reminder',
+        body: 'Your Wednesday leg workout protocol begins in 30 minutes! Get ready.',
+        timestamp: '10 mins ago',
+        isRead: false,
+      ),
+      NotificationModel(
+        id: '2',
+        title: 'Protein Goal Reached',
+        body: 'Impressive! You just reached your target consumption profile of 140g today.',
+        timestamp: '2 hours ago',
+        isRead: false,
+      ),
+      NotificationModel(
+        id: '3',
+        title: 'Weekly Progress Report',
+        body: 'Consistency score increased by 12%! Your analytics chart has been generated.',
+        timestamp: '1 day ago',
+        isRead: false,
+      ),
+      NotificationModel(
+        id: '4',
+        title: 'New Workout Generated',
+        body: 'AI Coach suggested a mobility block replacement for Goblet Squats.',
+        timestamp: '2 days ago',
+        isRead: true,
+      ),
+      NotificationModel(
+        id: '5',
+        title: 'Subscription Renewal',
+        body: 'Your Pro plan will renew automatically on July 15th.',
+        timestamp: '4 days ago',
+        isRead: true,
+      ),
+      NotificationModel(
+        id: '6',
+        title: 'Personal Best Achieved',
+        body: 'High intensity volume squat record unlocked: 120kg!',
+        timestamp: '1 week ago',
+        isRead: true,
+      ),
     ];
   }
 
   // --- AI Chat History ---
-  static List<Map<String, dynamic>> getChatHistory() {
+  static List<ChatMessage> getChatHistoryModels() {
     final str = _prefs?.getString('chat_history');
     if (str != null) {
       try {
         final List<dynamic> decoded = jsonDecode(str);
-        return decoded.map((e) => Map<String, dynamic>.from(e)).toList();
+        return decoded
+            .map((e) => ChatMessage.fromJson(Map<String, dynamic>.from(e)))
+            .toList();
       } catch (_) {
         return _getDefaultChat();
       }
@@ -230,30 +243,44 @@ class LocalStorage {
     return _getDefaultChat();
   }
 
-  static Future<void> saveChatHistory(List<Map<String, dynamic>> history) async {
-    await _prefs?.setString('chat_history', jsonEncode(history));
+  static List<Map<String, dynamic>> getChatHistory() {
+    return getChatHistoryModels().map((e) => e.toJson()).toList();
   }
 
-  static List<Map<String, dynamic>> _getDefaultChat() {
+  static Future<void> saveChatHistory(dynamic history) async {
+    if (history is List<ChatMessage>) {
+      final jsonList = history.map((e) => e.toJson()).toList();
+      await _prefs?.setString('chat_history', jsonEncode(jsonList));
+    } else if (history is List) {
+      final jsonList = history.map((e) {
+        if (e is ChatMessage) return e.toJson();
+        if (e is Map<String, dynamic>) return e;
+        return ChatMessage.fromJson(Map<String, dynamic>.from(e as Map)).toJson();
+      }).toList();
+      await _prefs?.setString('chat_history', jsonEncode(jsonList));
+    }
+  }
+
+  static List<ChatMessage> _getDefaultChat() {
     return [
-      {
-        'sender': 'bot',
-        'text': "I've reviewed your biometric data from yesterday's recovery cycle. Your heart rate variability is up by 8%, suggesting you're ready for a higher-intensity session today.",
-        'tags': ['High Intensity Recommended', 'Restorative Focus']
-      },
-      {
-        'sender': 'user',
-        'text': "Thanks, Coach. I'm feeling a bit tight in my hip flexors after sitting all day. Should I adjust the warmup?"
-      },
-      {
-        'sender': 'bot',
-        'text': 'Absolutely. Let\'s integrate 5 minutes of "90/90 Hip Switches" and "Pigeon Pose" into your session. Precision in mobility prevents injury in performance.',
-        'routineCard': true
-      },
-      {
-        'sender': 'bot',
-        'text': "Also, don't forget your post-workout hydration. Since today's session is more intense, aim for 20g of clean protein within 45 minutes of finishing to maximize muscle protein synthesis."
-      }
+      ChatMessage(
+        sender: 'bot',
+        text: "I've reviewed your biometric data from yesterday's recovery cycle. Your heart rate variability is up by 8%, suggesting you're ready for a higher-intensity session today.",
+        tags: ['High Intensity Recommended', 'Restorative Focus'],
+      ),
+      ChatMessage(
+        sender: 'user',
+        text: "Thanks, Coach. I'm feeling a bit tight in my hip flexors after sitting all day. Should I adjust the warmup?",
+      ),
+      ChatMessage(
+        sender: 'bot',
+        text: 'Absolutely. Let\'s integrate 5 minutes of "90/90 Hip Switches" and "Pigeon Pose" into your session. Precision in mobility prevents injury in performance.',
+        routineCard: true,
+      ),
+      ChatMessage(
+        sender: 'bot',
+        text: "Also, don't forget your post-workout hydration. Since today's session is more intense, aim for 20g of clean protein within 45 minutes of finishing to maximize muscle protein synthesis.",
+      ),
     ];
   }
 }

@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../app_theme.dart';
 import '../data/local_storage.dart';
+import '../data/profile_provider.dart';
 import '../main.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -67,37 +68,29 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     }
   }
 
-  int _calculateAge(DateTime birthDate) {
-    DateTime today = DateTime.now();
-    int age = today.year - birthDate.year;
-    if (today.month < birthDate.month ||
-        (today.month == birthDate.month && today.day < birthDate.day)) {
-      age--;
-    }
-    return age;
-  }
-
   Future<void> _finishOnboarding() async {
-    // Generate/Load active profile, then override with onboarding answers
-    final profile = LocalStorage.getUserProfile();
-    profile['name'] = _nameController.text.trim();
-    profile['gender'] = _selectedGender;
-    if (_selectedBirthdate != null) {
-      profile['age'] = _calculateAge(_selectedBirthdate!);
-    } else {
-      profile['age'] = 25; // fallback default
-    }
-    profile['weight'] = double.tryParse(_weightController.text) ?? 70.0;
-    profile['height'] = double.tryParse(_heightController.text) ?? 170.0;
-    profile['targetWeight'] = double.tryParse(_targetWeightController.text) ?? 68.0;
-    profile['goal'] = _selectedGoal;
-    profile['level'] = _selectedLevel;
-    profile['weeklyGoal'] = _weeklyGoal.toInt();
-    profile['diet'] = _selectedDiet;
-    // Set default standard profile picture field
-    profile['profilePic'] = '';
+    final provider = ProfileProvider();
+    final profile = provider.userProfile;
 
-    await LocalStorage.saveUserProfile(profile);
+    profile.name = _nameController.text.trim();
+    profile.gender = _selectedGender;
+    if (_selectedBirthdate != null) {
+      profile.dob = _selectedBirthdate!.toIso8601String().split('T')[0];
+    } else {
+      profile.dob = '1998-01-01'; // fallback default
+    }
+    profile.weight = _weightController.text.trim();
+    profile.height = _heightController.text.trim();
+    profile.fitnessGoal = _selectedGoal;
+    profile.workoutExperience = _selectedLevel;
+    profile.dietPreference = _selectedDiet;
+    profile.profilePic = '';
+
+    // Save extra fields for onboarding tracking
+    profile['targetWeight'] = double.tryParse(_targetWeightController.text) ?? 68.0;
+    profile['weeklyGoal'] = _weeklyGoal.toInt();
+
+    await provider.update(profile);
     await LocalStorage.setLoggedIn(true);
 
     if (mounted) {

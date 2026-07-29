@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../app_theme.dart';
 import '../data/local_storage.dart';
+import '../models/active_workout_session.dart';
 import '../models/workout_history.dart';
 
 class Exercise {
@@ -79,12 +80,20 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
   void _loadOrCreateSession() {
     final saved = LocalStorage.getActiveSession();
     if (saved != null) {
-      _currentIndex = saved['currentIndex'] ?? 0;
-      _seconds = saved['seconds'] ?? 0;
-      _isPaused = saved['isPaused'] ?? false;
-      final rawSets = saved['completedSets'] as List?;
-      if (rawSets != null) {
-        _completedSets = rawSets.map((e) => List<bool>.from(e as List)).toList();
+      // Validate session workout identity to prevent cross-workout state corruption
+      final savedWorkout = saved.workoutName;
+      final matchesWorkout = savedWorkout == widget.workoutName ||
+          (savedWorkout == 'Workout Session' && widget.workoutName == 'Workout Session');
+
+      if (matchesWorkout) {
+        _currentIndex = saved.currentIndex;
+        _seconds = saved.seconds;
+        _isPaused = saved.isPaused;
+        if (saved.completedSets.isNotEmpty && saved.completedSets.length == _exercises.length) {
+          _completedSets = saved.completedSets;
+        } else {
+          _initEmptySets();
+        }
       } else {
         _initEmptySets();
       }
@@ -101,12 +110,14 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
   }
 
   void _saveSession() {
-    LocalStorage.saveActiveSession({
-      'currentIndex': _currentIndex,
-      'seconds': _seconds,
-      'isPaused': _isPaused,
-      'completedSets': _completedSets.map((e) => e).toList(),
-    });
+    final session = ActiveWorkoutSession(
+      workoutName: widget.workoutName,
+      currentIndex: _currentIndex,
+      seconds: _seconds,
+      isPaused: _isPaused,
+      completedSets: _completedSets,
+    );
+    LocalStorage.saveActiveSession(session);
   }
 
   void _startTimer() {

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'local_storage.dart';
+import '../models/user_profile.dart';
 
 /// Global single source of truth for user profile data.
 /// All screens that display profile info should read from this provider.
@@ -7,38 +8,38 @@ class ProfileProvider extends ChangeNotifier {
   static final ProfileProvider _instance = ProfileProvider._internal();
   factory ProfileProvider() => _instance;
   ProfileProvider._internal() {
-    _profile = LocalStorage.getUserProfile();
+    _userProfile = LocalStorage.getUserProfile();
   }
 
-  late Map<String, dynamic> _profile;
+  late UserProfile _userProfile;
 
-  Map<String, dynamic> get profile => _profile;
+  UserProfile get userProfile => _userProfile;
+  Map<String, dynamic> get profile => _userProfile.toJson();
 
-  String get name => _profile['name'] as String? ?? 'User';
-  String get email => _profile['email'] as String? ?? '';
-  String get phone => _profile['phone'] as String? ?? '';
-  String get dob => _profile['dob'] as String? ?? '';
-  String get gender => _profile['gender'] as String? ?? 'Male';
-  String get height => _profile['height']?.toString() ?? '175';
-  String get weight => _profile['weight']?.toString() ?? '68.2';
-  String get fitnessGoal => _profile['fitnessGoal'] as String? ?? 'Build Muscle';
-  String get workoutExperience => _profile['workoutExperience'] as String? ?? 'Intermediate';
-  List<String> get preferredDays =>
-      (_profile['preferredDays'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [];
-  String get dietPreference => _profile['dietPreference'] as String? ?? 'High Protein';
-  String get massUnit => _profile['massUnit'] as String? ?? 'kg';
-  String get lengthUnit => _profile['lengthUnit'] as String? ?? 'cm';
-  String get subscription => _profile['subscription'] as String? ?? 'Free';
-  String get profilePic => _profile['profilePic'] as String? ?? '';
-  bool get notificationsEnabled => _profile['notificationsEnabled'] as bool? ?? true;
-  String get privacy => _profile['privacy'] as String? ?? 'Friends Only';
+  String get name => _userProfile.name;
+  String get email => _userProfile.email;
+  String get phone => _userProfile.phone;
+  String get dob => _userProfile.dob;
+  String get gender => _userProfile.gender;
+  String get height => _userProfile.height;
+  String get weight => _userProfile.weight;
+  String get fitnessGoal => _userProfile.fitnessGoal;
+  String get workoutExperience => _userProfile.workoutExperience;
+  List<String> get preferredDays => _userProfile.preferredDays;
+  String get dietPreference => _userProfile.dietPreference;
+  String get massUnit => _userProfile.massUnit;
+  String get lengthUnit => _userProfile.lengthUnit;
+  String get subscription => _userProfile.subscription;
+  String get profilePic => _userProfile.profilePic;
+  bool get notificationsEnabled => _userProfile.notificationsEnabled;
+  String get privacy => _userProfile.privacy;
 
   /// Calculates age from date of birth
   int get age {
     try {
-      final dobStr = _profile['dob'];
-      if (dobStr != null && dobStr.isNotEmpty) {
-        final dob = DateTime.parse(dobStr as String);
+      final dobStr = _userProfile.dob;
+      if (dobStr.isNotEmpty) {
+        final dob = DateTime.parse(dobStr);
         final today = DateTime.now();
         int calculatedAge = today.year - dob.year;
         if (today.month < dob.month ||
@@ -66,21 +67,25 @@ class ProfileProvider extends ChangeNotifier {
 
   /// Reload from local storage (e.g. on app resume)
   void reload() {
-    _profile = LocalStorage.getUserProfile();
+    _userProfile = LocalStorage.getUserProfile();
     notifyListeners();
   }
 
   /// Update profile and persist to local storage
-  Future<void> update(Map<String, dynamic> newProfile) async {
-    _profile = Map<String, dynamic>.from(newProfile);
-    await LocalStorage.saveUserProfile(_profile);
+  Future<void> update(dynamic newProfile) async {
+    if (newProfile is UserProfile) {
+      _userProfile = newProfile;
+    } else if (newProfile is Map<String, dynamic>) {
+      _userProfile = UserProfile.fromJson(newProfile);
+    }
+    await LocalStorage.saveUserProfile(_userProfile);
     notifyListeners();
   }
 
   /// Update a single field and persist
   Future<void> updateField(String key, dynamic value) async {
-    _profile[key] = value;
-    await LocalStorage.saveUserProfile(_profile);
+    _userProfile[key] = value;
+    await LocalStorage.saveUserProfile(_userProfile);
     notifyListeners();
   }
 }
