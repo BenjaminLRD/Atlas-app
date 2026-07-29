@@ -234,3 +234,65 @@ Use Graphify for:
 
 Do not use Graphify for simple edits.
 
+
+
+\## Documentation Rules
+
+
+
+Before major changes:
+
+
+
+\- Update CHANGELOG.md with a summary of the changes.
+
+\- Include added features, changed behavior, and bug fixes.
+
+\- Keep entries concise and relevant.
+
+
+
+Do not update CHANGELOG.md for:
+
+\- minor UI tweaks
+
+\- formatting changes
+
+\- simple typo fixes
+
+\- small one-line fixes
+
+
+
+\## Testing Rules
+
+
+
+After code changes:
+
+
+
+\- Run relevant Flutter analysis.
+
+\- Fix introduced errors.
+
+\- Do not ignore analyzer warnings.
+
+\- Do not modify tests unless required.
+
+
+
+\## Formatting
+
+
+
+Before completing Flutter code changes:
+
+
+
+\- Keep Dart formatting consistent.
+
+\- Use dart format.
+
+\- Avoid unnecessary formatting changes.
+
