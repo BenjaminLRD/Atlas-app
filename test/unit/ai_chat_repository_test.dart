@@ -18,7 +18,7 @@ void main() {
       final repo = LocalAIChatRepository();
       final service = AIChatService(repo);
 
-      final history = service.getChatHistoryModels();
+      final history = service.getChatHistory();
       expect(history.isNotEmpty, isTrue);
       expect(history.first.sender, equals('bot'));
     });
@@ -32,12 +32,12 @@ void main() {
       ];
 
       await service.saveChatHistory(customMessages);
-      final retrieved = service.getChatHistoryModels();
+      final retrieved = service.getChatHistory();
       expect(retrieved.length, equals(2));
       expect(retrieved.first.text, equals('Hello AI'));
 
       await service.clearChatHistory();
-      final cleared = service.getChatHistoryModels();
+      final cleared = service.getChatHistory();
       expect(cleared.isEmpty, isTrue);
     });
 

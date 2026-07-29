@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../app_theme.dart';
 import '../data/ai_chat_service.dart';
+import '../models/chat_message.dart';
 
 class AiCoachChatScreen extends StatefulWidget {
   const AiCoachChatScreen({super.key});
@@ -13,7 +14,7 @@ class _AiCoachChatScreenState extends State<AiCoachChatScreen> {
   late final AIChatService _chatService;
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  List<Map<String, dynamic>> _messages = [];
+  List<ChatMessage> _messages = [];
 
   final List<String> _suggestedPrompts = [
     "Generate today's workout",
@@ -52,10 +53,10 @@ class _AiCoachChatScreenState extends State<AiCoachChatScreen> {
   void _sendMessage(String text) {
     if (text.trim().isEmpty) return;
 
-    final userMsg = {
-      'sender': 'user',
-      'text': text,
-    };
+    final userMsg = ChatMessage(
+      sender: 'user',
+      text: text,
+    );
 
     setState(() {
       _messages.add(userMsg);
@@ -67,7 +68,7 @@ class _AiCoachChatScreenState extends State<AiCoachChatScreen> {
     _chatService.generateResponse(text).then((botResponse) {
       if (mounted) {
         setState(() {
-          _messages.add(botResponse.toJson());
+          _messages.add(botResponse);
         });
         _chatService.saveChatHistory(_messages);
         _scrollToBottom();

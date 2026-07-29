@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../app_theme.dart';
 import '../data/notification_service.dart';
+import '../models/notification_model.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -11,7 +12,7 @@ class NotificationsScreen extends StatefulWidget {
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
   late final NotificationService _notificationService;
-  late List<Map<String, dynamic>> _notifications;
+  late List<NotificationModel> _notifications;
 
   @override
   void initState() {
@@ -23,24 +24,27 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   void _markAllAsRead() {
     setState(() {
       _notificationService.markAllAsRead(_notifications);
+      _notifications = _notificationService.getNotifications();
     });
   }
 
   void _removeNotification(String id) {
     setState(() {
       _notificationService.removeNotification(_notifications, id);
+      _notifications = _notificationService.getNotifications();
     });
   }
 
   void _toggleNotificationReadStatus(String id, bool isCurrentlyRead) {
     setState(() {
       _notificationService.toggleReadStatus(_notifications, id, isCurrentlyRead);
+      _notifications = _notificationService.getNotifications();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final unreadCount = _notifications.where((n) => !n['isRead']).length;
+    final unreadCount = _notifications.where((n) => !n.isRead).length;
 
     return Scaffold(
       appBar: AppBar(

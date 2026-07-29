@@ -9,18 +9,13 @@ class AIChatService {
   AIChatService([AIChatRepository? repository])
       : _repository = repository ?? LocalAIChatRepository();
 
-  /// Retrieve chat history as map items for screen rendering
-  List<Map<String, dynamic>> getChatHistory() {
+  /// Retrieve chat history as strongly-typed ChatMessage objects
+  List<ChatMessage> getChatHistory() {
     return _repository.getChatHistory();
   }
 
-  /// Retrieve chat history as strongly-typed ChatMessage objects
-  List<ChatMessage> getChatHistoryModels() {
-    return _repository.getChatHistoryModels();
-  }
-
   /// Persist updated chat history
-  Future<void> saveChatHistory(dynamic history) async {
+  Future<void> saveChatHistory(List<ChatMessage> history) async {
     await _repository.saveChatHistory(history);
   }
 

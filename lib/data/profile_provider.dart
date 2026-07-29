@@ -79,11 +79,32 @@ class ProfileProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Update profile and persist via repository
-  Future<void> update(dynamic newProfile) async {
+  /// Update strongly typed profile and persist via repository
+  Future<void> updateProfile(UserProfile newProfile) async {
     await _repository.saveProfile(newProfile);
     _userProfile = _repository.getProfile();
     notifyListeners();
+  }
+
+  /// Update profile from UserProfile model or Map and persist via repository
+  Future<void> update(dynamic newProfile) async {
+    if (newProfile is UserProfile) {
+      await updateProfile(newProfile);
+    } else if (newProfile is Map<String, dynamic>) {
+      final updated = _userProfile.copyWith(
+        name: newProfile['name'] as String?,
+        email: newProfile['email'] as String?,
+        phone: newProfile['phone'] as String?,
+        dob: newProfile['dob'] as String?,
+        gender: newProfile['gender'] as String?,
+        height: newProfile['height'] as String?,
+        weight: newProfile['weight'] as String?,
+        fitnessGoal: newProfile['fitnessGoal'] as String? ?? newProfile['goal'] as String?,
+        workoutExperience: newProfile['workoutExperience'] as String? ?? newProfile['level'] as String?,
+        dietPreference: newProfile['dietPreference'] as String? ?? newProfile['diet'] as String?,
+      );
+      await updateProfile(updated);
+    }
   }
 
   /// Update a single field and persist via repository

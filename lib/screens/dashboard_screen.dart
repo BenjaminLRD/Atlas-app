@@ -70,12 +70,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   void _loadState() {
-    debugPrint('[DashboardScreen] _loadState() called');
     setState(() {
       _proteinConsumed = _nutritionService.getProteinConsumed();
       _proteinGoal = _nutritionService.getProteinGoal();
     });
-    debugPrint('[DashboardScreen] _proteinConsumed assigned value: $_proteinConsumed');
   }
 
   void _addProtein(double amount) async {

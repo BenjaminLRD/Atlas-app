@@ -4,7 +4,7 @@ import 'local_storage.dart';
 /// Abstract interface for profile data operations.
 abstract class ProfileRepository {
   UserProfile getProfile();
-  Future<void> saveProfile(dynamic profile);
+  Future<void> saveProfile(UserProfile profile);
   Future<void> updateField(String key, dynamic value);
 }
 
@@ -16,7 +16,7 @@ class LocalProfileRepository implements ProfileRepository {
   }
 
   @override
-  Future<void> saveProfile(dynamic profile) async {
+  Future<void> saveProfile(UserProfile profile) async {
     await LocalStorage.saveUserProfile(profile);
   }
 

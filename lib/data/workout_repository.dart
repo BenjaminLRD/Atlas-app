@@ -5,7 +5,7 @@ import 'local_storage.dart';
 /// Abstract interface for workout persistence operations.
 abstract class WorkoutRepository {
   ActiveWorkoutSession? getActiveSession();
-  Future<void> saveActiveSession(dynamic session);
+  Future<void> saveActiveSession(ActiveWorkoutSession session);
   Future<void> clearActiveSession();
   List<WorkoutHistory> getWorkoutHistory();
   Future<void> saveWorkoutCompletion(WorkoutHistory entry);
@@ -19,7 +19,7 @@ class LocalWorkoutRepository implements WorkoutRepository {
   }
 
   @override
-  Future<void> saveActiveSession(dynamic session) async {
+  Future<void> saveActiveSession(ActiveWorkoutSession session) async {
     await LocalStorage.saveActiveSession(session);
   }
 

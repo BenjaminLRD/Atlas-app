@@ -8,44 +8,41 @@ class NotificationService {
   NotificationService([NotificationRepository? repository])
       : _repository = repository ?? LocalNotificationRepository();
 
-  /// Get list of notifications as maps for UI rendering
-  List<Map<String, dynamic>> getNotifications() {
+  /// Get list of notifications as strongly typed NotificationModel objects
+  List<NotificationModel> getNotifications() {
     return _repository.getNotifications();
   }
 
-  /// Get list of notifications as strongly typed NotificationModel objects
-  List<NotificationModel> getNotificationModels() {
-    return _repository.getNotificationModels();
-  }
-
   /// Persist updated notification list
-  Future<void> saveNotifications(dynamic list) async {
+  Future<void> saveNotifications(List<NotificationModel> list) async {
     await _repository.saveNotifications(list);
   }
 
   /// Mark all notifications as read
-  Future<void> markAllAsRead(List<Map<String, dynamic>> notifications) async {
-    for (var n in notifications) {
-      n['isRead'] = true;
-    }
-    await _repository.saveNotifications(notifications);
+  Future<void> markAllAsRead(List<NotificationModel> notifications) async {
+    final updated = notifications
+        .map((n) => n.copyWith(isRead: true))
+        .toList();
+    await _repository.saveNotifications(updated);
   }
 
   /// Remove a single notification by id
   Future<void> removeNotification(
-      List<Map<String, dynamic>> notifications, String id) async {
-    notifications.removeWhere((n) => n['id'] == id);
-    await _repository.saveNotifications(notifications);
+      List<NotificationModel> notifications, String id) async {
+    final updated = notifications.where((n) => n.id != id).toList();
+    await _repository.saveNotifications(updated);
   }
 
   /// Toggle read status for a single notification
   Future<void> toggleReadStatus(
-      List<Map<String, dynamic>> notifications, String id, bool isCurrentlyRead) async {
-    final index = notifications.indexWhere((n) => n['id'] == id);
-    if (index != -1) {
-      notifications[index]['isRead'] = !isCurrentlyRead;
-      await _repository.saveNotifications(notifications);
-    }
+      List<NotificationModel> notifications, String id, bool isCurrentlyRead) async {
+    final updated = notifications.map((n) {
+      if (n.id == id) {
+        return n.copyWith(isRead: !isCurrentlyRead);
+      }
+      return n;
+    }).toList();
+    await _repository.saveNotifications(updated);
   }
 
   /// Check if there are any unread notifications

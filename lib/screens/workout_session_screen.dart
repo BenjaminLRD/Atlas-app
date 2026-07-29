@@ -21,10 +21,12 @@ class Exercise {
 
 class WorkoutSessionScreen extends StatefulWidget {
   final String workoutName;
+  final String? workoutId;
 
   const WorkoutSessionScreen({
     super.key,
     this.workoutName = 'Workout Session',
+    this.workoutId,
   });
 
   @override
@@ -84,9 +86,15 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
     final saved = _workoutService.getActiveSession();
     if (saved != null) {
       // Validate session workout identity to prevent cross-workout state corruption
-      final savedWorkout = saved.workoutName;
-      final matchesWorkout = savedWorkout == widget.workoutName ||
-          (savedWorkout == 'Workout Session' && widget.workoutName == 'Workout Session');
+      bool matchesWorkout = false;
+      if (saved.workoutId != null && widget.workoutId != null) {
+        // Primary identity check by workoutId
+        matchesWorkout = (saved.workoutId == widget.workoutId);
+      } else {
+        // Legacy fallback check by workoutName
+        matchesWorkout = (saved.workoutName == widget.workoutName ||
+            (saved.workoutName == 'Workout Session' && widget.workoutName == 'Workout Session'));
+      }
 
       if (matchesWorkout) {
         _currentIndex = saved.currentIndex;
@@ -115,6 +123,7 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
   void _saveSession() {
     final session = ActiveWorkoutSession(
       workoutName: widget.workoutName,
+      workoutId: widget.workoutId,
       currentIndex: _currentIndex,
       seconds: _seconds,
       isPaused: _isPaused,

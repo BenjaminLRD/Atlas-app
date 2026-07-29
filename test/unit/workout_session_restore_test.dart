@@ -83,5 +83,29 @@ void main() {
 
       expect(matchesDefault, isTrue);
     });
+
+    test('uses workoutId as primary identity check over workoutName', () async {
+      final session = ActiveWorkoutSession(
+        workoutName: 'Renamed Leg Routine',
+        workoutId: 'leg_unique_id_101',
+        currentIndex: 0,
+        seconds: 180,
+        isPaused: false,
+        completedSets: [],
+      );
+
+      await LocalStorage.saveActiveSession(session);
+
+      final retrieved = LocalStorage.getActiveSession();
+      expect(retrieved, isNotNull);
+
+      // Primary check by workoutId matches even if name changed
+      const targetId = 'leg_unique_id_101';
+      bool matches = false;
+      if (retrieved!.workoutId != null && targetId.isNotEmpty) {
+        matches = (retrieved.workoutId == targetId);
+      }
+      expect(matches, isTrue);
+    });
   });
 }

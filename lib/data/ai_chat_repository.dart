@@ -3,31 +3,25 @@ import 'local_storage.dart';
 
 /// Abstract interface for AI chat history persistence operations.
 abstract class AIChatRepository {
-  List<Map<String, dynamic>> getChatHistory();
-  List<ChatMessage> getChatHistoryModels();
-  Future<void> saveChatHistory(dynamic history);
+  List<ChatMessage> getChatHistory();
+  Future<void> saveChatHistory(List<ChatMessage> history);
   Future<void> clearChatHistory();
 }
 
 /// Default local implementation of AIChatRepository backed by LocalStorage.
 class LocalAIChatRepository implements AIChatRepository {
   @override
-  List<Map<String, dynamic>> getChatHistory() {
-    return LocalStorage.getChatHistory();
-  }
-
-  @override
-  List<ChatMessage> getChatHistoryModels() {
+  List<ChatMessage> getChatHistory() {
     return LocalStorage.getChatHistoryModels();
   }
 
   @override
-  Future<void> saveChatHistory(dynamic history) async {
+  Future<void> saveChatHistory(List<ChatMessage> history) async {
     await LocalStorage.saveChatHistory(history);
   }
 
   @override
   Future<void> clearChatHistory() async {
-    await LocalStorage.saveChatHistory([]);
+    await LocalStorage.saveChatHistory(<ChatMessage>[]);
   }
 }

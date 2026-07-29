@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_profile.dart';
 import '../models/notification_model.dart';
@@ -24,22 +23,15 @@ class LocalStorage {
   // --- Protein Nutrition ---
   static double getProteinConsumed() {
     final todayStr = DateTime.now().toIso8601String().split('T')[0];
-    final exists = _prefs?.containsKey('protein_consumed_$todayStr') ?? false;
     final todayVal = _prefs?.getDouble('protein_consumed_$todayStr');
-    double result = 0.0;
     if (todayVal != null) {
-      result = todayVal;
-    } else {
-      final lastDate = _prefs?.getString('protein_last_date');
-      if (lastDate == todayStr) {
-        result = _prefs?.getDouble('protein_consumed') ?? 0.0;
-      }
+      return todayVal;
     }
-    debugPrint('[LocalStorage] today: $todayStr');
-    debugPrint('[LocalStorage] protein_consumed_$todayStr exists: $exists');
-    debugPrint('[LocalStorage] protein_consumed_$todayStr value: $todayVal');
-    debugPrint('[LocalStorage] final value returned: $result');
-    return result;
+    final lastDate = _prefs?.getString('protein_last_date');
+    if (lastDate == todayStr) {
+      return _prefs?.getDouble('protein_consumed') ?? 0.0;
+    }
+    return 0.0;
   }
 
   static double getProteinGoal() {

@@ -29,32 +29,32 @@ void main() {
       await service.markAllAsRead(notifications);
 
       final updated = service.getNotifications();
-      expect(updated.every((n) => n['isRead'] == true), isTrue);
+      expect(updated.every((n) => n.isRead == true), isTrue);
       expect(service.hasUnreadNotifications(), isFalse);
     });
 
     test('NotificationService removeNotification removes target notification', () async {
       final service = NotificationService();
       final notifications = service.getNotifications();
-      final targetId = notifications.first['id'] as String;
+      final targetId = notifications.first.id;
 
       await service.removeNotification(notifications, targetId);
 
       final updated = service.getNotifications();
-      expect(updated.any((n) => n['id'] == targetId), isFalse);
+      expect(updated.any((n) => n.id == targetId), isFalse);
     });
 
     test('NotificationService toggleReadStatus flips target notification read state', () async {
       final service = NotificationService();
       final notifications = service.getNotifications();
-      final targetId = notifications.first['id'] as String;
-      final initialRead = notifications.first['isRead'] as bool;
+      final targetId = notifications.first.id;
+      final initialRead = notifications.first.isRead;
 
       await service.toggleReadStatus(notifications, targetId, initialRead);
 
       final updated = service.getNotifications();
-      final item = updated.firstWhere((n) => n['id'] == targetId);
-      expect(item['isRead'], equals(!initialRead));
+      final item = updated.firstWhere((n) => n.id == targetId);
+      expect(item.isRead, equals(!initialRead));
     });
   });
 }
