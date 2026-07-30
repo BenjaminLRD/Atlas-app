@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../app_theme.dart';
 import '../data/local_storage.dart';
+import '../widgets/common/app_button.dart';
+import '../widgets/common/app_card.dart';
 import 'forgot_password_screen.dart';
 import 'onboarding_screen.dart';
 import '../main.dart';
@@ -79,66 +80,46 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: context.appBackground,
       body: Stack(
         children: [
-          // Decorative background circles
+          // Background ambient green glow highlights
           Positioned(
-            top: -60,
-            right: -60,
+            top: -80,
+            left: MediaQuery.of(context).size.width * 0.2,
             child: Container(
-              width: 200,
-              height: 200,
+              width: 250,
+              height: 250,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.primary.withValues(alpha: 0.07),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 80,
-            left: -80,
-            child: Container(
-              width: 220,
-              height: 220,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.primaryFixed.withValues(alpha: 0.5),
+                color: AppColors.primary.withValues(alpha: 0.12),
               ),
             ),
           ),
 
           SafeArea(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
               child: Column(
                 children: [
-                  const SizedBox(height: 40),
-
-                  // Logo + branding
-                  _buildHeader(),
-                  const SizedBox(height: 32),
-
-                  // Login card
-                  _buildLoginCard(),
-                  const SizedBox(height: 20),
-
-                  // Safety footer
-                  _buildSafetyFooter(),
                   const SizedBox(height: 16),
 
-                  // Terms
-                  _buildTermsText(),
-                  const SizedBox(height: 32),
+                  // 1. Logo & App Branding Header
+                  _buildBrandingHeader(context),
+                  const SizedBox(height: 24),
+
+                  // 2. Main Login Form Card
+                  _buildLoginFormCard(context),
+                  const SizedBox(height: 24),
                 ],
               ),
             ),
           ),
 
-          // Loading overlay
+          // Loading Overlay
           if (_isLoading)
             Container(
-              color: Theme.of(context).colorScheme.scrim.withValues(alpha: 0.3),
+              color: Colors.black.withValues(alpha: 0.4),
               child: const Center(
                 child: CircularProgressIndicator(color: AppColors.primary),
               ),
@@ -148,236 +129,211 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildBrandingHeader(BuildContext context) {
     return Column(
       children: [
-        // Gym logo icon
+        // Dumbbell Circle Icon Container
         Container(
-          width: 80,
-          height: 80,
+          width: 72,
+          height: 72,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            border: Border.all(
-              color: AppColors.primary,
-              width: 2.5,
-            ),
-            color: Colors.transparent,
+            color: context.appSurfaceElevated,
+            border: Border.all(color: AppColors.primary, width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primary.withValues(alpha: 0.25),
+                blurRadius: 16,
+                spreadRadius: 2,
+              ),
+            ],
           ),
-          child: Center(
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                // Barbell icon
-                const Icon(
-                  Icons.fitness_center,
-                  color: AppColors.primary,
-                  size: 36,
-                ),
-                // Mountain hint at bottom
-                Positioned(
-                  bottom: 12,
-                  child: Icon(
-                    Icons.terrain,
-                    color: AppColors.primary.withValues(alpha: 0.5),
-                    size: 16,
-                  ),
-                ),
-              ],
+          child: const Center(
+            child: Icon(
+              Icons.fitness_center_rounded,
+              color: AppColors.primary,
+              size: 34,
             ),
           ),
         ),
-        const SizedBox(height: 16),
-        Text(
-          'Aizawl Gym',
-          style: GoogleFonts.hankenGrotesk(
-            fontSize: 32,
-            fontWeight: FontWeight.w800,
-            color: AppColors.primary,
-            letterSpacing: -0.5,
+        const SizedBox(height: 14),
+
+        // Brand Title Text
+        Text.rich(
+          TextSpan(
+            children: [
+              const TextSpan(
+                text: 'Aizawl ',
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontSize: 28,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.5,
+                ),
+              ),
+              TextSpan(
+                text: 'Gym',
+                style: TextStyle(
+                  color: context.appTextPrimary,
+                  fontSize: 28,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.5,
+                ),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 4),
+
+        // Tagline Subtitle
         Text(
           'Stronger Every Day',
-          style: GoogleFonts.inter(
-            fontSize: 15,
-            color: AppColors.onSurfaceVariant,
-            fontWeight: FontWeight.w400,
+          style: AppTheme.bodySm.copyWith(
+            color: context.appTextSecondary,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildLoginCard() {
-    return Container(
-      padding: const EdgeInsets.all(28),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainer,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.06),
-            blurRadius: 30,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
+  Widget _buildLoginFormCard(BuildContext context) {
+    return AppCard(
+      padding: const EdgeInsets.all(22),
       child: Form(
         key: _formKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Welcome Title & Subtitle
             Text(
               'Welcome Back',
-              style: GoogleFonts.hankenGrotesk(
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
-                color: AppColors.onSurface,
+              style: AppTheme.headlineLg.copyWith(
+                fontSize: 22,
+                color: context.appTextPrimary,
               ),
             ),
             const SizedBox(height: 4),
             Text(
               'Login to continue your fitness journey',
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                color: AppColors.onSurfaceVariant,
+              style: AppTheme.bodySm.copyWith(
+                color: context.appTextSecondary,
+                fontSize: 13,
               ),
             ),
-            const SizedBox(height: 28),
+            const SizedBox(height: 22),
 
-            // Email
+            // Email Address Input Field
             Text(
               'Email Address',
-              style: GoogleFonts.inter(
-                fontSize: 14,
+              style: AppTheme.bodySm.copyWith(
                 fontWeight: FontWeight.w600,
-                color: AppColors.onSurface,
+                color: context.appTextPrimary,
+                fontSize: 13,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             TextFormField(
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
               validator: _validateEmail,
+              style: AppTheme.bodySm.copyWith(color: context.appTextPrimary, fontSize: 14),
               decoration: _inputDecoration(
+                context,
                 hint: 'Enter your email',
-                icon: Icons.mail_outline,
+                icon: Icons.mail_outline_rounded,
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
 
-            // Password
+            // Password Input Field
             Text(
               'Password',
-              style: GoogleFonts.inter(
-                fontSize: 14,
+              style: AppTheme.bodySm.copyWith(
                 fontWeight: FontWeight.w600,
-                color: AppColors.onSurface,
+                color: context.appTextPrimary,
+                fontSize: 13,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             TextFormField(
               controller: _passwordController,
               obscureText: _obscurePassword,
               validator: _validatePassword,
+              style: AppTheme.bodySm.copyWith(color: context.appTextPrimary, fontSize: 14),
               decoration: _inputDecoration(
+                context,
                 hint: 'Enter your password',
-                icon: Icons.lock_outline,
+                icon: Icons.lock_outline_rounded,
                 suffix: GestureDetector(
-                  onTap: () =>
-                      setState(() => _obscurePassword = !_obscurePassword),
+                  onTap: () => setState(() => _obscurePassword = !_obscurePassword),
                   child: Icon(
-                    _obscurePassword
-                        ? Icons.visibility_off_outlined
-                        : Icons.visibility_outlined,
-                    color: AppColors.onSurfaceVariant,
-                    size: 22,
+                    _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                    color: context.appTextSecondary,
+                    size: 20,
                   ),
                 ),
               ),
             ),
             const SizedBox(height: 8),
 
-            // Forgot password
+            // Forgot Password Link
             Align(
               alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: () {
+              child: GestureDetector(
+                onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => const ForgotPasswordScreen(),
-                    ),
+                    MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
                   );
                 },
-                style: TextButton.styleFrom(
-                  padding: EdgeInsets.zero,
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
                 child: Text(
                   'Forgot Password?',
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
+                  style: AppTheme.bodySm.copyWith(
                     color: AppColors.primary,
                     fontWeight: FontWeight.w600,
+                    fontSize: 13,
                   ),
                 ),
               ),
             ),
             const SizedBox(height: 20),
 
-            // Login button
-            SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: ElevatedButton(
-                onPressed: _isLoading ? null : _handleLogin,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: AppColors.onPrimary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 0,
-                ),
-                child: Text(
-                  'Login',
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
+            // Primary Login Button
+            AppButton.primary(
+              label: 'Login',
+              isLoading: _isLoading,
+              onPressed: _isLoading ? null : _handleLogin,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 22),
 
-            // Divider
+            // Divider "or continue with"
             Row(
               children: [
-                const Expanded(child: Divider()),
+                Expanded(child: Divider(color: context.appOutlineVariant.withValues(alpha: 0.3))),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Text(
                     'or continue with',
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      color: AppColors.onSurfaceVariant,
+                    style: AppTheme.bodySm.copyWith(
+                      fontSize: 12,
+                      color: context.appTextSecondary,
                     ),
                   ),
                 ),
-                const Expanded(child: Divider()),
+                Expanded(child: Divider(color: context.appOutlineVariant.withValues(alpha: 0.3))),
               ],
             ),
             const SizedBox(height: 16),
 
-            // Social buttons
+            // Social Buttons Row
             Row(
               children: [
                 Expanded(
                   child: _buildSocialButton(
-                    label: 'Continue with Google',
+                    context,
+                    label: 'Google',
                     icon: _googleIcon(),
                     onTap: _handleGoogleSignIn,
                   ),
@@ -385,40 +341,39 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: _buildSocialButton(
-                    label: 'Continue with Apple',
-                    icon: Icon(Icons.apple, size: 22, color: Theme.of(context).colorScheme.onSurface),
+                    context,
+                    label: 'Apple',
+                    icon: Icon(Icons.apple, size: 20, color: context.appTextPrimary),
                     onTap: _handleAppleSignIn,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 22),
 
-            // Sign Up row
+            // Sign Up Footer Link
             Center(
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    "Don't have an account?  ",
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      color: AppColors.onSurfaceVariant,
+                    "Don't have an account? ",
+                    style: AppTheme.bodySm.copyWith(
+                      fontSize: 13,
+                      color: context.appTextSecondary,
                     ),
                   ),
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (_) => const OnboardingScreen(),
-                        ),
+                        MaterialPageRoute(builder: (_) => const OnboardingScreen()),
                       );
                     },
                     child: Text(
                       'Sign Up',
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
+                      style: AppTheme.bodySm.copyWith(
+                        fontSize: 13,
                         color: AppColors.primary,
                         fontWeight: FontWeight.w700,
                       ),
@@ -433,7 +388,8 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildSocialButton({
+  Widget _buildSocialButton(
+    BuildContext context, {
     required String label,
     required Widget icon,
     required VoidCallback onTap,
@@ -441,25 +397,23 @@ class _LoginScreenState extends State<LoginScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 48,
+        height: 46,
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceContainer,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: AppColors.outlineVariant),
+          color: context.appSurfaceElevated,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: context.appOutlineVariant.withValues(alpha: 0.3)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             icon,
             const SizedBox(width: 8),
-            Flexible(
-              child: Text(
-                label.replaceFirst('Continue with ', ''),
-                style: GoogleFonts.inter(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.onSurface,
-                ),
+            Text(
+              label,
+              style: AppTheme.bodySm.copyWith(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: context.appTextPrimary,
               ),
             ),
           ],
@@ -468,26 +422,19 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _googleIcon() {
-    return SizedBox(
-      width: 22,
-      height: 22,
-      child: CustomPaint(painter: _GoogleLogoPainter()),
-    );
-  }
-
-  InputDecoration _inputDecoration({
+  InputDecoration _inputDecoration(
+    BuildContext context, {
     required String hint,
     required IconData icon,
     Widget? suffix,
   }) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: GoogleFonts.inter(
-        color: AppColors.outline,
+      hintStyle: AppTheme.bodySm.copyWith(
+        color: context.appTextSecondary.withValues(alpha: 0.6),
         fontSize: 14,
       ),
-      prefixIcon: Icon(icon, color: AppColors.onSurfaceVariant, size: 20),
+      prefixIcon: Icon(icon, color: AppColors.primary, size: 18),
       suffixIcon: suffix != null
           ? Padding(
               padding: const EdgeInsets.only(right: 12),
@@ -495,119 +442,36 @@ class _LoginScreenState extends State<LoginScreen> {
             )
           : null,
       filled: true,
-      fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+      fillColor: context.appSurfaceElevated,
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.outlineVariant),
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: context.appOutlineVariant.withValues(alpha: 0.3)),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.outlineVariant),
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: context.appOutlineVariant.withValues(alpha: 0.3)),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: AppColors.error),
       ),
       focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: AppColors.error, width: 1.5),
       ),
-      contentPadding:
-          const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
     );
   }
 
-  Widget _buildSafetyFooter() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainer.withValues(alpha: 0.8),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.outlineVariant.withValues(alpha: 0.5)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: const BoxDecoration(
-              color: AppColors.primary,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.verified_user_outlined,
-              color: AppColors.onPrimary,
-              size: 20,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Your data is safe with us',
-                  style: GoogleFonts.inter(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.onSurface,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  'We prioritize your privacy and keep your information secure.',
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: AppColors.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const Icon(
-            Icons.lock_outline,
-            color: AppColors.onSurfaceVariant,
-            size: 24,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTermsText() {
-    return Text.rich(
-      TextSpan(
-        text: 'By continuing, you agree to our ',
-        style: GoogleFonts.inter(
-          fontSize: 12,
-          color: AppColors.onSurfaceVariant,
-        ),
-        children: [
-          TextSpan(
-            text: 'Terms of Service',
-            style: GoogleFonts.inter(
-              fontSize: 12,
-              color: AppColors.primary,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const TextSpan(text: '\nand '),
-          TextSpan(
-            text: 'Privacy Policy',
-            style: GoogleFonts.inter(
-              fontSize: 12,
-              color: AppColors.primary,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const TextSpan(text: '.'),
-        ],
-      ),
-      textAlign: TextAlign.center,
+  Widget _googleIcon() {
+    return SizedBox(
+      width: 18,
+      height: 18,
+      child: CustomPaint(painter: _GoogleLogoPainter()),
     );
   }
 }
@@ -624,10 +488,9 @@ class _GoogleLogoPainter extends CustomPainter {
     final radius = size.width / 2;
     final innerRadius = radius * 0.4;
 
-    // Simple 4-color circle to represent Google G
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),
-      -1.5708, // top
+      -1.5708,
       1.5708,
       false,
       paintBlue..strokeWidth = radius * 0.35..style = PaintingStyle.stroke,
@@ -654,14 +517,12 @@ class _GoogleLogoPainter extends CustomPainter {
       paintRed..strokeWidth = radius * 0.35..style = PaintingStyle.stroke,
     );
 
-    // Inner white circle to make it look like a ring
     canvas.drawCircle(
       center,
       innerRadius,
       Paint()..color = Colors.transparent,
     );
 
-    // Horizontal bar for G
     canvas.drawRect(
       Rect.fromLTWH(center.dx, center.dy - radius * 0.12, radius * 0.9, radius * 0.24),
       Paint()..color = paintBlue.color,

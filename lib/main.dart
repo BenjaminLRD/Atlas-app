@@ -4,11 +4,13 @@ import 'app_theme.dart';
 import 'data/app_dependencies.dart';
 import 'data/local_storage.dart';
 import 'data/profile_provider.dart';
+import 'widgets/common/ambient_background.dart';
 import 'widgets/top_app_bar.dart';
 import 'widgets/ai_chat_button.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/diet_plan_screen.dart';
-import 'screens/workout_plan_screen.dart';
+import 'screens/workout_session_screen.dart';
+import 'screens/workout_history_screen.dart';
 import 'screens/profile_screen.dart';
 
 import 'screens/login_screen.dart';
@@ -21,18 +23,33 @@ void main() async {
   runApp(const AizawlGymApp());
 }
 
+final ValueNotifier<ThemeMode> themeModeNotifier = ValueNotifier<ThemeMode>(
+  _parseThemeMode(LocalStorage.getThemeModeString()),
+);
+
+ThemeMode _parseThemeMode(String val) {
+  if (val == 'light') return ThemeMode.light;
+  if (val == 'dark') return ThemeMode.dark;
+  return ThemeMode.system;
+}
+
 class AizawlGymApp extends StatelessWidget {
   const AizawlGymApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Aizawl Gym',
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
-      debugShowCheckedModeBanner: false,
-      home: LocalStorage.isLoggedIn() ? const MainShell() : const LoginScreen(),
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: themeModeNotifier,
+      builder: (context, currentMode, child) {
+        return MaterialApp(
+          title: 'Aizawl Gym',
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: currentMode,
+          debugShowCheckedModeBanner: false,
+          home: LocalStorage.isLoggedIn() ? const MainShell() : const LoginScreen(),
+        );
+      },
     );
   }
 }
@@ -51,7 +68,11 @@ class _MainShellState extends State<MainShell> {
   final List<Widget> _screens = const [
     DashboardScreen(),
     DietPlanScreen(),
-    WorkoutPlanScreen(),
+    WorkoutSessionScreen(
+      workoutName: 'Leg Day - Hypertrophy',
+      workoutId: 'leg_day_hypertrophy_01',
+    ),
+    WorkoutHistoryScreen(),
     ProfileScreen(),
   ];
 
@@ -59,6 +80,7 @@ class _MainShellState extends State<MainShell> {
     _NavItem(icon: Icons.dashboard_outlined, filledIcon: Icons.dashboard_rounded, label: 'Summary'),
     _NavItem(icon: Icons.restaurant_outlined, filledIcon: Icons.restaurant_rounded, label: 'Diet Plan'),
     _NavItem(icon: Icons.fitness_center_outlined, filledIcon: Icons.fitness_center_rounded, label: 'Workouts'),
+    _NavItem(icon: Icons.show_chart_rounded, filledIcon: Icons.analytics_rounded, label: 'Progress'),
     _NavItem(icon: Icons.person_outline_rounded, filledIcon: Icons.person_rounded, label: 'Profile'),
   ];
 
@@ -82,47 +104,49 @@ class _MainShellState extends State<MainShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      body: Stack(
-        children: [
-          // Screen content
-          IndexedStack(
-            index: _currentIndex,
-            children: _screens,
-          ),
+      backgroundColor: context.appBackground,
+      body: AmbientBackground(
+        child: Stack(
+          children: [
+            // Screen content
+            IndexedStack(
+              index: _currentIndex,
+              children: _screens,
+            ),
 
-          // Top App Bar
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: SafeArea(
-              bottom: false,
-              child: CustomTopAppBar(
-                onProfileUpdated: () {
-                  _profileProvider.reload();
-                },
+            // Top App Bar
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: SafeArea(
+                bottom: false,
+                child: CustomTopAppBar(
+                  onProfileUpdated: () {
+                    _profileProvider.reload();
+                  },
+                ),
               ),
             ),
-          ),
 
-          // Frosted Glass Translucent Premium AI Chat Button
-          const Positioned(
-            bottom: 96,
-            right: 20,
-            child: AiChatButton(),
-          ),
-
-          // Bottom Nav Bar
-          Positioned(
-            bottom: 24,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: _buildBottomNavBar(),
+            // Global Floating AI Coach Button safely calculated above bottom nav and safe area
+            Positioned(
+              bottom: MediaQuery.of(context).padding.bottom + 84,
+              right: 18,
+              child: const AiChatButton(),
             ),
-          ),
-        ],
+
+            // Bottom Nav Bar with safe area calculation
+            Positioned(
+              bottom: MediaQuery.of(context).padding.bottom + 16,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: _buildBottomNavBar(),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

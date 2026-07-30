@@ -13,6 +13,10 @@ import 'package:aizawl_gym/data/app_dependencies.dart';
 import 'package:aizawl_gym/models/user_profile.dart';
 import 'package:aizawl_gym/models/active_workout_session.dart';
 import 'package:aizawl_gym/models/workout_history.dart';
+import 'package:aizawl_gym/models/daily_nutrition.dart';
+import 'package:aizawl_gym/models/food_item.dart';
+import 'package:aizawl_gym/models/macro_target.dart';
+import 'package:aizawl_gym/models/meal_entry.dart';
 import 'package:aizawl_gym/models/chat_message.dart';
 import 'package:aizawl_gym/models/notification_model.dart';
 
@@ -63,6 +67,8 @@ class FakeWorkoutRepository implements WorkoutRepository {
 class FakeNutritionRepository implements NutritionRepository {
   double _consumed = 0.0;
   double _goal = 140.0;
+  MacroTarget _macroTarget = MacroTarget.defaultTarget();
+  final Map<String, DailyNutrition> _store = {};
 
   @override
   double getProteinConsumed() => _consumed;
@@ -78,6 +84,60 @@ class FakeNutritionRepository implements NutritionRepository {
   @override
   Future<void> saveProteinGoal(double value) async {
     _goal = value;
+  }
+
+  @override
+  DailyNutrition getDailyNutrition(String date) {
+    return _store[date] ?? DailyNutrition.defaultForDate(date, _macroTarget);
+  }
+
+  @override
+  Future<void> saveDailyNutrition(DailyNutrition dailyNutrition) async {
+    _store[dailyNutrition.date] = dailyNutrition;
+    _consumed = dailyNutrition.totalProteinConsumed;
+  }
+
+  @override
+  MacroTarget getMacroTarget() => _macroTarget;
+
+  @override
+  Future<void> saveMacroTarget(MacroTarget target) async {
+    _macroTarget = target;
+    _goal = target.proteinGrams;
+  }
+
+  @override
+  Future<void> logFoodItem({
+    required String date,
+    required MealCategory category,
+    required FoodItem foodItem,
+  }) async {
+    final daily = getDailyNutrition(date);
+    final updatedMeals = daily.meals.map((meal) {
+      if (meal.category == category) {
+        final newItems = List<FoodItem>.from(meal.items)..add(foodItem);
+        return meal.copyWith(items: newItems);
+      }
+      return meal;
+    }).toList();
+
+    await saveDailyNutrition(daily.copyWith(meals: updatedMeals));
+  }
+
+  @override
+  Future<void> toggleMealCompletion({
+    required String date,
+    required String mealId,
+  }) async {
+    final daily = getDailyNutrition(date);
+    final updatedMeals = daily.meals.map((meal) {
+      if (meal.id == mealId) {
+        return meal.copyWith(isCompleted: !meal.isCompleted);
+      }
+      return meal;
+    }).toList();
+
+    await saveDailyNutrition(daily.copyWith(meals: updatedMeals));
   }
 }
 

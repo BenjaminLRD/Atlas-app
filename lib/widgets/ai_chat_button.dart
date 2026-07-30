@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../app_theme.dart';
 import '../screens/ai_coach_chat_screen.dart';
@@ -11,128 +10,88 @@ class AiChatButton extends StatefulWidget {
 }
 
 class _AiChatButtonState extends State<AiChatButton> with TickerProviderStateMixin {
-  late AnimationController _controller;
+  late AnimationController _pressController;
   late AnimationController _pulseController;
   late Animation<double> _scaleAnimation;
-  late Animation<double> _pulseScaleAnimation;
   late Animation<double> _pulseGlowAnimation;
   bool _isHovered = false;
 
   @override
   void initState() {
     super.initState();
-    // Animation for tapping interaction (press down shrink)
-    _controller = AnimationController(
+    _pressController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 150),
     );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.9).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.92).animate(
+      CurvedAnimation(parent: _pressController, curve: Curves.easeOut),
     );
 
-    // Animation for continuous idle breathing pulse
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2000),
     )..repeat(reverse: true);
 
-    _pulseScaleAnimation = Tween<double>(begin: 1.0, end: 1.06).animate(
+    _pulseGlowAnimation = Tween<double>(begin: 4.0, end: 12.0).animate(
       CurvedAnimation(
         parent: _pulseController,
-        curve: const Interval(0.0, 1.0, curve: Curves.easeInOut),
-      ),
-    );
-
-    _pulseGlowAnimation = Tween<double>(begin: 4.0, end: 14.0).animate(
-      CurvedAnimation(
-        parent: _pulseController,
-        curve: const Interval(0.0, 1.0, curve: Curves.easeInOut),
+        curve: Curves.easeInOut,
       ),
     );
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _pressController.dispose();
     _pulseController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: GestureDetector(
-        onTapDown: (_) => _controller.forward(),
+        onTapDown: (_) => _pressController.forward(),
         onTapUp: (_) {
-          _controller.reverse();
+          _pressController.reverse();
           _navigateToChat();
         },
-        onTapCancel: () => _controller.reverse(),
+        onTapCancel: () => _pressController.reverse(),
         child: ScaleTransition(
           scale: _scaleAnimation,
           child: AnimatedBuilder(
             animation: _pulseController,
             builder: (context, child) {
-              final double currentPulseScale = _isHovered ? 1.0 : _pulseScaleAnimation.value;
-              final double currentGlowRadius = _isHovered ? 20.0 : _pulseGlowAnimation.value;
+              final double glowRadius = _isHovered ? 16.0 : _pulseGlowAnimation.value;
 
-              return Transform.scale(
-                scale: currentPulseScale,
-                child: Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      // Dual shadow layers for modern neon glow effect
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: _isHovered ? 0.45 : 0.25),
-                        blurRadius: currentGlowRadius,
-                        spreadRadius: _isHovered ? 4 : 1,
-                        offset: const Offset(0, 4),
-                      ),
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.15),
-                        blurRadius: currentGlowRadius * 1.5,
-                        spreadRadius: 0,
-                      ),
-                    ],
+              return Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isDark ? const Color(0xFF0F3818) : AppColors.primary,
+                  border: Border.all(
+                    color: AppColors.primary,
+                    width: 2.0,
                   ),
-                  child: ClipOval(
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 16.0, sigmaY: 16.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          // Sleek semi-transparent glass container with primary green accent tint
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              AppColors.primary.withValues(alpha: _isHovered ? 0.9 : 0.65),
-                              AppColors.primary.withValues(alpha: _isHovered ? 0.8 : 0.5),
-                            ],
-                          ),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: AppColors.onPrimary.withValues(alpha: _isHovered ? 0.4 : 0.25),
-                            width: 1.2,
-                          ),
-                        ),
-                        child: Center(
-                          child: AnimatedRotation(
-                            turns: _isHovered ? 0.05 : 0.0,
-                            duration: const Duration(milliseconds: 250),
-                            child: Icon(
-                              Icons.chat_bubble_outline,
-                              color: AppColors.onPrimary.withValues(alpha: _isHovered ? 1.0 : 0.95),
-                              size: 20,
-                            ),
-                          ),
-                        ),
-                      ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: isDark ? 0.5 : 0.35),
+                      blurRadius: glowRadius,
+                      spreadRadius: _isHovered ? 2 : 1,
+                      offset: const Offset(0, 3),
                     ),
+                  ],
+                ),
+                child: Center(
+                  child: Icon(
+                    Icons.chat_bubble_rounded,
+                    color: AppColors.onPrimary,
+                    size: 22,
                   ),
                 ),
               );

@@ -80,7 +80,7 @@ class AppColors {
 extension AppThemeContext on BuildContext {
   bool get isDarkMode => Theme.of(this).brightness == Brightness.dark;
 
-  Color get appBackground => isDarkMode ? const Color(0xFF101213) : AppColors.background;
+  Color get appBackground => isDarkMode ? const Color(0xFF101213) : const Color(0xFFF8FCF8);
   Color get appSurface => isDarkMode ? const Color(0xFF1B1E20) : AppColors.surface;
   Color get appSurfaceElevated => isDarkMode ? const Color(0xFF25292C) : AppColors.surfaceElevated;
   Color get appSurfaceContainerLow => isDarkMode ? const Color(0xFF171A1C) : AppColors.surfaceContainerLow;
@@ -90,7 +90,38 @@ extension AppThemeContext on BuildContext {
   Color get appOutlineVariant => isDarkMode ? const Color(0xFF2E3338) : AppColors.outlineVariant;
   Color get appCardBg => isDarkMode
       ? const Color(0xFF1B1E20).withValues(alpha: 0.85)
-      : const Color(0xFFFFFFFF).withValues(alpha: 0.85);
+      : const Color(0xFFFFFFFF);
+
+  LinearGradient get appBackgroundGradient => isDarkMode
+      ? const LinearGradient(
+          colors: [Color(0xFF101213), Color(0xFF101213)],
+        )
+      : const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFFEAF8EE), // Top Left
+            Color(0xFFF8FCF8), // Center
+            Color(0xFFF2FBF4), // Bottom Right
+          ],
+          stops: [0.0, 0.5, 1.0],
+        );
+
+  BoxShadow get appCardShadow => isDarkMode
+      ? BoxShadow(
+          color: Colors.black.withValues(alpha: 0.2),
+          blurRadius: 20,
+          offset: const Offset(0, 4),
+        )
+      : BoxShadow(
+          color: AppColors.primary.withValues(alpha: 0.05),
+          blurRadius: 24,
+          offset: const Offset(0, 6),
+        );
+
+  Color get appCardBorder => isDarkMode
+      ? const Color(0xFF2E3338).withValues(alpha: 0.3)
+      : const Color(0xFFFFFFFF).withValues(alpha: 0.65);
 }
 
 class AppTheme {

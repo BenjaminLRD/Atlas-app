@@ -5,6 +5,8 @@ import '../models/notification_model.dart';
 import '../models/chat_message.dart';
 import '../models/active_workout_session.dart';
 import '../models/workout_history.dart';
+import '../models/daily_nutrition.dart';
+import '../models/macro_target.dart';
 
 class LocalStorage {
   static SharedPreferences? _prefs;
@@ -47,6 +49,46 @@ class LocalStorage {
 
   static Future<void> saveProteinGoal(double val) async {
     await _prefs?.setDouble('protein_goal', val);
+  }
+
+  // --- Daily Nutrition & Macros ---
+  static DailyNutrition getDailyNutrition(String date) {
+    final str = _prefs?.getString('nutrition_daily_$date');
+    if (str != null) {
+      try {
+        final decoded = jsonDecode(str) as Map<String, dynamic>;
+        return DailyNutrition.fromJson(decoded);
+      } catch (_) {
+        return DailyNutrition.defaultForDate(date, getMacroTarget());
+      }
+    }
+    return DailyNutrition.defaultForDate(date, getMacroTarget());
+  }
+
+  static Future<void> saveDailyNutrition(DailyNutrition dailyNutrition) async {
+    await _prefs?.setString('nutrition_daily_${dailyNutrition.date}', jsonEncode(dailyNutrition.toJson()));
+    final todayStr = DateTime.now().toIso8601String().split('T')[0];
+    if (dailyNutrition.date == todayStr) {
+      await saveProteinConsumed(dailyNutrition.totalProteinConsumed);
+    }
+  }
+
+  static MacroTarget getMacroTarget() {
+    final str = _prefs?.getString('macro_target');
+    if (str != null) {
+      try {
+        final decoded = jsonDecode(str) as Map<String, dynamic>;
+        return MacroTarget.fromJson(decoded);
+      } catch (_) {
+        return MacroTarget.defaultTarget();
+      }
+    }
+    return MacroTarget.defaultTarget();
+  }
+
+  static Future<void> saveMacroTarget(MacroTarget target) async {
+    await _prefs?.setString('macro_target', jsonEncode(target.toJson()));
+    await saveProteinGoal(target.proteinGrams);
   }
 
   // --- Workout Session ---
@@ -106,6 +148,23 @@ class LocalStorage {
 
   static Future<void> setLoggedIn(bool value) async {
     await _prefs?.setBool('is_logged_in', value);
+  }
+
+  // --- Theme Mode ---
+  static String getThemeModeString() {
+    return _prefs?.getString('app_theme_mode') ?? 'system';
+  }
+
+  static Future<void> saveThemeModeString(String mode) async {
+    await _prefs?.setString('app_theme_mode', mode);
+  }
+
+  static bool getBool(String key, {bool defaultValue = true}) {
+    return _prefs?.getBool(key) ?? defaultValue;
+  }
+
+  static Future<void> saveBool(String key, bool val) async {
+    await _prefs?.setBool(key, val);
   }
 
   static Future<void> clearAll() async {

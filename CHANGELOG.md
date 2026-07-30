@@ -3,6 +3,99 @@
 ## Current
 
 ### Added
+- Comprehensive Design System Consolidation & Component Library:
+  - Built 12 unified, highly reusable design system components in `lib/widgets/common/`:
+    - `AppHeader` ([app_header.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/widgets/common/app_header.dart)): Standardized top app bar with `AppHeader.standard`, `AppHeader.back`, and `AppHeader.centered`.
+    - `AppChip` ([app_chip.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/widgets/common/app_chip.dart)): Badge & selector component with micro scale-bounce tap animation.
+    - `AppListTile` ([app_list_tile.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/widgets/common/app_list_tile.dart)): Reusable list row item with leading icon badge, title, subtitle, trailing action/switch, and `onTap`.
+    - `AppButton` ([app_button.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/widgets/common/app_button.dart)): Unified button component (`AppButton.primary`, `AppButton.secondary`, `AppButton.text`, `AppButton.icon`) with touch feedback.
+    - `AppBottomSheet` ([app_bottom_sheet.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/widgets/common/app_bottom_sheet.dart)): Static modal helper with `SafeArea`, top drag handle indicator, 24px radii, and height bounds.
+    - `AppDialog` ([app_dialog.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/widgets/common/app_dialog.dart)): Standard alert dialog helper `AppDialog.show(...)`.
+    - `AppInsightCard` ([app_insight_card.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/widgets/common/app_insight_card.dart)): Reusable AI insight banner card with subtle border glow.
+    - `AppHeroCard` ([app_hero_card.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/widgets/common/app_hero_card.dart)): Featured protocol and workout hero card component.
+    - `AppAnalyticsCard` ([app_analytics_card.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/widgets/common/app_analytics_card.dart)): Bento analytics summary card for metrics & biometrics.
+    - `AppChartCard` ([app_chart_card.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/widgets/common/app_chart_card.dart)): Chart container with section header and period selector chips.
+    - `AppChart` ([app_chart.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/widgets/common/app_chart.dart)): Line chart wrapper around `fl_chart`.
+    - `AppAnimation` ([app_animation.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/widgets/common/app_animation.dart)): Micro-animation utilities (`scaleBounce`, `pulseGlow`).
+  - Migrated screens to consume design system widgets directly, eliminating duplicated UI elements across the application.
+  - Verification: 100% test & analysis pass (`flutter analyze`: 0 errors; `flutter test`: 38/38 passed).
+- Application-Wide Header Standardization:
+  - Created reusable `AppHeader` widget ([app_header.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/widgets/common/app_header.dart)) supporting `AppHeader.standard`, `AppHeader.back`, and `AppHeader.centered` variants.
+  - Implemented `SafeArea` integration, content-driven height, 16px horizontal padding, truncated title/subtitle (`maxLines: 1`, `overflow: TextOverflow.ellipsis`), and 40x40 circular action buttons with explicit 16px gap to eliminate icon overlap across all device sizes.
+  - Migrated all screens (`Dashboard`, `Diet Plan`, `Profile`, `Workout Session`, `Workout History`, `Body Composition`, `Edit Profile`, `Settings`, `Notifications`, `Weekly Workout Plan`, `AI Coach Chat`) to use `AppHeader`.
+  - Resolved bottom sheet `RenderFlex` overflow exception in `SettingsScreen` by updating layout constraints.
+- Completed Application-Wide UI & Visual QA Pass:
+  - Bottom Sheet Scroll Safety Overhaul: Fixed Privacy & Security sheet clipping (shown in QA screenshot) by setting `isScrollControlled: true`, wrapping in `SafeArea` + `ConstrainedBox(maxHeight: 85vh)` + `SingleChildScrollView`. Restored the `"Your data is safe"` encrypted banner card and added a top drag handle indicator.
+  - Global Modal Sheet Audit: Standardized modal bottom sheets across `SettingsScreen`, `ProfileScreen`, `DashboardScreen`, `DietPlanScreen`, and `WorkoutSessionScreen` with 24px top corner radii, drag indicator handles, and scroll bounds to prevent clipping on small devices.
+  - Safe Area & Inset Compliance: Verified scroll paddings across all 11 screens (`Dashboard`, `Diet Plan`, `Workouts`, `Workout Session`, `Workout History`, `Profile`, `Edit Profile`, `Body Composition`, `Settings`, `Notifications`, `AI Coach Chat`) to ensure no elements overlap status bars, notches, home indicators, navigation bars, or the floating AI coach button.
+  - Design Token Consistency: Enforced uniform 16px card radii, shadow softness (`blurRadius: 24`), `AppColors.primary` green accents, and theme context surface tokens across Light and Dark modes.
+  - Verification: 100% test & analysis pass (`flutter analyze`: 0 errors, 0 warnings; `flutter test`: 38/38 passed).
+- Completed Application-wide Navigation & Interaction Audit:
+  - New Screen `BodyCompositionScreen` ([body_composition_screen.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/screens/body_composition_screen.dart)): Dedicated screen for Body Composition & Vitals wired to `"View Details"` on Profile screen. Displays BMI, Body Fat %, Muscle Mass, Resting HR, Healthy Reference Ranges table, AI Body Composition Analysis, and Smart Scale Bluetooth sync.
+  - Profile Screen (`profile_screen.dart`): Wired `Weight` card `→` to `Log Weight` modal bottom sheet (updates `ProfileProvider` weight, recalculates BMI & weight spots, displays confirmation SnackBar). Wired `Diet Preference` card `→` to `Dietary Preference` modal bottom sheet (`High Protein`, `Keto`, `Balanced`, `Vegan`, `Low Carb`). Wired `"View Details"` to `BodyCompositionScreen`.
+  - Dashboard Screen (`dashboard_screen.dart`): Wired `Active Protocol` card to `WorkoutSessionScreen`, `'Plan'` button to `WeeklyWorkoutPlanScreen`, `Activity Rings` card to `Daily Activity Breakdown` modal, `Weight` card to `BodyCompositionScreen`, `Steps` card to `Step Breakdown` modal, and `Water` card to `Log Water Intake` (+250ml logging).
+  - Diet Plan Screen (`diet_plan_screen.dart`): Wired meal cards to `Meal Details` modal sheet with logged food items and `"Add Food Item to Meal"` action.
+  - Workout Session Screen (`workout_session_screen.dart`): Wired `Exercise` card tap to `Exercise Details & Instructions` modal sheet with form guidance and muscle targeting breakdown.
+  - Notifications Screen (`notifications_screen.dart`): Auto-marks all unread notifications as read upon opening the screen.
+  - Verification: 100% test & analysis pass (`flutter analyze`: 0 errors, 0 warnings; `flutter test`: 38/38 passed).
+- Completed Profile Screen UI QA Fixes ([profile_screen.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/screens/profile_screen.dart)):
+  - Header Overlap Fix: Restructured header layout using `Expanded` and flex hierarchy with an explicit 16px horizontal gap between Notifications (bell with green badge dot) and Settings (gear button), eliminating text clipping and header overlap on all screen widths.
+  - Set Header Title Color: Styled app title `Aizawl Gym` in primary green (`AppColors.primary`) matching the target reference screenshot.
+  - Removed "Update" Text: Completely removed the redundant `"Update"` text label from all 4 Bento profile cards (`AGE`, `WEIGHT`, `HEIGHT`, `DIET PREFERENCE`), keeping only the clean trailing green arrow icon (`→`) in the bottom-right corner.
+  - Dynamic Real Local Timestamp: Replaced static timestamp text with real local time formatting (`Last updated: 7:42 PM`). Refreshes dynamically whenever profile data changes, the screen refreshes, or the user taps the refresh icon.
+  - Equal Bento Card Heights: Wrapped Bento grid row pairs in `IntrinsicHeight` to enforce equal card heights, uniform padding, and aligned trailing arrows across all device form factors.
+- Implemented Light Mode Premium Background Enhancement:
+  - Background Gradient: Replaced flat white/light grey background with an ultra-smooth green gradient (`#EAF8EE` -> `#F8FCF8` -> `#F2FBF4`) defined via `context.appBackgroundGradient`.
+  - Depth & Ambient Organic Blobs: Created `AmbientBackground` widget ([ambient_background.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/widgets/common/ambient_background.dart)) rendering soft blurred depth circles (opacity 3%–6%) behind content that slowly float when motion is enabled (respects `MediaQuery.of(context).disableAnimations`).
+  - Floating White Cards: Updated `AppCard` ([app_card.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/widgets/common/app_card.dart)) to use crisp white surfaces (`#FFFFFF`) with `blurRadius: 24` floating shadows and subtle borders (`context.appCardShadow` and `context.appCardBorder`), making cards float gently above the background like Apple Fitness, WHOOP, Oura, and Linear.
+  - Preserved Dark Mode: All Dark Mode background, surface, glass, and shadow tokens remain 100% untouched.
+- Completed Settings Screen Polish & Functionality Update ([settings_screen.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/screens/settings_screen.dart)):
+  - Removed Accent Color Section: Completely removed Accent Color title, description, and color swatches list; reflowed the layout naturally with zero empty space.
+  - Functional Theme Switcher: `System`, `Light`, and `Dark` segmented buttons instantly update `themeModeNotifier` and persist choice across restarts via `LocalStorage.saveThemeModeString`.
+  - Workout History Navigation: Wired directly to `WorkoutHistoryScreen()`.
+  - Functional Units Switcher: Subtitle reflects current units (`Metric (kg, cm)` or `Imperial (lbs, in)`). Tapping opens a bottom sheet modal to switch units, updating `UserProfile.massUnit` & `lengthUnit` via `ProfileProvider` and showing a confirmation SnackBar.
+  - Notifications Settings Sub-Page: Modal bottom sheet with individual switches for `Workout Reminders`, `Meal Reminders`, `Goal Achievements`, and `General App Notifications`, persisting state via `LocalStorage.saveBool`.
+  - Inline Workout Reminders Switch: Functional switch persisting state in `LocalStorage` and `UserProfile`.
+  - Privacy Sub-Page Modal: Includes `Privacy Policy` view modal, `Terms of Service` view modal, `Data Storage` local device verification notice, and badged `Export Data` & `Delete Account` (`COMING SOON`) options.
+  - Support & FAQ Modals: Interactive dialogs for `Help & FAQ` and `Contact Support` (`support@aizawlgym.com`).
+  - Added feedback `SnackBar` messages and haptic/ripple feedback across all interactive setting actions.
+- Rebuilt `ProfileScreen` presentation layer ([profile_screen.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/screens/profile_screen.dart)) matching the reference design mockup:
+  - Header: Avatar circle, user name, "Your fitness journey" subtitle, and separate Notifications & Settings buttons.
+  - Profile Overview: Status timestamp ("Last updated: Today, 10:30 AM") with animated refresh action.
+  - 2x2 Bento Profile Cards: Age, Weight, Height, and Diet Preference with icons, values, status chips, and "Update →" actions navigating to `EditProfileScreen`.
+  - Weight Trends Section: Animated 1M/6M/1Y range controls, left metrics summary column (Current, Change, Lowest, Highest), interactive `LineChart` with Y-axis labels (`64 kg`, `66 kg`, etc.), X-axis month labels, peak value callouts, and touch tooltips.
+  - Body Composition Section: 3 bento cards (BMI, Body Fat %, Muscle Mass) with status chips, progress bars, and healthy range indicators.
+- Updated Bottom Navigation Bar in `lib/main.dart` to 5-tab layout: `Summary`, `Diet Plan`, `Workouts` (center elevated button), `Progress` (`WorkoutHistoryScreen`), and `Profile` (`ProfileScreen`).
+- Completed UI QA Audit & Layout Fixes:
+  - Header Actions Spacing: Separated Notifications & Settings circular buttons across headers with explicit 14px spacing, preventing overlap on all screen widths.
+  - Consolidated AI Entry Points: Removed redundant duplicate "Ask AI Trainer" banners/cards from `DashboardScreen`, `WorkoutSessionScreen`, `ProfileScreen`, and `DietPlanScreen`, enforcing the global floating AI button as the single primary entry point.
+  - Calculated Safe Area & Floating Button Placement: Dynamically calculated bottom inset in `lib/main.dart` (`MediaQuery.of(context).padding.bottom + 84`), preventing the floating AI button from covering navigation items or controls.
+  - Calculated Bottom Padding Rule: Updated all scrollable screens (`DashboardScreen`, `DietPlanScreen`, `WorkoutSessionScreen`, `WorkoutHistoryScreen`, `ProfileScreen`) to use dynamic safe area bottom padding (`bottomInset + 130`), ensuring every interactive widget can be scrolled completely clear of bottom navigation and floating controls.
+- Verified 100% semantic tokenization and Light/Dark dual-theme parity across `DashboardScreen`, `DietPlanScreen`, `WorkoutHistoryScreen`, and `ProfileScreen` matching Stitch project `13103574813285232047` Light and Dark specifications with >=95% visual match.
+- Redesigned `ProfileScreen` ([profile_screen.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/screens/profile_screen.dart)) matching Stitch screens `e726126362ac404fa0904d9f84da9a95` (`Profile Dark`) and `c4a30eef79df495eb4880c55047b8552` (`Profile Light Mode`), featuring member hero glass card, core biometric bento metrics grid, interactive weight trends chart, athletic composition stats, and AI personal trainer insight.
+- Wired `ProfileScreen` directly to `ProfileProvider` for zero hardcoded profile state.
+- Redesigned `WorkoutHistoryScreen` ([workout_history_screen.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/screens/workout_history_screen.dart)) matching Stitch screen `342488d05e834b51a6e158833028e9cc` (`Workout History Dark`), featuring ambient green glow background, summary analytics bento row, and chronological workout history log glass cards.
+- Redesigned `DietPlanScreen` ([diet_plan_screen.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/screens/diet_plan_screen.dart)) matching Stitch screens `8d2b7b818b6141df9e8229b3ff62e053` (`Diet Plan Vitality Dark`) and `4e3c323ad1d5427d83291bad804da300` (`Diet Plan Light Mode`).
+- Wired `DietPlanScreen` directly to `NutritionService` & `NutritionRepository` using real `DailyNutrition`, `MealEntry`, `FoodItem`, and `MacroTarget` domain models.
+- Added interactive meal completion toggles, macro progress cards (Protein, Carbs, Fat), and an Add Food modal bottom sheet.
+- Redesigned `WorkoutSessionScreen` ([workout_session_screen.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/screens/workout_session_screen.dart)) to match finalized Stitch active workout experience mock: single primary rest timer card (`ProgressRing`), current exercise hero card with muscle focus pill, horizontal set progress tracker, weight/reps load summary, and fixed bottom `PrimaryButton` ("Complete Set N").
+- Updated bottom navigation "Workouts" tab in `lib/main.dart` to open `WorkoutSessionScreen` directly, providing a seamless active training flow.
+- Redesigned `ForgotPasswordScreen` ([forgot_password_screen.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/screens/forgot_password_screen.dart)) matching Stitch screen `25317a261bc44041a1cbe86fc5af75dd` (`Forgot Password Emerald Dark`) and `LoginScreen` glass card design language, eliminating light/dark authentication flow theme mismatch.
+- Completed Phase 3 UI implementation audit and verified `DashboardScreen` ([dashboard_screen.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/screens/dashboard_screen.dart)) against finalized Stitch design `13103574813285232047`, featuring Apple-style greeting header, compact AI Daily Insight card, active protocol card, concentric activity rings, responsive Bento metric cards, and 7-day performance trend bar chart.
+- Configured global AI Coach FAB floating layer in `lib/main.dart` (`AiChatButton`), rendering consistently across all 4 main tabs (Dashboard, Diet Plan, Workouts, Profile) positioned cleanly above bottom navigation bar.
+- Redesigned `AiChatButton` (`lib/widgets/ai_chat_button.dart`) to be theme-aware with green accent glow ring and speech bubble icon (`Icons.chat_bubble_rounded`) matching Stitch visual design mocks.
+- Redesigned `LoginScreen` (`lib/screens/login_screen.dart`) matching Vitality glass card design system with dumbbell brand logo header, translucent glass form container, green accent email/password fields, social login buttons (Google & Apple), and sign-up footer.
+- Created `SettingsScreen` (`lib/screens/settings_screen.dart`) featuring Apple-style segmented theme selection (System, Light, Dark), accent color swatches, preferences (Units, Notifications, Workout Reminders, Privacy), support (Help & FAQ, Contact Support), and logout action.
+- Added theme mode persistence (`getThemeModeString` / `saveThemeModeString`) in `LocalStorage` and `themeModeNotifier` in `lib/main.dart` driving real-time `ThemeMode` updates across the app.
+- Consolidated AI Coach entry points: Removed floating chat bubble above bottom navigation in `lib/main.dart`, keeping the top-right AI assistant icon near the greeting as the single primary access point.
+- Resolved `MetricCard` RenderFlex horizontal overflow by setting `mainAxisSize: MainAxisSize.min` on intrinsic value/unit rows inside `FittedBox`.
+- Refactored `DashboardScreen` health metric section into a responsive 2-column Bento layout on mobile (and 3-column on desktop) eliminating narrow 3-column clipping.
+- Enhanced `MetricCard` with `FittedBox` value text scaling, subtext ("vs yesterday", "72% of goal"), and optional trailing widget support.
+- Redesigned AI Daily Insight card matching Apple aesthetics with a translucent green glow border, compact height, and 2-line quote limit.
+- Expanded Nutrition Data Architecture with strongly typed domain models: `FoodItem`, `MealEntry` (with `MealCategory` enum), `MacroTarget`, and `DailyNutrition` in `lib/models/`.
+- Expanded `NutritionRepository` and `NutritionService` with domain methods: `getDailyNutrition(date)`, `saveDailyNutrition(data)`, `getMacroTarget()`, `saveMacroTarget(target)`, `logFoodItem()`, and `toggleMealCompletion()`.
+- Implemented `DailyNutrition` date-based persistence (`nutrition_daily_YYYY-MM-DD`) and `MacroTarget` storage in `LocalStorage`, keeping legacy protein methods synchronized.
+- Created unit safety test suites: `test/unit/nutrition_models_test.dart` and `test/unit/nutrition_repository_test.dart`.
 - Phase 3 UI/UX Polish: Dual-Theme Design System in `lib/app_theme.dart` with Apple-inspired light charcoal & translucent dark modes (`AppTheme.lightTheme` & `AppTheme.darkTheme`).
 - Created `AppThemeContext` extension on `BuildContext` (`context.appBackground`, `context.appSurface`, `context.appTextPrimary`, `context.appPrimary`, `context.appCardBg`) for automatic light/dark theme adaptability.
 - Redesigned core widgets in `lib/widgets/common/`: `AppCard`, `ProgressRing`, `PrimaryButton`, `MetricCard`, and `SectionHeader`.

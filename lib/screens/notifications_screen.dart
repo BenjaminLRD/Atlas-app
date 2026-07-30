@@ -3,6 +3,10 @@ import '../app_theme.dart';
 import '../data/app_dependencies.dart';
 import '../data/notification_service.dart';
 import '../models/notification_model.dart';
+import '../widgets/common/app_button.dart';
+import '../widgets/common/app_card.dart';
+import '../widgets/common/app_header.dart';
+import '../widgets/common/app_list_tile.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -19,6 +23,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   void initState() {
     super.initState();
     _notificationService = AppDependencies.instance.notificationService;
+    _notifications = _notificationService.getNotifications();
+    _notificationService.markAllAsRead(_notifications);
     _notifications = _notificationService.getNotifications();
   }
 
@@ -38,7 +44,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   void _toggleNotificationReadStatus(String id, bool isCurrentlyRead) {
     setState(() {
-      _notificationService.toggleReadStatus(_notifications, id, isCurrentlyRead);
+      _notificationService.toggleReadStatus(
+        _notifications,
+        id,
+        isCurrentlyRead,
+      );
       _notifications = _notificationService.getNotifications();
     });
   }
@@ -48,27 +58,31 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     final unreadCount = _notifications.where((n) => !n.isRead).length;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Notifications'),
-        actions: [
-          if (unreadCount > 0)
-            TextButton.icon(
-              onPressed: _markAllAsRead,
-              icon: const Icon(Icons.done_all, size: 18),
-              label: const Text('Mark all as read'),
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.primary,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              ),
-            ),
-        ],
+      backgroundColor: context.appBackground,
+      appBar: AppHeader.back(
+        title: 'Notifications',
+        subtitle: unreadCount > 0
+            ? '$unreadCount unread alerts'
+            : 'All caught up',
+        onBackTap: () => Navigator.maybePop(context),
+        trailing: unreadCount > 0
+            ? AppButton.text(
+                label: 'Mark all read',
+                icon: Icons.done_all,
+                onPressed: _markAllAsRead,
+              )
+            : null,
       ),
       body: _notifications.isEmpty
           ? const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.notifications_none, size: 64, color: AppColors.outline),
+                  Icon(
+                    Icons.notifications_none,
+                    size: 64,
+                    color: AppColors.outline,
+                  ),
                   SizedBox(height: 16),
                   Text('No notifications yet'),
                 ],
@@ -79,99 +93,56 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               itemCount: _notifications.length,
               itemBuilder: (context, index) {
                 final notification = _notifications[index];
-                final isUnread = !notification['isRead'];
+                final isUnread = !notification.isRead;
 
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface,
-                    borderRadius: BorderRadius.circular(12),
-                    border: isUnread
-                        ? Border.all(color: AppColors.primary, width: 2)
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: AppCard(
+                    borderColor: isUnread
+                        ? AppColors.primary.withValues(alpha: 0.5)
                         : null,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.onSurface.withValues(alpha: 0.05),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: ListTile(
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    leading: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: isUnread
-                            ? AppColors.primaryContainer.withValues(alpha: 0.3)
-                            : AppColors.surfaceContainer,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(Icons.notifications, size: 20),
-                    ),
-                    title: Text(
-                      notification['title'] ?? '',
-                      style: AppTheme.bodyMd.copyWith(
-                        fontWeight: isUnread ? FontWeight.bold : FontWeight.normal,
-                        color: AppColors.onSurface,
-                      ),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 4),
-                        Text(
-                          notification['body'] ?? '',
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: AppTheme.bodySm.copyWith(
-                            color: AppColors.onSurfaceVariant,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            Icon(Icons.access_time,
-                                size: 12, color: AppColors.outline),
-                            const SizedBox(width: 4),
-                            Text(
-                              notification['timestamp'] ?? '',
-                              style: AppTheme.labelCaps.copyWith(
-                                fontSize: 10,
-                                color: AppColors.outline,
-                              ),
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: AppListTile(
+                      leadingIcon: Icons.notifications,
+                      iconColor: isUnread
+                          ? AppColors.primary
+                          : AppColors.outline,
+                      title: notification.title,
+                      subtitle: notification.body,
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            onPressed: () => _toggleNotificationReadStatus(
+                              notification.id,
+                              notification.isRead,
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          onPressed: () => _toggleNotificationReadStatus(
-                              notification['id'] as String,
-                              notification['isRead'] as bool),
-                          icon: Icon(
-                            notification['isRead']
-                                ? Icons.check_circle_outline
-                                : Icons.radio_button_unchecked,
-                            size: 20,
-                            color: notification['isRead']
-                                ? AppColors.outline
-                                : AppColors.primary,
+                            icon: Icon(
+                              notification.isRead
+                                  ? Icons.check_circle_outline
+                                  : Icons.radio_button_unchecked,
+                              size: 20,
+                              color: notification.isRead
+                                  ? AppColors.outline
+                                  : AppColors.primary,
+                            ),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
                           ),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                        ),
-                        IconButton(
-                          onPressed: () => _removeNotification(notification['id'] as String),
-                          icon: const Icon(Icons.delete_outline, size: 20, color: AppColors.error),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                        ),
-                      ],
+                          const SizedBox(width: 4),
+                          IconButton(
+                            onPressed: () =>
+                                _removeNotification(notification.id),
+                            icon: const Icon(
+                              Icons.delete_outline,
+                              size: 20,
+                              color: AppColors.error,
+                            ),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 );

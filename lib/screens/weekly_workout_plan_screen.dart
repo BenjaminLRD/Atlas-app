@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import '../app_theme.dart';
+import '../widgets/common/app_button.dart';
+import '../widgets/common/app_card.dart';
+import '../widgets/common/app_chip.dart';
+import '../widgets/common/app_header.dart';
 import 'workout_session_screen.dart';
 
 class DailyPlan {
@@ -26,7 +30,8 @@ class WeeklyWorkoutPlanScreen extends StatefulWidget {
   const WeeklyWorkoutPlanScreen({super.key});
 
   @override
-  State<WeeklyWorkoutPlanScreen> createState() => _WeeklyWorkoutPlanScreenState();
+  State<WeeklyWorkoutPlanScreen> createState() =>
+      _WeeklyWorkoutPlanScreenState();
 }
 
 class _WeeklyWorkoutPlanScreenState extends State<WeeklyWorkoutPlanScreen> {
@@ -111,10 +116,7 @@ class _WeeklyWorkoutPlanScreenState extends State<WeeklyWorkoutPlanScreen> {
       title: 'Rest & Repair',
       duration: '0 mins',
       muscleGroups: 'Total Rest',
-      exercises: [
-        'Light Walk - 20 mins',
-        'Passive Stretching - 15 mins',
-      ],
+      exercises: ['Light Walk - 20 mins', 'Passive Stretching - 15 mins'],
     ),
   ];
 
@@ -124,18 +126,11 @@ class _WeeklyWorkoutPlanScreenState extends State<WeeklyWorkoutPlanScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.onSurface),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'Weekly Workout Plan',
-          style: AppTheme.headlineMd.copyWith(fontSize: 18),
-        ),
+      backgroundColor: context.appBackground,
+      appBar: AppHeader.back(
+        title: 'Weekly Workout Plan',
+        subtitle: 'HYBRID STRENGTH II',
+        onBackTap: () => Navigator.maybePop(context),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -153,14 +148,14 @@ class _WeeklyWorkoutPlanScreenState extends State<WeeklyWorkoutPlanScreen> {
             const SizedBox(height: 8),
             Text(
               'Weekly Schedule',
-              style: AppTheme.headlineLgMobile,
+              style: AppTheme.headlineLgMobile.copyWith(
+                color: context.appTextPrimary,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
               'Click daily cards below to reveal specific exercises, goals, and training guidelines.',
-              style: AppTheme.bodyMd.copyWith(
-                color: AppColors.onSurfaceVariant,
-              ),
+              style: AppTheme.bodyMd.copyWith(color: context.appTextSecondary),
             ),
             const SizedBox(height: 24),
 
@@ -173,200 +168,193 @@ class _WeeklyWorkoutPlanScreenState extends State<WeeklyWorkoutPlanScreen> {
                 final plan = _weeklyPlans[index];
                 final isExpanded = _expandedIndex == index;
 
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  decoration: BoxDecoration(
-                    color: plan.isToday
-                        ? AppColors.primaryFixed.withValues(alpha: 0.15)
-                        : AppColors.surface,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: plan.isToday ? AppColors.primary : AppColors.outlineVariant,
-                      width: plan.isToday ? 2 : 1,
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      // Header part
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            _expandedIndex = isExpanded ? -1 : index;
-                          });
-                        },
-                        borderRadius: BorderRadius.circular(12),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            children: [
-                              SizedBox(
-                                width: 50,
-                                child: Column(
-                                  children: [
-                                    Text(
-                                      plan.dayName.substring(0, 3),
-                                      style: AppTheme.labelCaps.copyWith(
-                                        color: plan.isToday ? AppColors.primary : AppColors.tertiary,
-                                        fontSize: 10,
-                                        fontWeight: plan.isToday ? FontWeight.bold : FontWeight.w500,
-                                      ),
-                                    ),
-                                    Text(
-                                      plan.date,
-                                      style: AppTheme.headlineMd.copyWith(
-                                        fontSize: 20,
-                                        color: plan.isToday ? AppColors.primary : AppColors.onSurface,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                height: 36,
-                                width: 1,
-                                color: AppColors.outlineVariant,
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      plan.title,
-                                      style: AppTheme.bodyMd.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.onSurface,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      'Target: ${plan.muscleGroups}',
-                                      style: AppTheme.bodySm.copyWith(
-                                        color: AppColors.onSurfaceVariant,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  if (plan.isToday)
-                                    Container(
-                                      margin: const EdgeInsets.only(bottom: 4),
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.primary,
-                                        borderRadius: BorderRadius.circular(100),
-                                      ),
-                                      child: Text(
-                                        'TODAY',
-                                        style: AppTheme.labelCaps.copyWith(
-                                          color: AppColors.onPrimary,
-                                          fontSize: 8,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  Text(
-                                    plan.duration,
-                                    style: AppTheme.bodySm.copyWith(
-                                      color: AppColors.onSurfaceVariant,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(width: 8),
-                              Icon(
-                                isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                                color: plan.isToday ? AppColors.primary : AppColors.outline,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-
-                      // Exercises part (if expanded)
-                      if (isExpanded)
-                        Container(
-                          padding: const EdgeInsets.only(left: 16, right: 16, bottom: 20),
-                          width: double.infinity,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Divider(height: 1, color: AppColors.outlineVariant),
-                              const SizedBox(height: 16),
-                              Text(
-                                'EXERCISE SEQUENCE',
-                                style: AppTheme.labelCaps.copyWith(
-                                  fontSize: 9,
-                                  color: AppColors.tertiary,
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              ...List.generate(plan.exercises.length, (exIdx) {
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 6),
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: AppCard(
+                    borderColor: plan.isToday ? AppColors.primary : null,
+                    padding: EdgeInsets.zero,
+                    child: Column(
+                      children: [
+                        // Header row
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              _expandedIndex = isExpanded ? -1 : index;
+                            });
+                          },
+                          borderRadius: BorderRadius.circular(24),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  width: 50,
+                                  child: Column(
                                     children: [
-                                      Container(
-                                        margin: const EdgeInsets.only(top: 4),
-                                        width: 6,
-                                        height: 6,
-                                        decoration: const BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: AppColors.primary,
+                                      Text(
+                                        plan.dayName.substring(0, 3),
+                                        style: AppTheme.labelCaps.copyWith(
+                                          color: plan.isToday
+                                              ? AppColors.primary
+                                              : AppColors.tertiary,
+                                          fontSize: 10,
+                                          fontWeight: plan.isToday
+                                              ? FontWeight.bold
+                                              : FontWeight.w500,
                                         ),
                                       ),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: Text(
-                                          plan.exercises[exIdx],
-                                          style: AppTheme.bodyMd.copyWith(
-                                            color: AppColors.onSurface,
-                                          ),
+                                      Text(
+                                        plan.date,
+                                        style: AppTheme.headlineMd.copyWith(
+                                          fontSize: 20,
+                                          color: plan.isToday
+                                              ? AppColors.primary
+                                              : context.appTextPrimary,
                                         ),
                                       ),
                                     ],
                                   ),
-                                );
-                              }),
-                              if (plan.isToday) ...[
+                                ),
+                                Container(
+                                  height: 36,
+                                  width: 1,
+                                  color: context.appOutlineVariant,
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        plan.title,
+                                        style: AppTheme.bodyMd.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: context.appTextPrimary,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        'Target: ${plan.muscleGroups}',
+                                        style: AppTheme.bodySm.copyWith(
+                                          color: context.appTextSecondary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    if (plan.isToday)
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          bottom: 4,
+                                        ),
+                                        child: AppChip.primary(label: 'TODAY'),
+                                      ),
+                                    Text(
+                                      plan.duration,
+                                      style: AppTheme.bodySm.copyWith(
+                                        color: context.appTextSecondary,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(width: 8),
+                                Icon(
+                                  isExpanded
+                                      ? Icons.keyboard_arrow_up
+                                      : Icons.keyboard_arrow_down,
+                                  color: plan.isToday
+                                      ? AppColors.primary
+                                      : AppColors.outline,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        // Expanded exercise list
+                        if (isExpanded)
+                          Container(
+                            padding: const EdgeInsets.only(
+                              left: 16,
+                              right: 16,
+                              bottom: 20,
+                            ),
+                            width: double.infinity,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Divider(
+                                  height: 1,
+                                  color: context.appOutlineVariant,
+                                ),
                                 const SizedBox(height: 16),
-                                SizedBox(
-                                  width: double.infinity,
-                                  child: ElevatedButton.icon(
+                                Text(
+                                  'EXERCISE SEQUENCE',
+                                  style: AppTheme.labelCaps.copyWith(
+                                    fontSize: 9,
+                                    color: AppColors.tertiary,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                ...List.generate(plan.exercises.length, (
+                                  exIdx,
+                                ) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 6,
+                                    ),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          margin: const EdgeInsets.only(top: 4),
+                                          width: 6,
+                                          height: 6,
+                                          decoration: const BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: AppColors.primary,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Text(
+                                            plan.exercises[exIdx],
+                                            style: AppTheme.bodyMd.copyWith(
+                                              color: context.appTextPrimary,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }),
+                                if (plan.isToday) ...[
+                                  const SizedBox(height: 16),
+                                  AppButton.primary(
+                                    label: 'Start Workout',
+                                    icon: Icons.play_arrow,
                                     onPressed: () {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => const WorkoutSessionScreen(),
+                                          builder: (context) =>
+                                              const WorkoutSessionScreen(),
                                         ),
                                       );
                                     },
-                                    icon: const Icon(Icons.play_arrow, size: 18),
-                                    label: const Text('Start Workout'),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: AppColors.primary,
-                                      foregroundColor: AppColors.onPrimary,
-                                      padding: const EdgeInsets.symmetric(vertical: 14),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      textStyle: AppTheme.bodyMd.copyWith(
-                                        fontWeight: FontWeight.w700,
-                                        color: AppColors.onPrimary,
-                                      ),
-                                    ),
                                   ),
-                                ),
+                                ],
                               ],
-                            ],
+                            ),
                           ),
-                        ),
-                    ],
+                      ],
+                    ),
                   ),
                 );
               },

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../app_theme.dart';
 import '../data/app_dependencies.dart';
+import '../widgets/common/app_header.dart';
+import '../widgets/common/app_chip.dart';
 import '../data/ai_chat_service.dart';
 import '../models/chat_message.dart';
 
@@ -54,10 +56,7 @@ class _AiCoachChatScreenState extends State<AiCoachChatScreen> {
   void _sendMessage(String text) {
     if (text.trim().isEmpty) return;
 
-    final userMsg = ChatMessage(
-      sender: 'user',
-      text: text,
-    );
+    final userMsg = ChatMessage(sender: 'user', text: text);
 
     setState(() {
       _messages.add(userMsg);
@@ -80,45 +79,18 @@ class _AiCoachChatScreenState extends State<AiCoachChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.onSurface),
-          onPressed: () => Navigator.pop(context),
+      backgroundColor: context.appBackground,
+      appBar: AppHeader.back(
+        title: 'AI Gym Coach',
+        subtitle: 'Always online AI trainer',
+        onBackTap: () => Navigator.maybePop(context),
+        trailing: IconButton(
+          icon: Icon(Icons.refresh, color: context.appTextPrimary, size: 20),
+          onPressed: () async {
+            await _chatService.clearChatHistory();
+            _loadMessages();
+          },
         ),
-        title: Row(
-          children: [
-            Container(
-              width: 32,
-              height: 32,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.primaryContainer,
-              ),
-              child: const Icon(
-                Icons.smart_toy,
-                size: 16,
-                color: AppColors.onPrimaryContainer,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              'AI Gym Coach',
-              style: AppTheme.headlineMd.copyWith(fontSize: 18),
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh, color: AppColors.onSurface),
-            onPressed: () async {
-              await _chatService.clearChatHistory();
-              _loadMessages();
-            },
-          ),
-        ],
       ),
       body: Column(
         children: [
@@ -139,7 +111,9 @@ class _AiCoachChatScreenState extends State<AiCoachChatScreen> {
                     padding: const EdgeInsets.only(bottom: 24),
                     child: _buildBotMessage(
                       msg['text'] ?? '',
-                      tags: (msg['tags'] as List?)?.map((e) => e.toString()).toList(),
+                      tags: (msg['tags'] as List?)
+                          ?.map((e) => e.toString())
+                          .toList(),
                       routineCard: msg['routineCard'] == true,
                     ),
                   );
@@ -163,7 +137,7 @@ class _AiCoachChatScreenState extends State<AiCoachChatScreen> {
 
   Widget _buildSuggestedPromptsList() {
     return Container(
-      height: 48,
+      height: 44,
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
@@ -173,18 +147,7 @@ class _AiCoachChatScreenState extends State<AiCoachChatScreen> {
           final prompt = _suggestedPrompts[index];
           return Padding(
             padding: const EdgeInsets.only(right: 8),
-            child: ActionChip(
-              backgroundColor: AppColors.surfaceContainerLow,
-              side: BorderSide(color: AppColors.outline.withValues(alpha: 0.1)),
-              label: Text(
-                prompt,
-                style: AppTheme.bodySm.copyWith(
-                  color: AppColors.onSurfaceVariant,
-                  fontSize: 12,
-                ),
-              ),
-              onPressed: () => _sendMessage(prompt),
-            ),
+            child: AppChip(label: prompt, onTap: () => _sendMessage(prompt)),
           );
         },
       ),
@@ -239,9 +202,7 @@ class _AiCoachChatScreenState extends State<AiCoachChatScreen> {
               children: [
                 Text(
                   text,
-                  style: AppTheme.bodyMd.copyWith(
-                    color: AppColors.onSurface,
-                  ),
+                  style: AppTheme.bodyMd.copyWith(color: AppColors.onSurface),
                 ),
                 if (tags != null) ...[
                   const SizedBox(height: 12),
@@ -300,9 +261,7 @@ class _AiCoachChatScreenState extends State<AiCoachChatScreen> {
             ),
             child: Text(
               text,
-              style: AppTheme.bodyMd.copyWith(
-                color: AppColors.onPrimary,
-              ),
+              style: AppTheme.bodyMd.copyWith(color: AppColors.onPrimary),
             ),
           ),
         ),
@@ -362,9 +321,7 @@ class _AiCoachChatScreenState extends State<AiCoachChatScreen> {
                 ),
                 Text(
                   'Mobility Correction A',
-                  style: AppTheme.bodySm.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: AppTheme.bodySm.copyWith(fontWeight: FontWeight.w600),
                 ),
               ],
             ),
@@ -414,9 +371,7 @@ class _AiCoachChatScreenState extends State<AiCoachChatScreen> {
                 onSubmitted: _sendMessage,
                 decoration: InputDecoration(
                   hintText: 'Ask Aizawl Gym AI...',
-                  hintStyle: AppTheme.bodyMd.copyWith(
-                    color: AppColors.outline,
-                  ),
+                  hintStyle: AppTheme.bodyMd.copyWith(color: AppColors.outline),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                 ),
