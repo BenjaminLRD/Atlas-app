@@ -99,7 +99,28 @@ class _PulseGlowWidgetState extends State<_PulseGlowWidget> with SingleTickerPro
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: widget.duration)..repeat(reverse: true);
+    _controller = AnimationController(vsync: this, duration: widget.duration);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _updateAnimationState();
+  }
+
+  void _updateAnimationState() {
+    final tickerEnabled = TickerMode.valuesOf(context).enabled;
+    final disableAnimations = MediaQuery.of(context).disableAnimations;
+
+    if (!tickerEnabled || disableAnimations) {
+      if (_controller.isAnimating) {
+        _controller.stop();
+      }
+    } else {
+      if (!_controller.isAnimating) {
+        _controller.repeat(reverse: true);
+      }
+    }
   }
 
   @override

@@ -28,6 +28,7 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   String _selectedWeightPeriod = '6M';
   DateTime _lastUpdatedTime = DateTime.now();
+  int? _touchedSpotIndex;
 
   @override
   void initState() {
@@ -408,7 +409,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
-  /// 3. Compact 2x2 Bento Profile Cards Grid (Equal Heights & Trailing Arrow Only)
+  /// 3. Compact 2x2 Bento Profile Cards Grid
   Widget _buildBentoProfileCardsGrid(BuildContext context) {
     final ageStr = _provider.age > 0 ? '${_provider.age}' : '30';
     final weightStr = _provider.weight.isNotEmpty ? _provider.weight : '68.2';
@@ -430,7 +431,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                   context: context,
                   icon: Icons.calendar_today_rounded,
                   label: 'AGE',
-                  value: '$ageStr yrs',
+                  value: ageStr,
+                  unit: 'yrs',
                   subtitleWidget: _buildChipWidget(
                     context: context,
                     text: _formatDob(),
@@ -439,13 +441,14 @@ class _ProfileScreenState extends State<ProfileScreen>
                   onTap: _navigateToEditProfile,
                 ),
               ),
-              const SizedBox(width: 14),
+              const SizedBox(width: 12),
               Expanded(
                 child: _buildBentoCard(
                   context: context,
                   icon: Icons.scale_outlined,
                   label: 'WEIGHT',
-                  value: '$weightStr $massUnit',
+                  value: weightStr,
+                  unit: massUnit,
                   subtitleWidget: _buildChipWidget(
                     context: context,
                     text: '↓ 1.2 kg this month',
@@ -457,7 +460,7 @@ class _ProfileScreenState extends State<ProfileScreen>
             ],
           ),
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 12),
         IntrinsicHeight(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -467,27 +470,30 @@ class _ProfileScreenState extends State<ProfileScreen>
                   context: context,
                   icon: Icons.straighten_rounded,
                   label: 'HEIGHT',
-                  value: '$heightStr $heightUnit',
+                  value: heightStr,
+                  unit: heightUnit,
                   subtitleWidget: _buildChipWidget(
                     context: context,
-                    text: '↓ Normal range',
+                    text: 'Normal range',
                     isNormal: true,
                   ),
                   onTap: _navigateToEditProfile,
                 ),
               ),
-              const SizedBox(width: 14),
+              const SizedBox(width: 12),
               Expanded(
                 child: _buildBentoCard(
                   context: context,
                   icon: Icons.restaurant_outlined,
                   label: 'DIET PREFERENCE',
                   value: dietStr,
+                  unit: '',
                   subtitleWidget: Text(
                     'Macro protocol',
                     style: AppTheme.bodySm.copyWith(
                       fontSize: 11,
                       color: context.appTextSecondary,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                   onTap: _showDietPreferenceModal,
@@ -505,63 +511,87 @@ class _ProfileScreenState extends State<ProfileScreen>
     required IconData icon,
     required String label,
     required String value,
+    required String unit,
     required Widget subtitleWidget,
     required VoidCallback onTap,
   }) {
     return AppCard(
       padding: const EdgeInsets.all(14),
+      borderColor: context.isDarkMode
+          ? AppColors.primaryContainer.withValues(alpha: 0.3)
+          : null,
       onTap: onTap,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                width: 34,
-                height: 34,
+                padding: const EdgeInsets.all(7),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryContainer.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(8),
+                  color: AppColors.primaryContainer.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primaryContainer.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                    ),
+                  ],
                 ),
-                child: Icon(icon, color: AppColors.primary, size: 18),
+                child: Icon(icon, color: AppColors.primaryContainer, size: 18),
               ),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: AppTheme.labelCaps.copyWith(
-                  fontSize: 10,
-                  color: context.appTextSecondary,
-                ),
+              const Icon(
+                Icons.arrow_forward_ios_rounded,
+                color: AppColors.primaryContainer,
+                size: 14,
               ),
             ],
           ),
-          const SizedBox(height: 10),
-
+          const SizedBox(height: 12),
           Text(
-            value,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: AppTheme.displayMetrics.copyWith(
-              fontSize: 20,
-              fontWeight: FontWeight.w800,
-              color: context.appTextPrimary,
+            label,
+            style: AppTheme.labelCaps.copyWith(
+              fontSize: 10,
+              letterSpacing: 0.8,
+              fontWeight: FontWeight.w600,
+              color: context.appTextSecondary,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
+
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Text(
+                  value,
+                  style: AppTheme.headlineLg.copyWith(
+                    fontSize: 21,
+                    fontWeight: FontWeight.w800,
+                    color: context.appTextPrimary,
+                  ),
+                ),
+                if (unit.isNotEmpty) ...[
+                  const SizedBox(width: 4),
+                  Text(
+                    unit,
+                    style: AppTheme.bodySm.copyWith(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: context.appTextSecondary,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          const SizedBox(height: 6),
 
           subtitleWidget,
-          const Spacer(),
-          const SizedBox(height: 12),
-
-          // Clean Trailing Arrow Only (No "Update" Text)
-          Align(
-            alignment: Alignment.bottomRight,
-            child: const Icon(
-              Icons.east_rounded,
-              color: AppColors.primary,
-              size: 16,
-            ),
-          ),
         ],
       ),
     );
@@ -576,18 +606,36 @@ class _ProfileScreenState extends State<ProfileScreen>
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
         color: isNormal
-            ? AppColors.primaryContainer.withValues(alpha: 0.25)
+            ? AppColors.primaryContainer.withValues(alpha: 0.2)
             : context.appSurfaceElevated,
         borderRadius: BorderRadius.circular(6),
+        border: isNormal
+            ? Border.all(
+                color: AppColors.primaryContainer.withValues(alpha: 0.4),
+              )
+            : null,
       ),
       child: Text(
         text,
         style: AppTheme.labelCaps.copyWith(
           fontSize: 10,
           fontWeight: isNormal ? FontWeight.w700 : FontWeight.w500,
-          color: isNormal ? AppColors.primary : context.appTextSecondary,
+          color: isNormal
+              ? (context.isDarkMode
+                  ? AppColors.primaryContainer
+                  : AppColors.primary)
+              : context.appTextSecondary,
         ),
       ),
+    );
+  }
+
+  void _showMotivationalQuoteModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const _MotivationalQuoteBottomSheet(),
     );
   }
 
@@ -595,6 +643,9 @@ class _ProfileScreenState extends State<ProfileScreen>
   Widget _buildWeightTrendsSection(BuildContext context) {
     return AppCard(
       padding: const EdgeInsets.all(18),
+      borderColor: context.isDarkMode
+          ? AppColors.primaryContainer.withValues(alpha: 0.3)
+          : null,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -604,12 +655,19 @@ class _ProfileScreenState extends State<ProfileScreen>
             children: [
               Row(
                 children: [
-                  const Icon(
-                    Icons.show_chart_rounded,
-                    color: AppColors.primary,
-                    size: 20,
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryContainer.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.show_chart_rounded,
+                      color: AppColors.primaryContainer,
+                      size: 18,
+                    ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 10),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -640,13 +698,18 @@ class _ProfileScreenState extends State<ProfileScreen>
                 decoration: BoxDecoration(
                   color: context.appSurfaceElevated,
                   borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: context.appOutlineVariant.withValues(alpha: 0.3),
+                  ),
                 ),
                 child: Row(
                   children: ['1M', '6M', '1Y'].map((period) {
                     final isSelected = _selectedWeightPeriod == period;
                     return GestureDetector(
-                      onTap: () =>
-                          setState(() => _selectedWeightPeriod = period),
+                      onTap: () => setState(() {
+                        _selectedWeightPeriod = period;
+                        _touchedSpotIndex = null;
+                      }),
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
                         padding: const EdgeInsets.symmetric(
@@ -655,9 +718,21 @@ class _ProfileScreenState extends State<ProfileScreen>
                         ),
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? AppColors.primary
+                              ? (context.isDarkMode
+                                  ? AppColors.primaryContainer
+                                  : AppColors.primary)
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(8),
+                          boxShadow: isSelected
+                              ? [
+                                  BoxShadow(
+                                    color: AppColors.primaryContainer.withValues(
+                                      alpha: 0.3,
+                                    ),
+                                    blurRadius: 6,
+                                  ),
+                                ]
+                              : null,
                         ),
                         child: Text(
                           period,
@@ -665,9 +740,11 @@ class _ProfileScreenState extends State<ProfileScreen>
                             fontSize: 10,
                             fontWeight: isSelected
                                 ? FontWeight.w800
-                                : FontWeight.w500,
+                                : FontWeight.w600,
                             color: isSelected
-                                ? AppColors.onPrimary
+                                ? (context.isDarkMode
+                                    ? const Color(0xFF0F1412)
+                                    : AppColors.onPrimary)
                                 : context.appTextSecondary,
                           ),
                         ),
@@ -680,7 +757,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           ),
           const SizedBox(height: 18),
 
-          // Middle Layout: Left Summary Panel + Chart
+          // Middle Layout: Left Summary Panel + Interactive Chart
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -689,10 +766,12 @@ class _ProfileScreenState extends State<ProfileScreen>
                 width: 110,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: context.appSurfaceContainerLow,
+                  color: context.appSurfaceElevated,
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: context.appOutlineVariant.withValues(alpha: 0.2),
+                    color: context.isDarkMode
+                        ? AppColors.primaryContainer.withValues(alpha: 0.25)
+                        : context.appOutlineVariant.withValues(alpha: 0.4),
                   ),
                 ),
                 child: Column(
@@ -702,6 +781,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                       'CURRENT WEIGHT',
                       style: AppTheme.labelCaps.copyWith(
                         fontSize: 9,
+                        letterSpacing: 0.6,
+                        fontWeight: FontWeight.w600,
                         color: context.appTextSecondary,
                       ),
                     ),
@@ -715,7 +796,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                           style: AppTheme.displayMetrics.copyWith(
                             fontSize: 18,
                             fontWeight: FontWeight.w800,
-                            color: AppColors.primary,
+                            color: context.isDarkMode
+                                ? AppColors.primaryContainer
+                                : AppColors.primary,
                           ),
                         ),
                         const SizedBox(width: 2),
@@ -723,7 +806,10 @@ class _ProfileScreenState extends State<ProfileScreen>
                           'kg',
                           style: AppTheme.bodySm.copyWith(
                             fontSize: 11,
-                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600,
+                            color: context.isDarkMode
+                                ? AppColors.primaryContainer
+                                : AppColors.primary,
                           ),
                         ),
                       ],
@@ -734,6 +820,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                       'CHANGE ($_selectedWeightPeriod)',
                       style: AppTheme.labelCaps.copyWith(
                         fontSize: 9,
+                        letterSpacing: 0.6,
+                        fontWeight: FontWeight.w600,
                         color: context.appTextSecondary,
                       ),
                     ),
@@ -744,7 +832,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
                         color: _weightChange <= 0
-                            ? AppColors.primary
+                            ? (context.isDarkMode
+                                ? AppColors.primaryContainer
+                                : AppColors.primary)
                             : context.appTextPrimary,
                       ),
                     ),
@@ -754,6 +844,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                       'LOWEST',
                       style: AppTheme.labelCaps.copyWith(
                         fontSize: 9,
+                        letterSpacing: 0.6,
+                        fontWeight: FontWeight.w600,
                         color: context.appTextSecondary,
                       ),
                     ),
@@ -772,6 +864,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                       'HIGHEST',
                       style: AppTheme.labelCaps.copyWith(
                         fontSize: 9,
+                        letterSpacing: 0.6,
+                        fontWeight: FontWeight.w600,
                         color: context.appTextSecondary,
                       ),
                     ),
@@ -789,7 +883,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               ),
               const SizedBox(width: 12),
 
-              // Chart Area
+              // Interactive Line Chart Area
               Expanded(
                 child: SizedBox(
                   height: 180,
@@ -817,7 +911,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                         leftTitles: AxisTitles(
                           sideTitles: SideTitles(
                             showTitles: true,
-                            reservedSize: 34,
+                            reservedSize: 28,
                             interval: 2,
                             getTitlesWidget: (val, meta) {
                               final intVal = val.toInt();
@@ -832,6 +926,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                                       style: AppTheme.bodySm.copyWith(
                                         fontSize: 9,
                                         color: context.appTextSecondary,
+                                        fontWeight: FontWeight.w500,
                                       ),
                                     ),
                                     if (intVal == 68)
@@ -857,13 +952,21 @@ class _ProfileScreenState extends State<ProfileScreen>
                               final titles = _getWeightTitles();
                               final index = val.toInt();
                               if (index >= 0 && index < titles.length) {
+                                final isSelected = _touchedSpotIndex == index;
                                 return Padding(
                                   padding: const EdgeInsets.only(top: 4),
                                   child: Text(
                                     titles[index],
                                     style: AppTheme.labelCaps.copyWith(
                                       fontSize: 9,
-                                      color: context.appTextSecondary,
+                                      fontWeight: isSelected
+                                          ? FontWeight.w900
+                                          : FontWeight.w600,
+                                      color: isSelected
+                                          ? (context.isDarkMode
+                                              ? AppColors.primaryContainer
+                                              : AppColors.primary)
+                                          : context.appTextSecondary,
                                     ),
                                   ),
                                 );
@@ -876,16 +979,92 @@ class _ProfileScreenState extends State<ProfileScreen>
                       borderData: FlBorderData(show: false),
                       lineTouchData: LineTouchData(
                         enabled: true,
+                        touchCallback:
+                            (FlTouchEvent event, LineTouchResponse? touchResponse) {
+                          if (event is FlTapUpEvent ||
+                              event is FlPanUpdateEvent) {
+                            final spot =
+                                touchResponse?.lineBarSpots?.firstOrNull;
+                            if (spot != null) {
+                              setState(() {
+                                _touchedSpotIndex = spot.spotIndex;
+                              });
+                            }
+                          }
+                        },
+                        getTouchedSpotIndicator: (LineChartBarData barData,
+                            List<int> spotIndexes) {
+                          return spotIndexes.map((spotIndex) {
+                            return TouchedSpotIndicatorData(
+                              FlLine(
+                                color: AppColors.primaryContainer.withValues(
+                                  alpha: 0.8,
+                                ),
+                                strokeWidth: 1.5,
+                                dashArray: [4, 4],
+                              ),
+                              FlDotData(
+                                show: true,
+                                getDotPainter: (spot, percent, barData, index) {
+                                  return FlDotCirclePainter(
+                                    radius: 6,
+                                    color: AppColors.primaryContainer,
+                                    strokeWidth: 3,
+                                    strokeColor: context.appSurface,
+                                  );
+                                },
+                              ),
+                            );
+                          }).toList();
+                        },
                         touchTooltipData: LineTouchTooltipData(
+                          getTooltipColor: (spot) => context.isDarkMode
+                              ? const Color(0xFF1B2B20)
+                              : AppColors.surface,
+                          tooltipBorder: BorderSide(
+                            color: AppColors.primaryContainer.withValues(
+                              alpha: 0.6,
+                            ),
+                            width: 1.2,
+                          ),
+                          tooltipPadding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
                           getTooltipItems: (touchedSpots) {
+                            final titles = _getWeightTitles();
                             return touchedSpots.map((spot) {
+                              final idx = spot.spotIndex;
+                              final monthLabel = idx < titles.length
+                                  ? titles[idx]
+                                  : 'Wk ${idx + 1}';
                               return LineTooltipItem(
-                                '${spot.y.toStringAsFixed(1)} kg',
+                                '$monthLabel\n',
                                 AppTheme.labelCaps.copyWith(
                                   fontSize: 10,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.onPrimary,
+                                  color: context.appTextSecondary,
+                                  fontWeight: FontWeight.w600,
                                 ),
+                                children: [
+                                  TextSpan(
+                                    text: '${spot.y.toStringAsFixed(1)} ',
+                                    style: AppTheme.headlineMd.copyWith(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w800,
+                                      color: context.isDarkMode
+                                          ? AppColors.primaryContainer
+                                          : AppColors.primary,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: _provider.massUnit,
+                                    style: AppTheme.bodySm.copyWith(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                      color: context.appTextSecondary,
+                                    ),
+                                  ),
+                                ],
                               );
                             }).toList();
                           },
@@ -895,23 +1074,33 @@ class _ProfileScreenState extends State<ProfileScreen>
                         LineChartBarData(
                           spots: _getWeightSpots(),
                           isCurved: true,
-                          color: AppColors.primary,
+                          color: context.isDarkMode
+                              ? AppColors.primaryContainer
+                              : AppColors.primary,
                           barWidth: 2.5,
                           isStrokeCapRound: true,
                           dotData: FlDotData(
                             show: true,
                             getDotPainter: (spot, percent, barData, index) {
-                              final isPeak =
-                                  spot.y == 71.0 ||
+                              final isSelected = _touchedSpotIndex == index;
+                              final isPeak = spot.y == 71.0 ||
                                   spot.y == 70.1 ||
                                   spot.y == _currentWeight;
                               return FlDotCirclePainter(
-                                radius: isPeak ? 4 : 2.5,
-                                color: isPeak
-                                    ? AppColors.primary
-                                    : context.appSurface,
-                                strokeWidth: 2,
-                                strokeColor: AppColors.primary,
+                                radius: isSelected ? 5.5 : (isPeak ? 4.0 : 2.5),
+                                color: isSelected
+                                    ? AppColors.primaryContainer
+                                    : (isPeak
+                                        ? (context.isDarkMode
+                                            ? AppColors.primaryContainer
+                                            : AppColors.primary)
+                                        : context.appSurface),
+                                strokeWidth: isSelected ? 3 : 2,
+                                strokeColor: isSelected
+                                    ? context.appSurface
+                                    : (context.isDarkMode
+                                        ? AppColors.primaryContainer
+                                        : AppColors.primary),
                               );
                             },
                           ),
@@ -921,8 +1110,14 @@ class _ProfileScreenState extends State<ProfileScreen>
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
                               colors: [
-                                AppColors.primary.withValues(alpha: 0.25),
-                                AppColors.primary.withValues(alpha: 0.0),
+                                (context.isDarkMode
+                                        ? AppColors.primaryContainer
+                                        : AppColors.primary)
+                                    .withValues(alpha: 0.25),
+                                (context.isDarkMode
+                                        ? AppColors.primaryContainer
+                                        : AppColors.primary)
+                                    .withValues(alpha: 0.0),
                               ],
                             ),
                           ),
@@ -934,62 +1129,113 @@ class _ProfileScreenState extends State<ProfileScreen>
               ),
             ],
           ),
+          const SizedBox(height: 8),
+
+          // Tap guidance instruction
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.center_focus_strong_rounded,
+                size: 13,
+                color: context.isDarkMode
+                    ? AppColors.primaryContainer.withValues(alpha: 0.8)
+                    : AppColors.primary,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                'Tap on any point to see details',
+                style: AppTheme.labelCaps.copyWith(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                  color: context.appTextSecondary,
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 16),
 
-          // Progress Motivational Insight Card
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: AppColors.primaryContainer.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: AppColors.primary.withValues(alpha: 0.3),
+          // Interactive Motivational Banner
+          GestureDetector(
+            onTap: () => _showMotivationalQuoteModal(context),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+              decoration: BoxDecoration(
+                color: context.isDarkMode
+                    ? const Color(0xFF132A1C)
+                    : AppColors.primaryContainer.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: AppColors.primaryContainer.withValues(
+                    alpha: context.isDarkMode ? 0.7 : 0.4,
+                  ),
+                  width: 1.5,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primaryContainer.withValues(
+                      alpha: context.isDarkMode ? 0.35 : 0.15,
+                    ),
+                    blurRadius: 16,
+                    spreadRadius: 1,
+                  ),
+                ],
               ),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.emoji_events_rounded,
-                    color: AppColors.primary,
-                    size: 18,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Great job! You've maintained a healthy trend.",
-                        style: AppTheme.headlineMd.copyWith(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: context.appTextPrimary,
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryContainer.withValues(alpha: 0.2),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primaryContainer.withValues(
+                            alpha: 0.3,
+                          ),
+                          blurRadius: 8,
                         ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'Keep pushing toward your goal weight.',
-                        style: AppTheme.bodySm.copyWith(
-                          fontSize: 11,
-                          color: context.appTextSecondary,
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.emoji_events_rounded,
+                      color: AppColors.primaryContainer,
+                      size: 20,
+                    ),
                   ),
-                ),
-                const Icon(
-                  Icons.chevron_right_rounded,
-                  color: AppColors.primary,
-                  size: 20,
-                ),
-              ],
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Great job! You've maintained a healthy trend.",
+                          style: AppTheme.headlineMd.copyWith(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: context.appTextPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Keep pushing toward your goal weight.',
+                          style: AppTheme.bodySm.copyWith(
+                            fontSize: 11,
+                            color: context.appTextSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: context.isDarkMode
+                        ? AppColors.primaryContainer
+                        : AppColors.primary,
+                    size: 22,
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -1007,6 +1253,9 @@ class _ProfileScreenState extends State<ProfileScreen>
 
     return AppCard(
       padding: const EdgeInsets.all(18),
+      borderColor: context.isDarkMode
+          ? AppColors.primaryContainer.withValues(alpha: 0.3)
+          : null,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1043,13 +1292,17 @@ class _ProfileScreenState extends State<ProfileScreen>
                       style: AppTheme.bodySm.copyWith(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.primary,
+                        color: context.isDarkMode
+                            ? AppColors.primaryContainer
+                            : AppColors.primary,
                       ),
                     ),
                     const SizedBox(width: 4),
-                    const Icon(
+                    Icon(
                       Icons.chevron_right_rounded,
-                      color: AppColors.primary,
+                      color: context.isDarkMode
+                          ? AppColors.primaryContainer
+                          : AppColors.primary,
                       size: 18,
                     ),
                   ],
@@ -1116,10 +1369,12 @@ class _ProfileScreenState extends State<ProfileScreen>
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: context.appSurfaceContainerLow,
+        color: context.appSurfaceElevated,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: context.appOutlineVariant.withValues(alpha: 0.2),
+          color: context.isDarkMode
+              ? AppColors.primaryContainer.withValues(alpha: 0.25)
+              : context.appOutlineVariant.withValues(alpha: 0.4),
         ),
       ),
       child: Column(
@@ -1129,6 +1384,8 @@ class _ProfileScreenState extends State<ProfileScreen>
             label,
             style: AppTheme.labelCaps.copyWith(
               fontSize: 9,
+              letterSpacing: 0.6,
+              fontWeight: FontWeight.w600,
               color: context.appTextSecondary,
             ),
           ),
@@ -1152,6 +1409,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                   unit,
                   style: AppTheme.bodySm.copyWith(
                     fontSize: 11,
+                    fontWeight: FontWeight.w600,
                     color: context.appTextSecondary,
                   ),
                 ),
@@ -1160,15 +1418,20 @@ class _ProfileScreenState extends State<ProfileScreen>
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryContainer.withValues(alpha: 0.25),
+                  color: AppColors.primaryContainer.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(6),
+                  border: Border.all(
+                    color: AppColors.primaryContainer.withValues(alpha: 0.4),
+                  ),
                 ),
                 child: Text(
                   chipText,
                   style: AppTheme.labelCaps.copyWith(
                     fontSize: 9,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.primary,
+                    color: context.isDarkMode
+                        ? AppColors.primaryContainer
+                        : AppColors.primary,
                   ),
                 ),
               ),
@@ -1178,11 +1441,22 @@ class _ProfileScreenState extends State<ProfileScreen>
 
           ClipRRect(
             borderRadius: BorderRadius.circular(999),
-            child: LinearProgressIndicator(
-              value: progress,
-              backgroundColor: context.appSurfaceElevated,
-              color: AppColors.primary,
-              minHeight: 4,
+            child: TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0.0, end: progress),
+              duration: const Duration(milliseconds: 800),
+              curve: Curves.easeOutCubic,
+              builder: (context, animProgress, child) {
+                return LinearProgressIndicator(
+                  value: animProgress,
+                  backgroundColor: context.appOutlineVariant.withValues(alpha: 0.2),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    context.isDarkMode
+                        ? AppColors.primaryContainer
+                        : AppColors.primary,
+                  ),
+                  minHeight: 4,
+                );
+              },
             ),
           ),
           const SizedBox(height: 8),
@@ -1196,6 +1470,567 @@ class _ProfileScreenState extends State<ProfileScreen>
           ),
         ],
       ),
+    );
+  }
+}
+
+class _MotivationalQuote {
+  final String characterName;
+  final String characterSource;
+  final String quoteText;
+  final String highlightText;
+  final String avatarSymbol;
+  final String powerTag;
+  final String assetName;
+
+  const _MotivationalQuote({
+    required this.characterName,
+    required this.characterSource,
+    required this.quoteText,
+    required this.highlightText,
+    required this.avatarSymbol,
+    required this.powerTag,
+    required this.assetName,
+  });
+
+  String get imagePath => 'assets/quotes/$assetName.png';
+  String get imagePathJpg => 'assets/quotes/$assetName.jpg';
+}
+
+const List<_MotivationalQuote> _motivationalQuotes = [
+  _MotivationalQuote(
+    characterName: 'Goku',
+    characterSource: 'Dragon Ball',
+    quoteText:
+        'Power comes in response to a need, not a desire. Train harder, push further, and become stronger.',
+    highlightText: 'become stronger.',
+    avatarSymbol: '悟',
+    powerTag: 'LIMITLESS POTENTIAL',
+    assetName: 'goku',
+  ),
+  _MotivationalQuote(
+    characterName: 'Naruto',
+    characterSource: 'Naruto',
+    quoteText:
+        'Hard work can overcome talent. Keep moving forward, even when the path is difficult.',
+    highlightText: 'moving forward',
+    avatarSymbol: '忍',
+    powerTag: 'NEVER GIVE UP',
+    assetName: 'naruto',
+  ),
+  _MotivationalQuote(
+    characterName: 'Saitama',
+    characterSource: 'One Punch Man',
+    quoteText:
+        'Discipline creates strength. Keep showing up and improving every single day.',
+    highlightText: 'every single day.',
+    avatarSymbol: '👊',
+    powerTag: 'UNSTOPPABLE DISCIPLINE',
+    assetName: 'saitama',
+  ),
+  _MotivationalQuote(
+    characterName: 'Garou',
+    characterSource: 'One Punch Man',
+    quoteText:
+        'Strength is forged through struggle. Every challenge is a chance to evolve.',
+    highlightText: 'chance to evolve.',
+    avatarSymbol: '狼',
+    powerTag: 'EVOLUTION THROUGH STRUGGLE',
+    assetName: 'garou',
+  ),
+];
+
+class _MotivationalQuoteBottomSheet extends StatefulWidget {
+  const _MotivationalQuoteBottomSheet();
+
+  @override
+  State<_MotivationalQuoteBottomSheet> createState() =>
+      __MotivationalQuoteBottomSheetState();
+}
+
+class __MotivationalQuoteBottomSheetState
+    extends State<_MotivationalQuoteBottomSheet>
+    with SingleTickerProviderStateMixin {
+  int _currentIndex = 0;
+  late final AnimationController _animController;
+  late final Animation<double> _fadeAnimation;
+  late final Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _animController,
+      curve: Curves.easeOutCubic,
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.08),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _animController,
+      curve: Curves.easeOutCubic,
+    ));
+    _animController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
+
+  void _nextQuote() {
+    _animController.forward(from: 0.0);
+    setState(() {
+      _currentIndex = (_currentIndex + 1) % _motivationalQuotes.length;
+    });
+  }
+
+  void _shareQuote(_MotivationalQuote quote) {
+    final textToShare =
+        '"${quote.quoteText}" — ${quote.characterName} (${quote.characterSource})';
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Quote copied to clipboard:\n$textToShare',
+          style: AppTheme.bodySm.copyWith(
+            color: AppColors.onPrimary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        backgroundColor: AppColors.primary,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final quote = _motivationalQuotes[_currentIndex];
+    final isDark = context.isDarkMode;
+
+    return Container(
+      margin: EdgeInsets.only(
+        left: 12,
+        right: 12,
+        bottom: MediaQuery.of(context).padding.bottom + 12,
+        top: 40,
+      ),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF121815) : AppColors.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: AppColors.primaryContainer.withValues(alpha: 0.4),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primaryContainer
+                .withValues(alpha: isDark ? 0.2 : 0.1),
+            blurRadius: 24,
+            spreadRadius: 2,
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Modal Header Bar: QUOTE OF THE DAY & Close button
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryContainer.withValues(alpha: 0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.auto_awesome_rounded,
+                      color: AppColors.primaryContainer,
+                      size: 16,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'QUOTE OF THE DAY',
+                    style: AppTheme.labelCaps.copyWith(
+                      fontSize: 12,
+                      letterSpacing: 1.2,
+                      fontWeight: FontWeight.w800,
+                      color: isDark
+                          ? AppColors.primaryContainer
+                          : AppColors.primary,
+                    ),
+                  ),
+                ],
+              ),
+              IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: context.appSurfaceElevated,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: context.appOutlineVariant.withValues(alpha: 0.4),
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.close_rounded,
+                    size: 18,
+                    color: context.appTextSecondary,
+                  ),
+                ),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+
+          // Main Animated Quote Content Row/Column
+          FadeTransition(
+            opacity: _fadeAnimation,
+            child: SlideTransition(
+              position: _slideAnimation,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final isWide = constraints.maxWidth > 500;
+                  final characterCard =
+                      _buildCharacterArtworkCard(context, quote);
+                  final quoteDetailCard = _buildQuoteDetailCard(context, quote);
+
+                  if (isWide) {
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(width: 210, height: 230, child: characterCard),
+                        const SizedBox(width: 18),
+                        Expanded(child: quoteDetailCard),
+                      ],
+                    );
+                  } else {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        SizedBox(height: 195, child: characterCard),
+                        const SizedBox(height: 16),
+                        quoteDetailCard,
+                      ],
+                    );
+                  }
+                },
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Bottom Action Buttons: Another Quote & Share
+          Row(
+            children: [
+              Expanded(
+                child: AppButton.primary(
+                  label: 'Another Quote',
+                  icon: Icons.autorenew_rounded,
+                  onPressed: _nextQuote,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: AppButton.secondary(
+                  label: 'Share',
+                  icon: Icons.ios_share_rounded,
+                  onPressed: () => _shareQuote(quote),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCharacterArtworkCard(
+      BuildContext context, _MotivationalQuote quote) {
+    final isDark = context.isDarkMode;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: context.appSurfaceElevated,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isDark
+              ? AppColors.primaryContainer.withValues(alpha: 0.4)
+              : AppColors.primary.withValues(alpha: 0.3),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primaryContainer
+                .withValues(alpha: isDark ? 0.25 : 0.12),
+            blurRadius: 16,
+            spreadRadius: 1,
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(18),
+        child: Image.asset(
+          quote.imagePath,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Image.asset(
+              quote.imagePathJpg,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return _buildFallbackArtworkContainer(context, quote);
+              },
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFallbackArtworkContainer(
+      BuildContext context, _MotivationalQuote quote) {
+    final isDark = context.isDarkMode;
+
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        // Dark surface base with subtle green ambient background gradient
+        Container(
+          decoration: BoxDecoration(
+            color: context.appSurfaceElevated,
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                context.appSurfaceElevated,
+                AppColors.primaryContainer.withValues(alpha: 0.12),
+              ],
+            ),
+          ),
+        ),
+
+        // Background ambient green aura circles
+        Positioned(
+          top: -24,
+          right: -24,
+          child: Container(
+            width: 110,
+            height: 110,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.primaryContainer.withValues(alpha: 0.12),
+            ),
+          ),
+        ),
+        Positioned(
+          bottom: -30,
+          left: -20,
+          child: Container(
+            width: 120,
+            height: 120,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.primaryContainer.withValues(alpha: 0.08),
+            ),
+          ),
+        ),
+
+        // Central Hero Character Artwork & Emblem Frame
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Character Emblem Badge Circle
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isDark ? const Color(0xFF0F1412) : context.appSurface,
+                  border: Border.all(
+                    color: AppColors.primaryContainer,
+                    width: 2.5,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primaryContainer.withValues(alpha: 0.45),
+                      blurRadius: 14,
+                      spreadRadius: 1,
+                    ),
+                  ],
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  quote.avatarSymbol,
+                  style: TextStyle(
+                    fontSize: quote.avatarSymbol.length > 2 ? 14 : 26,
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.primaryContainer,
+                    height: 1.0,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+
+              // Character Name Pill
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryContainer.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(
+                    color: AppColors.primaryContainer.withValues(alpha: 0.5),
+                  ),
+                ),
+                child: Text(
+                  quote.characterName.toUpperCase(),
+                  style: AppTheme.labelCaps.copyWith(
+                    fontSize: 11,
+                    letterSpacing: 1.2,
+                    fontWeight: FontWeight.w900,
+                    color: isDark
+                        ? AppColors.primaryContainer
+                        : AppColors.primary,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 6),
+
+              // Power Tag Badge
+              Text(
+                quote.powerTag,
+                style: AppTheme.labelCaps.copyWith(
+                  fontSize: 9,
+                  letterSpacing: 0.8,
+                  fontWeight: FontWeight.w700,
+                  color: context.appTextSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildQuoteDetailCard(
+      BuildContext context, _MotivationalQuote quote) {
+    final quoteText = quote.quoteText;
+    final highlightText = quote.highlightText;
+    final parts = quoteText.split(highlightText);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // Green quote symbol badge
+        Container(
+          width: 34,
+          height: 34,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: AppColors.primaryContainer.withValues(alpha: 0.2),
+            border: Border.all(
+              color: AppColors.primaryContainer.withValues(alpha: 0.5),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primaryContainer.withValues(alpha: 0.2),
+                blurRadius: 8,
+              ),
+            ],
+          ),
+          alignment: Alignment.center,
+          child: const Text(
+            '“',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.w900,
+              color: AppColors.primaryContainer,
+              height: 1.1,
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+
+        // Quote Rich Text with Vitality Green Highlight
+        RichText(
+          text: TextSpan(
+            style: AppTheme.headlineMd.copyWith(
+              fontSize: 17,
+              height: 1.4,
+              fontWeight: FontWeight.w700,
+              color: context.appTextPrimary,
+            ),
+            children: [
+              const TextSpan(text: '“ '),
+              if (parts.isNotEmpty) TextSpan(text: parts.first),
+              TextSpan(
+                text: highlightText,
+                style: TextStyle(
+                  color: context.isDarkMode
+                      ? AppColors.primaryContainer
+                      : AppColors.primary,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              if (parts.length > 1) TextSpan(text: parts.last),
+              const TextSpan(text: ' ”'),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+
+        // Character Attribution
+        Row(
+          children: [
+            Container(
+              width: 16,
+              height: 2,
+              color: AppColors.primaryContainer,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              quote.characterName,
+              style: AppTheme.headlineMd.copyWith(
+                fontSize: 14,
+                fontWeight: FontWeight.w800,
+                color: context.isDarkMode
+                    ? AppColors.primaryContainer
+                    : AppColors.primary,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              '•  ${quote.characterSource}',
+              style: AppTheme.bodySm.copyWith(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: context.appTextSecondary,
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

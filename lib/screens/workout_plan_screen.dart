@@ -48,8 +48,8 @@ class WorkoutPlanScreen extends StatelessWidget {
               ),
             ),
             OutlinedButton.icon(
-              onPressed: () {
-                Navigator.push(
+              onPressed: () async {
+                await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => const WorkoutHistoryScreen(),
@@ -186,8 +186,8 @@ class WorkoutPlanScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
-            onPressed: () {
-              Navigator.push(
+            onPressed: () async {
+              await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => const WorkoutSessionScreen(),

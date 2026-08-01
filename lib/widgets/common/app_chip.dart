@@ -67,7 +67,7 @@ class _AppChipState extends State<AppChip> with SingleTickerProviderStateMixin {
     super.initState();
     _scaleController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 120),
+      duration: AppDurations.fast,
     );
     _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
       CurvedAnimation(parent: _scaleController, curve: Curves.easeInOut),
@@ -123,37 +123,45 @@ class _AppChipState extends State<AppChip> with SingleTickerProviderStateMixin {
         break;
     }
 
-    return AnimatedBuilder(
-      animation: _scaleAnimation,
-      builder: (context, child) => Transform.scale(
-        scale: _scaleAnimation.value,
-        child: child,
-      ),
-      child: GestureDetector(
-        onTap: widget.onTap != null ? _handleTap : null,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: bgColor,
-            borderRadius: BorderRadius.circular(999),
-            border: border,
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (widget.icon != null) ...[
-                Icon(widget.icon, size: 12, color: textColor),
-                const SizedBox(width: 4),
-              ],
-              Text(
-                widget.label,
-                style: AppTheme.labelCaps.copyWith(
-                  fontSize: 11,
-                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                  color: textColor,
+    return Semantics(
+      button: widget.onTap != null,
+      selected: widget.variant == AppChipVariant.selectable ? isSelected : null,
+      label: widget.label,
+      enabled: widget.onTap != null,
+      child: AnimatedBuilder(
+        animation: _scaleAnimation,
+        builder: (context, child) => Transform.scale(
+          scale: _scaleAnimation.value,
+          child: child,
+        ),
+        child: GestureDetector(
+          onTap: widget.onTap != null ? _handleTap : null,
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            constraints: const BoxConstraints(minHeight: 32),
+            decoration: BoxDecoration(
+              color: bgColor,
+              borderRadius: AppRadii.borderFull,
+              border: border,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (widget.icon != null) ...[
+                  Icon(widget.icon, size: 12, color: textColor),
+                  const SizedBox(width: 4),
+                ],
+                Text(
+                  widget.label,
+                  style: AppTheme.labelCaps.copyWith(
+                    fontSize: 11,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                    color: textColor,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

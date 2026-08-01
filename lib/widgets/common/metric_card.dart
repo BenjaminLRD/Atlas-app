@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../app_theme.dart';
 import 'app_card.dart';
+import 'app_loading_state.dart';
 
 class MetricCard extends StatelessWidget {
-  final IconData icon;
+  final IconData? icon;
+  final String? iconAsset;
   final Color iconBgColor;
   final Color iconColor;
   final String label;
@@ -15,10 +18,12 @@ class MetricCard extends StatelessWidget {
   final Widget? trailingWidget;
   final double? progress;
   final VoidCallback? onTap;
+  final bool isLoading;
 
   const MetricCard({
     super.key,
-    required this.icon,
+    this.icon,
+    this.iconAsset,
     required this.iconBgColor,
     required this.iconColor,
     required this.label,
@@ -30,6 +35,7 @@ class MetricCard extends StatelessWidget {
     this.trailingWidget,
     this.progress,
     this.onTap,
+    this.isLoading = false,
   });
 
   @override
@@ -50,8 +56,22 @@ class MetricCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: iconBgColor,
                   borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: iconBgColor.withValues(alpha: context.isDarkMode ? 0.5 : 0.25),
+                      blurRadius: 8,
+                      spreadRadius: 1,
+                    ),
+                  ],
                 ),
-                child: Icon(icon, color: iconColor, size: 18),
+                child: iconAsset != null
+                    ? SvgPicture.asset(
+                        iconAsset!,
+                        width: 18,
+                        height: 18,
+                        colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+                      )
+                    : Icon(icon ?? Icons.help_outline, color: iconColor, size: 18),
               ),
               ?badge,
               ?trailingWidget,
@@ -68,52 +88,65 @@ class MetricCard extends StatelessWidget {
               color: context.appTextSecondary,
               letterSpacing: 0.8,
               fontSize: 11,
+              fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 2),
 
-          // Value & Unit with FittedBox to prevent overflow
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.centerLeft,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
-              children: [
-                Text(
-                  value,
-                  style: AppTheme.headlineLg.copyWith(
-                    fontSize: 26,
-                    fontWeight: FontWeight.w700,
-                    color: context.appTextPrimary,
-                  ),
-                ),
-                if (unit.isNotEmpty) ...[
-                  const SizedBox(width: 4),
+          if (isLoading) ...[
+            const SizedBox(height: 4),
+            const AppSkeletonBox(width: 80, height: 26),
+          ] else
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
                   Text(
-                    unit,
-                    style: AppTheme.bodySm.copyWith(
-                      fontWeight: FontWeight.w500,
-                      color: context.appTextSecondary,
-                      fontSize: 13,
+                    value,
+                    style: AppTheme.headlineLg.copyWith(
+                      fontSize: 26,
+                      fontWeight: FontWeight.w800,
+                      color: context.appTextPrimary,
                     ),
                   ),
+                  if (unit.isNotEmpty) ...[
+                    const SizedBox(width: 4),
+                    Text(
+                      unit,
+                      style: AppTheme.bodySm.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: context.appTextSecondary,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
-          ),
 
-          // Optional Progress Indicator
+          // Optional Animated Progress Indicator
           if (progress != null) ...[
             const SizedBox(height: 8),
             ClipRRect(
-              borderRadius: BorderRadius.circular(999),
-              child: LinearProgressIndicator(
-                value: progress!.clamp(0.0, 1.0),
-                minHeight: 5,
-                backgroundColor: context.appOutlineVariant.withValues(alpha: 0.2),
-                valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primaryContainer),
+              borderRadius: AppRadii.borderFull,
+              child: TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0.0, end: progress!.clamp(0.0, 1.0)),
+                duration: const Duration(milliseconds: 800),
+                curve: Curves.easeOutCubic,
+                builder: (context, animProgress, child) {
+                  return LinearProgressIndicator(
+                    value: animProgress,
+                    minHeight: 5,
+                    backgroundColor: context.appOutlineVariant.withValues(alpha: 0.25),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      context.isDarkMode ? AppColors.primaryContainer : AppColors.primary,
+                    ),
+                  );
+                },
               ),
             ),
           ],

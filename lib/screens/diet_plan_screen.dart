@@ -44,16 +44,39 @@ class _DietPlanScreenState extends State<DietPlanScreen> {
   }
 
   Future<void> _updateProtein(double newValue) async {
-    await _nutritionService.saveProteinConsumed(newValue);
+    final currentMealsProtein = _dailyNutrition.meals
+        .where((m) => m.isCompleted)
+        .fold(0.0, (sum, meal) => sum + meal.totalProtein);
+    final newBase = (newValue - currentMealsProtein).clamp(0.0, newValue);
+    final updated = _dailyNutrition.copyWith(baseProtein: newBase);
+    await _nutritionService.saveDailyNutrition(updated);
     _loadNutritionData();
   }
 
   Future<void> _toggleMeal(MealEntry meal) async {
+    final nextState = !meal.isCompleted;
     await _nutritionService.toggleMealCompletion(
       date: _dailyNutrition.date,
       mealId: meal.id,
     );
     _loadNutritionData();
+
+    if (mounted) {
+      final String calText = meal.totalCalories.toStringAsFixed(0);
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 2),
+          content: Text(
+            nextState
+                ? 'Finished ${meal.name}! (+$calText kcal, +${meal.totalProtein.toStringAsFixed(0)}g P)'
+                : 'Marked ${meal.name} as incomplete',
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
+        ),
+      );
+    }
   }
 
   void _showMealDetailsModal(MealEntry meal) {
@@ -91,6 +114,15 @@ class _DietPlanScreenState extends State<DietPlanScreen> {
           }),
           const SizedBox(height: 16),
           AppButton.primary(
+            label: meal.isCompleted ? 'Mark as Incomplete' : 'Finish Meal',
+            icon: meal.isCompleted ? Icons.close_rounded : Icons.check_circle_rounded,
+            onPressed: () {
+              Navigator.pop(context);
+              _toggleMeal(meal);
+            },
+          ),
+          const SizedBox(height: 10),
+          AppButton.secondary(
             label: 'Add Food Item to ${meal.name}',
             icon: Icons.add_circle_outline_rounded,
             onPressed: () {
@@ -140,7 +172,6 @@ class _DietPlanScreenState extends State<DietPlanScreen> {
 
     final caloriesGoal = _dailyNutrition.targets.calories;
     final caloriesConsumed = _dailyNutrition.totalCaloriesConsumed;
-    final caloriesRemaining = _dailyNutrition.caloriesRemaining;
     final calorieProgress = (caloriesConsumed / caloriesGoal).clamp(0.0, 1.0);
 
     final bottomInset = MediaQuery.of(context).padding.bottom;
@@ -172,61 +203,104 @@ class _DietPlanScreenState extends State<DietPlanScreen> {
             ),
             const SizedBox(height: 18),
 
-            // 2. Daily Calorie Progress Ring Glass Card
+            // 2. Daily Calorie Progress Ring Card
             AppCard(
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+              padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 16),
+              borderColor: context.isDarkMode
+                  ? AppColors.primaryContainer.withValues(alpha: 0.3)
+                  : null,
               child: Column(
                 children: [
-                  ProgressRing.single(
-                    size: 190,
-                    progress: calorieProgress,
-                    color: AppColors.primary,
-                    strokeWidth: 14,
-                    centerChild: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          caloriesConsumed.toStringAsFixed(0),
-                          style: AppTheme.displayMetrics.copyWith(
-                            fontSize: 36,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                        Text(
-                          '/ ${caloriesGoal.toStringAsFixed(0)} kcal',
-                          style: AppTheme.bodySm.copyWith(
-                            color: context.appTextSecondary,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: context.appSurfaceElevated,
-                            borderRadius: BorderRadius.circular(999),
-                            border: Border.all(
-                              color: AppColors.primary.withValues(alpha: 0.3),
+                  TweenAnimationBuilder<double>(
+                    tween: Tween<double>(end: calorieProgress),
+                    duration: const Duration(milliseconds: 600),
+                    curve: Curves.easeOutCubic,
+                    builder: (context, animVal, child) {
+                      final animatedCals = animVal * caloriesGoal;
+                      final animatedRemaining = (caloriesGoal - animatedCals).clamp(0.0, caloriesGoal);
+
+                      return Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primaryContainer.withValues(
+                                alpha: context.isDarkMode ? 0.3 : 0.1,
+                              ),
+                              blurRadius: 24,
+                              spreadRadius: 2,
                             ),
-                          ),
-                          child: Text(
-                            '${caloriesRemaining.toStringAsFixed(0)} kcal left',
-                            style: AppTheme.labelCaps.copyWith(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.primary,
-                            ),
+                          ],
+                        ),
+                        child: ProgressRing.single(
+                          size: 190,
+                          progress: animVal,
+                          color: AppColors.primaryContainer,
+                          strokeWidth: 14,
+                          centerChild: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                animatedCals.toStringAsFixed(0),
+                                style: AppTheme.displayMetrics.copyWith(
+                                  fontSize: 38,
+                                  fontWeight: FontWeight.w800,
+                                  color: context.isDarkMode
+                                      ? AppColors.primaryContainer
+                                      : AppColors.primary,
+                                ),
+                              ),
+                              Text(
+                                '/ ${caloriesGoal.toStringAsFixed(0)} kcal',
+                                style: AppTheme.bodySm.copyWith(
+                                  color: context.appTextSecondary,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryContainer.withValues(
+                                    alpha: 0.2,
+                                  ),
+                                  borderRadius: BorderRadius.circular(999),
+                                  border: Border.all(
+                                    color: AppColors.primaryContainer.withValues(
+                                      alpha: 0.4,
+                                    ),
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColors.primaryContainer.withValues(
+                                        alpha: 0.25,
+                                      ),
+                                      blurRadius: 8,
+                                    ),
+                                  ],
+                                ),
+                                child: Text(
+                                  '${animatedRemaining.toStringAsFixed(0)} kcal left',
+                                  style: AppTheme.labelCaps.copyWith(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: context.isDarkMode
+                                        ? AppColors.primaryContainer
+                                        : AppColors.primary,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 22),
 
                   // Macros Progress Row
                   Row(
@@ -239,9 +313,10 @@ class _DietPlanScreenState extends State<DietPlanScreen> {
                           goal: _dailyNutrition.targets.proteinGrams,
                           unit: 'g',
                           color: AppColors.ringProtein,
+                          icon: Icons.fitness_center_rounded,
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: _buildMacroItem(
                           context: context,
@@ -250,9 +325,10 @@ class _DietPlanScreenState extends State<DietPlanScreen> {
                           goal: _dailyNutrition.targets.carbsGrams,
                           unit: 'g',
                           color: AppColors.ringStreak,
+                          icon: Icons.bolt_rounded,
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: _buildMacroItem(
                           context: context,
@@ -261,6 +337,7 @@ class _DietPlanScreenState extends State<DietPlanScreen> {
                           goal: _dailyNutrition.targets.fatGrams,
                           unit: 'g',
                           color: AppColors.tertiary,
+                          icon: Icons.local_fire_department_rounded,
                         ),
                       ),
                     ],
@@ -301,53 +378,118 @@ class _DietPlanScreenState extends State<DietPlanScreen> {
     required double goal,
     required String unit,
     required Color color,
+    required IconData icon,
   }) {
     final progress = (consumed / goal).clamp(0.0, 1.0);
     return Container(
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
       decoration: BoxDecoration(
         color: context.appSurfaceElevated,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: context.appOutlineVariant.withValues(alpha: 0.3),
+          color: context.isDarkMode
+              ? color.withValues(alpha: 0.35)
+              : context.appOutlineVariant.withValues(alpha: 0.4),
+          width: 1.2,
         ),
-      ),
-      child: Column(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(999),
-            child: LinearProgressIndicator(
-              value: progress,
-              minHeight: 4,
-              backgroundColor: context.appBackground,
-              valueColor: AlwaysStoppedAnimation<Color>(color),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: AppTheme.labelCaps.copyWith(
-              fontSize: 10,
-              color: context.appTextSecondary,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            '${consumed.toStringAsFixed(0)}$unit',
-            style: AppTheme.headlineMd.copyWith(
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-              color: color,
-            ),
-          ),
-          Text(
-            '/ ${goal.toStringAsFixed(0)}$unit',
-            style: AppTheme.bodySm.copyWith(
-              fontSize: 10,
-              color: context.appTextSecondary,
-            ),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: context.isDarkMode ? 0.15 : 0.05),
+            blurRadius: 8,
+            spreadRadius: 0,
           ),
         ],
+      ),
+      child: TweenAnimationBuilder<double>(
+        tween: Tween<double>(end: progress),
+        duration: const Duration(milliseconds: 600),
+        curve: Curves.easeOutCubic,
+        builder: (context, animProgress, child) {
+          final animConsumed = animProgress * goal;
+          final animPercent = (animProgress * 100).toInt();
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Icon(icon, size: 13, color: color),
+                  ),
+                  Text(
+                    '$animPercent%',
+                    style: AppTheme.labelCaps.copyWith(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      color: color,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                label,
+                style: AppTheme.labelCaps.copyWith(
+                  fontSize: 10,
+                  letterSpacing: 0.8,
+                  fontWeight: FontWeight.w600,
+                  color: context.appTextSecondary,
+                ),
+              ),
+              const SizedBox(height: 2),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Text(
+                      animConsumed.toStringAsFixed(0),
+                      style: AppTheme.headlineMd.copyWith(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                        color: context.appTextPrimary,
+                      ),
+                    ),
+                    Text(
+                      unit,
+                      style: AppTheme.bodySm.copyWith(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: color,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '/ ${goal.toStringAsFixed(0)}$unit',
+                      style: AppTheme.bodySm.copyWith(
+                        fontSize: 10,
+                        color: context.appTextSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(999),
+                child: LinearProgressIndicator(
+                  value: animProgress,
+                  minHeight: 5,
+                  backgroundColor: context.appOutlineVariant.withValues(alpha: 0.2),
+                  valueColor: AlwaysStoppedAnimation<Color>(color),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -356,114 +498,237 @@ class _DietPlanScreenState extends State<DietPlanScreen> {
     final bool isCompleted = meal.isCompleted;
 
     return AppCard(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(16),
       borderColor: isCompleted
-          ? AppColors.primary.withValues(alpha: 0.4)
-          : null,
+          ? AppColors.primaryContainer.withValues(alpha: 0.7)
+          : (context.isDarkMode
+              ? context.appOutlineVariant.withValues(alpha: 0.3)
+              : null),
       onTap: () => _showMealDetailsModal(meal),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
         children: [
-          // Completion Checkbox Container with Scale-Bounce Micro Animation
-          GestureDetector(
-            onTap: () => _toggleMeal(meal),
-            child: AnimatedScale(
-              scale: isCompleted ? 1.05 : 1.0,
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeOutBack,
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isCompleted
-                      ? AppColors.primary
-                      : context.appSurfaceElevated,
-                  border: Border.all(
-                    color: isCompleted
-                        ? AppColors.primary
-                        : context.appOutlineVariant,
-                    width: 1.5,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Circular Checkbox Container with Scale-Bounce Animation
+              GestureDetector(
+                onTap: () => _toggleMeal(meal),
+                child: AnimatedScale(
+                  scale: isCompleted ? 1.08 : 1.0,
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeOutBack,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isCompleted
+                          ? AppColors.primaryContainer
+                          : context.appSurfaceElevated,
+                      border: Border.all(
+                        color: isCompleted
+                            ? AppColors.primaryContainer
+                            : context.appOutlineVariant,
+                        width: 1.5,
+                      ),
+                      boxShadow: isCompleted
+                          ? [
+                              BoxShadow(
+                                color: AppColors.primaryContainer.withValues(alpha: 0.5),
+                                blurRadius: 10,
+                                spreadRadius: 1,
+                              ),
+                            ]
+                          : null,
+                    ),
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 200),
+                      transitionBuilder: (child, anim) =>
+                          ScaleTransition(scale: anim, child: child),
+                      child: isCompleted
+                          ? const Icon(
+                              Icons.check_rounded,
+                              key: ValueKey('check'),
+                              color: Colors.white,
+                              size: 22,
+                            )
+                          : const Icon(
+                              Icons.restaurant_outlined,
+                              key: ValueKey('rest'),
+                              color: AppColors.primaryContainer,
+                              size: 20,
+                            ),
+                    ),
                   ),
                 ),
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 200),
-                  transitionBuilder: (child, anim) =>
-                      ScaleTransition(scale: anim, child: child),
-                  child: isCompleted
-                      ? const Icon(
-                          Icons.check_rounded,
-                          key: ValueKey('check'),
-                          color: AppColors.onPrimary,
-                          size: 18,
-                        )
-                      : const Icon(
-                          Icons.restaurant_outlined,
-                          key: ValueKey('rest'),
-                          color: AppColors.primary,
-                          size: 16,
+              ),
+              const SizedBox(width: 14),
+
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              meal.name,
+                              style: AppTheme.headlineMd.copyWith(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: context.appTextPrimary,
+                              ),
+                            ),
+                            if (isCompleted) ...[
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryContainer.withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  'DONE',
+                                  style: AppTheme.labelCaps.copyWith(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w800,
+                                    color: AppColors.primaryContainer,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryContainer.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                              color: AppColors.primaryContainer.withValues(alpha: 0.3),
+                            ),
+                          ),
+                          child: Text(
+                            '${meal.totalCalories.toStringAsFixed(0)} kcal',
+                            style: AppTheme.labelCaps.copyWith(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: context.isDarkMode
+                                  ? AppColors.primaryContainer
+                                  : AppColors.primary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.access_time_rounded,
+                          size: 12,
+                          color: context.appTextSecondary,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          meal.timeLabel,
+                          style: AppTheme.labelCaps.copyWith(
+                            fontSize: 11,
+                            color: context.appTextSecondary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+
+                    // Food Items Chips
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
+                      children: meal.items.map((item) {
+                        return AppChip(
+                          label: item.name,
+                          variant: AppChipVariant.subtle,
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 10),
+
+                    // Macros Row
+                    Row(
+                      children: [
+                        _buildNutritionPill('P', '${meal.totalProtein.toStringAsFixed(0)}g', AppColors.ringProtein),
+                        const SizedBox(width: 6),
+                        _buildNutritionPill('C', '${meal.totalCarbs.toStringAsFixed(0)}g', AppColors.ringStreak),
+                        const SizedBox(width: 6),
+                        _buildNutritionPill('F', '${meal.totalFat.toStringAsFixed(0)}g', AppColors.tertiary),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            ),
+            ],
           ),
-          const SizedBox(width: 12),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          const SizedBox(height: 14),
+          // Clear "Finish Meal" Action Button
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => _toggleMeal(meal),
+              borderRadius: BorderRadius.circular(10),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: isCompleted
+                      ? AppColors.primaryContainer.withValues(alpha: 0.18)
+                      : AppColors.primaryContainer.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: isCompleted
+                        ? AppColors.primaryContainer.withValues(alpha: 0.5)
+                        : AppColors.primaryContainer.withValues(alpha: 0.35),
+                    width: 1.2,
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      meal.name,
-                      style: AppTheme.headlineMd.copyWith(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: context.appTextPrimary,
-                      ),
+                    Icon(
+                      isCompleted
+                          ? Icons.check_circle_rounded
+                          : Icons.check_circle_outline_rounded,
+                      size: 18,
+                      color: context.isDarkMode
+                          ? AppColors.primaryContainer
+                          : AppColors.primary,
                     ),
+                    const SizedBox(width: 8),
                     Text(
-                      '${meal.totalCalories.toStringAsFixed(0)} kcal',
-                      style: AppTheme.bodySm.copyWith(
-                        fontSize: 13,
+                      isCompleted ? 'Meal Completed' : 'Finish Meal',
+                      style: AppTheme.labelCaps.copyWith(
+                        fontSize: 12,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.primary,
+                        letterSpacing: 0.5,
+                        color: context.isDarkMode
+                            ? AppColors.primaryContainer
+                            : AppColors.primary,
                       ),
                     ),
                   ],
                 ),
-                Text(
-                  meal.timeLabel,
-                  style: AppTheme.labelCaps.copyWith(
-                    fontSize: 10,
-                    color: context.appTextSecondary,
-                  ),
-                ),
-                const SizedBox(height: 8),
-
-                // Food Items Chips
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 4,
-                  children: meal.items.map((item) {
-                    return AppChip(
-                      label: item.name,
-                      variant: AppChipVariant.subtle,
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'P: ${meal.totalProtein.toStringAsFixed(0)}g · C: ${meal.totalCarbs.toStringAsFixed(0)}g · F: ${meal.totalFat.toStringAsFixed(0)}g',
-                  style: AppTheme.labelCaps.copyWith(
-                    fontSize: 10,
-                    color: context.appTextSecondary,
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ],
@@ -471,9 +736,31 @@ class _DietPlanScreenState extends State<DietPlanScreen> {
     );
   }
 
+  Widget _buildNutritionPill(String tag, String value, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 0.8),
+      ),
+      child: Text(
+        '$tag: $value',
+        style: AppTheme.labelCaps.copyWith(
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+          color: color,
+        ),
+      ),
+    );
+  }
+
   Widget _buildQuickProteinLogCard(BuildContext context) {
     return AppCard(
       padding: const EdgeInsets.all(16),
+      borderColor: context.isDarkMode
+          ? AppColors.primaryContainer.withValues(alpha: 0.25)
+          : null,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -484,10 +771,16 @@ class _DietPlanScreenState extends State<DietPlanScreen> {
                 decoration: BoxDecoration(
                   color: AppColors.primaryContainer.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primaryContainer.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                    ),
+                  ],
                 ),
                 child: const Icon(
                   Icons.bolt,
-                  color: AppColors.primary,
+                  color: AppColors.primaryContainer,
                   size: 20,
                 ),
               ),
@@ -512,6 +805,7 @@ class _DietPlanScreenState extends State<DietPlanScreen> {
                   style: AppTheme.bodySm.copyWith(
                     color: context.appTextPrimary,
                     fontSize: 14,
+                    fontWeight: FontWeight.w500,
                   ),
                   decoration: InputDecoration(
                     labelText: 'Protein Consumed (g)',
@@ -532,7 +826,7 @@ class _DietPlanScreenState extends State<DietPlanScreen> {
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(
-                        color: AppColors.primary,
+                        color: AppColors.primaryContainer,
                         width: 2,
                       ),
                     ),

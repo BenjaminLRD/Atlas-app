@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../app_theme.dart';
 
@@ -23,7 +22,29 @@ class _AmbientBackgroundState extends State<AmbientBackground> with SingleTicker
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 18),
-    )..repeat(reverse: true);
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _updateAnimationState();
+  }
+
+  void _updateAnimationState() {
+    final tickerEnabled = TickerMode.valuesOf(context).enabled;
+    final disableAnimations = MediaQuery.of(context).disableAnimations;
+    final isDark = context.isDarkMode;
+
+    if (!tickerEnabled || disableAnimations || isDark) {
+      if (_controller.isAnimating) {
+        _controller.stop();
+      }
+    } else {
+      if (!_controller.isAnimating) {
+        _controller.repeat(reverse: true);
+      }
+    }
   }
 
   @override
@@ -45,62 +66,70 @@ class _AmbientBackgroundState extends State<AmbientBackground> with SingleTicker
 
     return Stack(
       children: [
-        // 1. Light Mode Premium Soft Gradient (#EAF8EE -> #F8FCF8 -> #F2FBF4)
-        Positioned.fill(
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: context.appBackgroundGradient,
-            ),
-          ),
-        ),
-
-        // 2. Soft Ambient Organic Blobs (Opacity 3% - 6%)
-        if (!disableAnimations)
-          AnimatedBuilder(
-            animation: _controller,
-            builder: (context, _) {
-              final animVal = _controller.value;
-              return Stack(
-                children: [
-                  Positioned(
-                    top: -60 + (animVal * 25),
-                    right: -50 - (animVal * 15),
-                    child: _buildBlob(240, AppColors.primaryContainer.withValues(alpha: 0.05)),
-                  ),
-                  Positioned(
-                    bottom: 140 - (animVal * 30),
-                    left: -60 + (animVal * 20),
-                    child: _buildBlob(280, AppColors.primaryFixed.withValues(alpha: 0.04)),
-                  ),
-                  Positioned(
-                    top: MediaQuery.of(context).size.height * 0.45 + (animVal * 15),
-                    right: -40 + (animVal * 10),
-                    child: _buildBlob(200, AppColors.secondaryContainer.withValues(alpha: 0.04)),
-                  ),
-                ],
-              );
-            },
-          )
-        else
-          Stack(
+        ExcludeSemantics(
+          child: Stack(
             children: [
-              Positioned(
-                top: -60,
-                right: -50,
-                child: _buildBlob(240, AppColors.primaryContainer.withValues(alpha: 0.05)),
+              // 1. Light Mode Premium Soft Gradient (#EAF8EE -> #F8FCF8 -> #F2FBF4)
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: context.appBackgroundGradient,
+                  ),
+                ),
               ),
-              Positioned(
-                bottom: 140,
-                left: -60,
-                child: _buildBlob(280, AppColors.primaryFixed.withValues(alpha: 0.04)),
-              ),
-              Positioned(
-                top: MediaQuery.of(context).size.height * 0.45,
-                right: -40,
-                child: _buildBlob(200, AppColors.secondaryContainer.withValues(alpha: 0.04)),
-              ),
+
+              // 2. Soft Ambient Organic Blobs wrapped in RepaintBoundary for zero foreground repaint impact
+              if (!disableAnimations)
+                RepaintBoundary(
+                  child: AnimatedBuilder(
+                    animation: _controller,
+                    builder: (context, _) {
+                      final animVal = _controller.value;
+                      return Stack(
+                        children: [
+                          Positioned(
+                            top: -60 + (animVal * 25),
+                            right: -50 - (animVal * 15),
+                            child: _buildBlob(240, AppColors.primaryContainer.withValues(alpha: 0.12)),
+                          ),
+                          Positioned(
+                            bottom: 140 - (animVal * 30),
+                            left: -60 + (animVal * 20),
+                            child: _buildBlob(280, AppColors.primaryFixed.withValues(alpha: 0.10)),
+                          ),
+                          Positioned(
+                            top: MediaQuery.of(context).size.height * 0.45 + (animVal * 15),
+                            right: -40 + (animVal * 10),
+                            child: _buildBlob(200, AppColors.secondaryContainer.withValues(alpha: 0.10)),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                )
+              else
+                Stack(
+                  children: [
+                    Positioned(
+                      top: -60,
+                      right: -50,
+                      child: _buildBlob(240, AppColors.primaryContainer.withValues(alpha: 0.12)),
+                    ),
+                    Positioned(
+                      bottom: 140,
+                      left: -60,
+                      child: _buildBlob(280, AppColors.primaryFixed.withValues(alpha: 0.10)),
+                    ),
+                    Positioned(
+                      top: MediaQuery.of(context).size.height * 0.45,
+                      right: -40,
+                      child: _buildBlob(200, AppColors.secondaryContainer.withValues(alpha: 0.10)),
+                    ),
+                  ],
+                ),
             ],
           ),
+        ),
 
         // 3. Foreground Child Content
         Positioned.fill(
@@ -116,11 +145,13 @@ class _AmbientBackgroundState extends State<AmbientBackground> with SingleTicker
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: color,
-      ),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 70, sigmaY: 70),
-        child: Container(color: Colors.transparent),
+        gradient: RadialGradient(
+          colors: [
+            color,
+            color.withValues(alpha: 0.0),
+          ],
+          stops: const [0.25, 1.0],
+        ),
       ),
     );
   }

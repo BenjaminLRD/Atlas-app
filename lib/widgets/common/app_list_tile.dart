@@ -42,8 +42,8 @@ class AppListTile extends StatelessWidget {
 
     return ListTile(
       dense: dense,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 2),
+      shape: const RoundedRectangleBorder(borderRadius: AppRadii.borderMd),
       onTap: onTap,
       leading: leadingWidget,
       title: Text(

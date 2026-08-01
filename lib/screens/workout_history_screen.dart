@@ -6,6 +6,8 @@ import '../models/workout_history.dart';
 import '../widgets/common/app_card.dart';
 import '../widgets/common/app_header.dart';
 import '../widgets/common/section_header.dart';
+import 'notifications_screen.dart';
+import 'settings_screen.dart';
 
 class WorkoutHistoryScreen extends StatefulWidget {
   const WorkoutHistoryScreen({super.key});
@@ -27,8 +29,29 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen>
     _glowController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
-    )..repeat(reverse: true);
+    );
     _loadHistory();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _updateAnimationState();
+  }
+
+  void _updateAnimationState() {
+    final tickerEnabled = TickerMode.valuesOf(context).enabled;
+    final disableAnimations = MediaQuery.of(context).disableAnimations;
+
+    if (!tickerEnabled || disableAnimations) {
+      if (_glowController.isAnimating) {
+        _glowController.stop();
+      }
+    } else {
+      if (!_glowController.isAnimating) {
+        _glowController.repeat(reverse: true);
+      }
+    }
   }
 
   @override
@@ -94,11 +117,12 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen>
       0.0,
       (sum, item) => sum + item.completionPercentage,
     );
-    return (total / _history.length) * 100;
+    return total / _history.length;
   }
 
   @override
   Widget build(BuildContext context) {
+    _history = _workoutService.getWorkoutHistory();
     return Scaffold(
       backgroundColor: context.appBackground,
       body: Stack(
@@ -179,10 +203,17 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen>
   }
 
   Widget _buildHeaderBar(BuildContext context) {
-    return AppHeader.back(
-      title: 'Workout History',
-      subtitle: '${_history.length} Sessions',
-      onBackTap: () => Navigator.maybePop(context),
+    return AppHeader.standard(
+      title: 'Progress & Analytics',
+      subtitle: '${_history.length} Completed Sessions',
+      onNotificationsTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+      ),
+      onSettingsTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const SettingsScreen()),
+      ),
     );
   }
 
@@ -192,100 +223,219 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen>
 
     return Row(
       children: [
-        // Total Workouts
+        // Total Workouts Completed Card
         Expanded(
           child: AppCard(
             padding: const EdgeInsets.all(14),
+            borderColor: context.isDarkMode
+                ? AppColors.primaryContainer.withValues(alpha: 0.3)
+                : null,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(
-                  Icons.emoji_events_outlined,
-                  color: AppColors.primary,
-                  size: 20,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(7),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryContainer.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primaryContainer.withValues(alpha: 0.3),
+                            blurRadius: 8,
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.emoji_events_rounded,
+                        color: AppColors.primaryContainer,
+                        size: 18,
+                      ),
+                    ),
+                    Icon(
+                      Icons.auto_graph_rounded,
+                      size: 14,
+                      color: AppColors.primaryContainer.withValues(alpha: 0.8),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 Text(
                   'COMPLETED',
                   style: AppTheme.labelCaps.copyWith(
                     fontSize: 10,
+                    letterSpacing: 0.8,
+                    fontWeight: FontWeight.w600,
                     color: context.appTextSecondary,
                   ),
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  '${_history.length}',
-                  style: AppTheme.displayMetrics.copyWith(
-                    fontSize: 20,
-                    color: context.appTextPrimary,
-                  ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Text(
+                      '${_history.length}',
+                      style: AppTheme.headlineLg.copyWith(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        color: context.appTextPrimary,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'sessions',
+                      style: AppTheme.bodySm.copyWith(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: context.appTextSecondary,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: 10),
 
-        // Total Duration
+        // Total Active Time Card
         Expanded(
           child: AppCard(
             padding: const EdgeInsets.all(14),
+            borderColor: context.isDarkMode
+                ? AppColors.primaryContainer.withValues(alpha: 0.3)
+                : null,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(
-                  Icons.timer_outlined,
-                  color: AppColors.primary,
-                  size: 20,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(7),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryContainer.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primaryContainer.withValues(alpha: 0.3),
+                            blurRadius: 8,
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.timer_sharp,
+                        color: AppColors.primaryContainer,
+                        size: 18,
+                      ),
+                    ),
+                    Icon(
+                      Icons.schedule_rounded,
+                      size: 14,
+                      color: AppColors.primaryContainer.withValues(alpha: 0.8),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 Text(
                   'ACTIVE TIME',
                   style: AppTheme.labelCaps.copyWith(
                     fontSize: 10,
+                    letterSpacing: 0.8,
+                    fontWeight: FontWeight.w600,
                     color: context.appTextSecondary,
                   ),
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  '$totalHoursStr hrs',
-                  style: AppTheme.displayMetrics.copyWith(
-                    fontSize: 20,
-                    color: context.appTextPrimary,
-                  ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Text(
+                      totalHoursStr,
+                      style: AppTheme.headlineLg.copyWith(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        color: context.appTextPrimary,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'hrs',
+                      style: AppTheme.bodySm.copyWith(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: context.appTextSecondary,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: 10),
 
-        // Avg Completion
+        // Avg Target Completion Card
         Expanded(
           child: AppCard(
             padding: const EdgeInsets.all(14),
+            borderColor: context.isDarkMode
+                ? AppColors.primaryContainer.withValues(alpha: 0.3)
+                : null,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(
-                  Icons.task_alt_rounded,
-                  color: AppColors.primary,
-                  size: 20,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(7),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryContainer.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primaryContainer.withValues(alpha: 0.3),
+                            blurRadius: 8,
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.verified_rounded,
+                        color: AppColors.primaryContainer,
+                        size: 18,
+                      ),
+                    ),
+                    Icon(
+                      Icons.trending_up_rounded,
+                      size: 14,
+                      color: AppColors.primaryContainer.withValues(alpha: 0.8),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 Text(
                   'AVG TARGET',
                   style: AppTheme.labelCaps.copyWith(
                     fontSize: 10,
+                    letterSpacing: 0.8,
+                    fontWeight: FontWeight.w600,
                     color: context.appTextSecondary,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   avgCompStr,
-                  style: AppTheme.displayMetrics.copyWith(
-                    fontSize: 20,
-                    color: AppColors.primary,
+                  style: AppTheme.headlineLg.copyWith(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    color: context.isDarkMode
+                        ? AppColors.primaryContainer
+                        : AppColors.primary,
                   ),
                 ),
               ],
@@ -299,42 +449,84 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen>
   Widget _buildEmptyState(BuildContext context) {
     return AppCard(
       padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 24),
-      child: Center(
-        child: Column(
-          children: [
-            Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                color: AppColors.primaryContainer.withValues(alpha: 0.2),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.fitness_center_rounded,
-                size: 32,
-                color: AppColors.primary,
+      borderColor: context.isDarkMode
+          ? AppColors.primaryContainer.withValues(alpha: 0.25)
+          : null,
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.primaryContainer.withValues(alpha: 0.15),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primaryContainer.withValues(
+                    alpha: context.isDarkMode ? 0.3 : 0.15,
+                  ),
+                  blurRadius: 20,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: const Icon(
+              Icons.fitness_center_rounded,
+              size: 38,
+              color: AppColors.primaryContainer,
+            ),
+          ),
+          const SizedBox(height: 18),
+          Text(
+            'No Training History Yet',
+            style: AppTheme.headlineMd.copyWith(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: context.appTextPrimary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Complete your first workout session to automatically log performance statistics, active duration, and progress volume!',
+            textAlign: TextAlign.center,
+            style: AppTheme.bodySm.copyWith(
+              fontSize: 13,
+              height: 1.4,
+              color: context.appTextSecondary,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+            decoration: BoxDecoration(
+              color: AppColors.primaryContainer.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(
+                color: AppColors.primaryContainer.withValues(alpha: 0.3),
               ),
             ),
-            const SizedBox(height: 16),
-            Text(
-              'No Completed Workouts Yet',
-              style: AppTheme.headlineMd.copyWith(
-                fontSize: 18,
-                color: context.appTextPrimary,
-              ),
-              textAlign: TextAlign.center,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.bolt,
+                  size: 14,
+                  color: AppColors.primaryContainer,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  'Start a workout from the Workouts tab',
+                  style: AppTheme.labelCaps.copyWith(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: context.isDarkMode
+                        ? AppColors.primaryContainer
+                        : AppColors.primary,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 6),
-            Text(
-              'Finish your first workout training session to automatically log performance statistics!',
-              style: AppTheme.bodySm.copyWith(
-                color: context.appTextSecondary,
-                fontSize: 13,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -343,12 +535,15 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen>
     return Column(
       children: List.generate(_history.length, (index) {
         final item = _history[index];
-        final percentInt = (item.completionPercentage * 100).toInt();
+        final percentInt = item.completionPercentage.toInt();
 
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
           child: AppCard(
             padding: const EdgeInsets.all(16),
+            borderColor: context.isDarkMode
+                ? AppColors.primaryContainer.withValues(alpha: 0.3)
+                : null,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -361,32 +556,54 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen>
                         item.workoutName,
                         style: AppTheme.headlineMd.copyWith(
                           fontSize: 17,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w800,
                           color: context.appTextPrimary,
                         ),
                       ),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 3,
+                        horizontal: 10,
+                        vertical: 4,
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.primaryContainer.withValues(
-                          alpha: 0.25,
+                          alpha: 0.2,
                         ),
                         borderRadius: BorderRadius.circular(999),
                         border: Border.all(
-                          color: AppColors.primary.withValues(alpha: 0.3),
+                          color: AppColors.primaryContainer.withValues(
+                            alpha: 0.4,
+                          ),
                         ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primaryContainer.withValues(
+                              alpha: 0.2,
+                            ),
+                            blurRadius: 6,
+                          ),
+                        ],
                       ),
-                      child: Text(
-                        '$percentInt% Completed',
-                        style: AppTheme.labelCaps.copyWith(
-                          color: AppColors.primary,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                        ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.check_circle_outline_rounded,
+                            size: 12,
+                            color: AppColors.primaryContainer,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            '$percentInt% Done',
+                            style: AppTheme.labelCaps.copyWith(
+                              color: context.isDarkMode
+                                  ? AppColors.primaryContainer
+                                  : AppColors.primary,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -394,54 +611,85 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen>
                 const SizedBox(height: 4),
 
                 // Date timestamp
-                Text(
-                  _formatDate(item.dateCompleted),
-                  style: AppTheme.labelCaps.copyWith(
-                    fontSize: 10,
-                    color: context.appTextSecondary,
-                  ),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_today_rounded,
+                      size: 12,
+                      color: context.appTextSecondary,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      _formatDate(item.dateCompleted),
+                      style: AppTheme.labelCaps.copyWith(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                        color: context.appTextSecondary,
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 12),
 
                 // Key metrics row (Duration & Exercises)
                 Row(
                   children: [
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.access_time_rounded,
-                          size: 14,
-                          color: AppColors.primary,
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: context.appSurfaceElevated,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: context.appOutlineVariant.withValues(alpha: 0.4),
                         ),
-                        const SizedBox(width: 5),
-                        Text(
-                          _formatDuration(item.durationSeconds),
-                          style: AppTheme.bodySm.copyWith(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: context.appTextPrimary,
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.timer_outlined,
+                            size: 13,
+                            color: AppColors.primaryContainer,
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 5),
+                          Text(
+                            _formatDuration(item.durationSeconds),
+                            style: AppTheme.bodySm.copyWith(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: context.appTextPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    const SizedBox(width: 16),
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.format_list_bulleted_rounded,
-                          size: 14,
-                          color: AppColors.primary,
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: context.appSurfaceElevated,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: context.appOutlineVariant.withValues(alpha: 0.4),
                         ),
-                        const SizedBox(width: 5),
-                        Text(
-                          '${item.exercisesCompleted} Exercises',
-                          style: AppTheme.bodySm.copyWith(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: context.appTextPrimary,
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.fitness_center_rounded,
+                            size: 13,
+                            color: AppColors.primaryContainer,
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 5),
+                          Text(
+                            '${item.exercisesCompleted} Exercises',
+                            style: AppTheme.bodySm.copyWith(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: context.appTextPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),

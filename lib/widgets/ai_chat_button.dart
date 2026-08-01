@@ -30,7 +30,7 @@ class _AiChatButtonState extends State<AiChatButton> with TickerProviderStateMix
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2000),
-    )..repeat(reverse: true);
+    );
 
     _pulseGlowAnimation = Tween<double>(begin: 4.0, end: 12.0).animate(
       CurvedAnimation(
@@ -38,6 +38,27 @@ class _AiChatButtonState extends State<AiChatButton> with TickerProviderStateMix
         curve: Curves.easeInOut,
       ),
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _updateAnimationState();
+  }
+
+  void _updateAnimationState() {
+    final tickerEnabled = TickerMode.valuesOf(context).enabled;
+    final disableAnimations = MediaQuery.of(context).disableAnimations;
+
+    if (!tickerEnabled || disableAnimations) {
+      if (_pulseController.isAnimating) {
+        _pulseController.stop();
+      }
+    } else {
+      if (!_pulseController.isAnimating) {
+        _pulseController.repeat(reverse: true);
+      }
+    }
   }
 
   @override
@@ -66,32 +87,47 @@ class _AiChatButtonState extends State<AiChatButton> with TickerProviderStateMix
           child: AnimatedBuilder(
             animation: _pulseController,
             builder: (context, child) {
-              final double glowRadius = _isHovered ? 16.0 : _pulseGlowAnimation.value;
+              final double glowRadius = _isHovered ? 18.0 : _pulseGlowAnimation.value;
+              final double breathScale = 1.0 + (_pulseController.value * 0.04);
 
-              return Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isDark ? const Color(0xFF0F3818) : AppColors.primary,
-                  border: Border.all(
-                    color: AppColors.primary,
-                    width: 2.0,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primary.withValues(alpha: isDark ? 0.5 : 0.35),
-                      blurRadius: glowRadius,
-                      spreadRadius: _isHovered ? 2 : 1,
-                      offset: const Offset(0, 3),
+              return Transform.scale(
+                scale: breathScale,
+                child: Container(
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: isDark
+                          ? const [Color(0xFF165B22), Color(0xFF0F3818)]
+                          : const [AppColors.primaryContainer, AppColors.primary],
                     ),
-                  ],
-                ),
-                child: Center(
-                  child: Icon(
-                    Icons.chat_bubble_rounded,
-                    color: AppColors.onPrimary,
-                    size: 22,
+                    border: Border.all(
+                      color: AppColors.primaryContainer,
+                      width: 2.0,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primaryContainer.withValues(alpha: isDark ? 0.65 : 0.45),
+                        blurRadius: glowRadius * 1.5,
+                        spreadRadius: _isHovered ? 3 : 1.5,
+                      ),
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: isDark ? 0.4 : 0.25),
+                        blurRadius: glowRadius * 0.7,
+                        spreadRadius: 1,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.chat_bubble_rounded,
+                      color: Colors.white,
+                      size: 22,
+                    ),
                   ),
                 ),
               );

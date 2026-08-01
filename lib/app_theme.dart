@@ -1,6 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+/// Semantic design tokens for spacing in padding and layout gaps.
+abstract class AppSpacing {
+  static const double xs = 4.0;
+  static const double sm = 8.0;
+  static const double md = 12.0;
+  static const double lg = 16.0;
+  static const double xl = 20.0;
+  static const double xxl = 24.0;
+}
+
+/// Semantic border radius tokens for component corners.
+abstract class AppRadii {
+  static const double sm = 8.0;
+  static const double md = 12.0;
+  static const double lg = 16.0;
+  static const double xl = 24.0;
+  static const double full = 999.0;
+
+  static const BorderRadius borderSm = BorderRadius.all(Radius.circular(sm));
+  static const BorderRadius borderMd = BorderRadius.all(Radius.circular(md));
+  static const BorderRadius borderLg = BorderRadius.all(Radius.circular(lg));
+  static const BorderRadius borderXl = BorderRadius.all(Radius.circular(xl));
+  static const BorderRadius borderFull = BorderRadius.all(Radius.circular(full));
+}
+
+/// Semantic animation duration tokens.
+abstract class AppDurations {
+  static const Duration fast = Duration(milliseconds: 150);
+  static const Duration medium = Duration(milliseconds: 300);
+  static const Duration slow = Duration(milliseconds: 500);
+}
+
 /// Semantic design tokens for the Aizawl Gym Vitality Design System.
 class AppColors {
   // Brand Primary (Vitality Green)
@@ -84,10 +116,10 @@ extension AppThemeContext on BuildContext {
   Color get appSurface => isDarkMode ? const Color(0xFF1B1E20) : AppColors.surface;
   Color get appSurfaceElevated => isDarkMode ? const Color(0xFF25292C) : AppColors.surfaceElevated;
   Color get appSurfaceContainerLow => isDarkMode ? const Color(0xFF171A1C) : AppColors.surfaceContainerLow;
-  Color get appTextPrimary => isDarkMode ? const Color(0xFFF9F9FE) : AppColors.textPrimary;
-  Color get appTextSecondary => isDarkMode ? const Color(0xFFA2A8AE) : AppColors.textSecondary;
+  Color get appTextPrimary => isDarkMode ? const Color(0xFFFFFFFF) : AppColors.textPrimary;
+  Color get appTextSecondary => isDarkMode ? const Color(0xFFCCCCCC) : AppColors.textSecondary;
   Color get appPrimary => isDarkMode ? const Color(0xFF32D74B) : AppColors.primary;
-  Color get appOutlineVariant => isDarkMode ? const Color(0xFF2E3338) : AppColors.outlineVariant;
+  Color get appOutlineVariant => isDarkMode ? const Color(0xFF3F454B) : AppColors.outlineVariant;
   Color get appCardBg => isDarkMode
       ? const Color(0xFF1B1E20).withValues(alpha: 0.85)
       : const Color(0xFFFFFFFF);
@@ -157,6 +189,19 @@ class AppTheme {
       ),
       scaffoldBackgroundColor: AppColors.background,
       textTheme: _textTheme(AppColors.textPrimary, AppColors.textSecondary),
+      inputDecorationTheme: InputDecorationTheme(
+        labelStyle: const TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w500),
+        hintStyle: TextStyle(color: AppColors.textSecondary.withValues(alpha: 0.7)),
+        helperStyle: const TextStyle(color: AppColors.textSecondary),
+        enabledBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: AppColors.outlineVariant, width: 1),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
     );
   }
 
@@ -180,16 +225,29 @@ class AppTheme {
         error: Color(0xFFFFB4AB),
         onError: Color(0xFF690005),
         surface: Color(0xFF1B1E20),
-        onSurface: Color(0xFFF9F9FE),
+        onSurface: Color(0xFFFFFFFF),
         surfaceContainerHighest: Color(0xFF2E3338),
-        outline: Color(0xFF8C938B),
-        outlineVariant: Color(0xFF2E3338),
-        inverseSurface: Color(0xFFF9F9FE),
+        outline: Color(0xFFA3ACA1),
+        outlineVariant: Color(0xFF3F454B),
+        inverseSurface: Color(0xFFFFFFFF),
         onInverseSurface: Color(0xFF1A1C1F),
         inversePrimary: AppColors.primary,
       ),
       scaffoldBackgroundColor: const Color(0xFF101213),
-      textTheme: _textTheme(const Color(0xFFF9F9FE), const Color(0xFFA2A8AE)),
+      textTheme: _textTheme(const Color(0xFFFFFFFF), const Color(0xFFCCCCCC)),
+      inputDecorationTheme: InputDecorationTheme(
+        labelStyle: const TextStyle(color: Color(0xFFCCCCCC), fontWeight: FontWeight.w500),
+        hintStyle: const TextStyle(color: Color(0xFF9EA3AC)),
+        helperStyle: const TextStyle(color: Color(0xFFCCCCCC)),
+        enabledBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: Color(0xFF3F454B), width: 1),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: AppColors.primaryContainer, width: 1.5),
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
     );
   }
 

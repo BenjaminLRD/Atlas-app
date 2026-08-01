@@ -3,6 +3,47 @@
 ## Current
 
 ### Added
+- Production Polish Sprint — Loading States:
+  - Reusable Loading & Skeleton Components: Created [app_loading_state.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/widgets/common/app_loading_state.dart) featuring:
+    - `AppSkeletonBox`: Animated pulse/shimmer skeleton container with accessibility pause control (`disableAnimations` & `TickerMode`).
+    - `AppSkeletonCard`: Skeleton representation for metric and content cards.
+    - `AppSkeletonChart`: Skeleton representation for chart cards.
+    - `AppLoadingState`: Universal section & page loading spinner placeholder.
+  - Network Image Loading & Error Fallback: Updated [AppHeader](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/widgets/common/app_header.dart) avatar image rendering to use `Image.network` with `loadingBuilder` (`AppSkeletonBox.circle`) and `errorBuilder` fallback to user initials.
+  - Skeleton Loading Integration:
+    - Added `isLoading` support to [AppChartCard](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/widgets/common/app_chart_card.dart) (renders `AppSkeletonBox` when data loading).
+    - Added `isLoading` support to [MetricCard](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/widgets/common/metric_card.dart) (renders skeleton value placeholders during async updates).
+  - Verification: 100% test & static analysis pass (`flutter analyze`: 0 errors/warnings; `flutter test`: 38/38 passed).
+
+- Production Polish Sprint 4 — Accessibility:
+  - Semantic Annotations: Wrapped custom interactive elements (`AppButton`, `AppChip`, `AppCard`, `AppHeader` avatar) in explicit `Semantics` widgets (`button: true`, `label`, `enabled`, `selected`) for TalkBack & VoiceOver compatibility.
+  - Touch Target Sizing: Standardized header action buttons and chip tap surfaces to meet minimum 44px x 44px touch target bounds without altering visual appearance.
+  - Custom Canvas Accessibility: Wrapped `ProgressRing` custom painter in `Semantics(label: ..., value: '$percent%')` to announce percentage values to screen readers.
+  - Decorative Element Exclusion: Wrapped non-semantic background ambient gradients and blur shapes in [AmbientBackground](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/widgets/common/ambient_background.dart) with `ExcludeSemantics`.
+  - Verification: 100% test & static analysis pass (`flutter analyze`: 0 errors/warnings; `flutter test`: 38/38 passed).
+
+- Production Polish Sprint 3 — Empty States:
+  - `AppEmptyState` Component: Created a unified design system empty state widget in [app_empty_state.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/widgets/common/app_empty_state.dart) supporting icon, title, supporting text, optional CTA action (`AppButton.primary` or custom widget), and customizable card framing.
+  - Screen Migrations:
+    - [NotificationsScreen](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/screens/notifications_screen.dart): Replaced raw centered text/icon with `AppEmptyState` ("No Notifications Yet").
+    - [WorkoutHistoryScreen](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/screens/workout_history_screen.dart): Standardized `_buildEmptyState` with card-framed `AppEmptyState` ("No Completed Workouts Yet").
+    - [AiCoachChatScreen](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/screens/ai_coach_chat_screen.dart): Added empty chat view using `AppEmptyState` ("AI Gym Coach Online") with a quick-start CTA ("Generate Today's Workout").
+  - Verification: 100% test & static analysis pass (`flutter analyze`: 0 errors/warnings; `flutter test`: 38/38 passed).
+
+- Production Polish Sprint 2 — Design Tokens:
+  - Spacing & Layout Tokens (`AppSpacing`): Defined `AppSpacing.xs` (4.0), `sm` (8.0), `md` (12.0), `lg` (16.0), `xl` (20.0), and `xxl` (24.0) in [app_theme.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/app_theme.dart) to replace repeated padding and layout gap literals across design system components and screen views.
+  - Corner Radii Tokens (`AppRadii`): Centralized `AppRadii.sm` (8.0), `md` (12.0), `lg` (16.0), `xl` (24.0), and `full` (999.0) with pre-built `BorderRadius` getters (`borderSm`, `borderMd`, `borderLg`, `borderXl`, `borderFull`), consolidating repeated corner radii in `AppCard`, `AppBottomSheet`, `AppDialog`, `AppChip`, and `AppListTile`.
+  - Animation Duration Tokens (`AppDurations`): Standardized micro-interaction and scale feedback animation speeds with `AppDurations.fast` (150ms), `medium` (300ms), and `slow` (500ms).
+  - Clean Code Hygiene: Resolved collection element null checks (`?badge`, `?trailingWidget`, `?trailing`) across common components.
+  - Verification: 100% test & static analysis pass (`flutter analyze`: 0 errors/warnings; `flutter test`: 38/38 passed).
+
+- Production Polish Sprint 1 — Performance & Motion:
+  - `AppCard` Backdrop Blur Optimization: Made backdrop blur opt-in (`enableBlur = false` by default in `AppCard`). Preserved backdrop blur on featured premium surfaces (`AppHeroCard`, `AppBottomSheet`, `AppDialog`) while removing raster blur compositing overhead on standard cards during scrolling.
+  - Animation Lifecycle & Accessibility Control: Updated `AmbientBackground`, `_PulseGlowWidgetState` (`AppAnimation`), `AiChatButton`, and `WorkoutHistoryScreen` to pause ticker controllers when off-screen (`!TickerMode.valuesOf(context).enabled`), when reduced-motion is requested (`MediaQuery.of(context).disableAnimations`), or in dark mode.
+  - `AmbientBackground` Render Optimization: Replaced per-frame canvas `BackdropFilter` (70px blur radius) with lightweight `RadialGradient` shapes wrapped in `RepaintBoundary`, eliminating background raster paint overhead for foreground contents.
+  - Localized Timer Updates: Refactored `WorkoutSessionScreen` to use `ValueNotifier<int>` for `_elapsedSeconds` and `_restSecondsRemaining` with `ValueListenableBuilder`, eliminating 60 full-screen rebuilds per minute during active workout sessions.
+  - Verification: 100% test & static analysis pass (`flutter analyze`: 0 errors/warnings; `flutter test`: 38/38 passed).
+
 - Comprehensive Design System Consolidation & Component Library:
   - Built 12 unified, highly reusable design system components in `lib/widgets/common/`:
     - `AppHeader` ([app_header.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/widgets/common/app_header.dart)): Standardized top app bar with `AppHeader.standard`, `AppHeader.back`, and `AppHeader.centered`.

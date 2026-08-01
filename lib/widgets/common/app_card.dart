@@ -14,11 +14,11 @@ class AppCard extends StatelessWidget {
   const AppCard({
     super.key,
     required this.child,
-    this.padding = const EdgeInsets.all(20),
-    this.borderRadius = 24.0,
+    this.padding = const EdgeInsets.all(AppSpacing.xl),
+    this.borderRadius = AppRadii.xl,
     this.backgroundColor,
     this.borderColor,
-    this.enableBlur = true,
+    this.enableBlur = false,
     this.onTap,
   });
 
@@ -51,9 +51,13 @@ class AppCard extends StatelessWidget {
     }
 
     if (onTap != null) {
-      return GestureDetector(
-        onTap: onTap,
-        child: content,
+      return Semantics(
+        button: true,
+        enabled: true,
+        child: GestureDetector(
+          onTap: onTap,
+          child: content,
+        ),
       );
     }
 

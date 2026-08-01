@@ -344,9 +344,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             icon: const Icon(Icons.save),
                             label: const Text('Save Changes'),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primary,
-                              foregroundColor: AppColors.onPrimary,
+                              backgroundColor: context.appPrimary,
+                              foregroundColor: context.isDarkMode ? Colors.black : Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 16),
+                              elevation: 0,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
@@ -359,14 +360,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           icon: const Icon(Icons.close),
                           label: const Text('Cancel'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.surfaceContainer,
-                            foregroundColor: AppColors.onSurface,
+                            backgroundColor: context.appSurfaceElevated,
+                            foregroundColor: context.appTextPrimary,
                             padding: const EdgeInsets.symmetric(
                               horizontal: 20,
                               vertical: 16,
                             ),
+                            elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
+                              side: BorderSide(color: context.appOutlineVariant),
                             ),
                           ),
                         ),
@@ -383,7 +386,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: AppTheme.headlineMd.copyWith(color: AppColors.onSurface),
+      style: AppTheme.headlineMd.copyWith(
+        color: context.appTextPrimary,
+        fontWeight: FontWeight.w700,
+      ),
     );
   }
 
@@ -401,16 +407,27 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.outline.withValues(alpha: 0.1)),
+        border: Border.all(color: context.appOutlineVariant),
       ),
       child: TextFormField(
         controller: controller,
         enabled: enabled,
         keyboardType: keyboardType,
+        style: AppTheme.bodyMd.copyWith(
+          color: context.appTextPrimary,
+          fontWeight: FontWeight.w500,
+        ),
         decoration: InputDecoration(
           labelText: label,
+          labelStyle: AppTheme.bodySm.copyWith(
+            color: context.appTextSecondary,
+            fontWeight: FontWeight.w500,
+          ),
           hintText: hint,
-          prefixIcon: Icon(icon, color: AppColors.primary),
+          hintStyle: AppTheme.bodySm.copyWith(
+            color: context.appTextSecondary.withValues(alpha: 0.7),
+          ),
+          prefixIcon: Icon(icon, color: context.appPrimary),
           suffix: unit != null
               ? Padding(padding: const EdgeInsets.only(right: 12), child: unit)
               : null,
@@ -419,7 +436,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             horizontal: 16,
             vertical: 16,
           ),
-          floatingLabelBehavior: FloatingLabelBehavior.never,
+          floatingLabelBehavior: FloatingLabelBehavior.auto,
         ),
         validator: required
             ? (value) {
@@ -462,23 +479,30 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.outline.withValues(alpha: 0.1)),
+          border: Border.all(color: context.appOutlineVariant),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
               children: [
-                Icon(Icons.calendar_today, color: AppColors.primary),
+                Icon(Icons.calendar_today, color: context.appPrimary),
                 const SizedBox(width: 12),
-                Text('Date of Birth', style: AppTheme.bodyMd),
+                Text(
+                  'Date of Birth',
+                  style: AppTheme.bodyMd.copyWith(
+                    color: context.appTextPrimary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ],
             ),
             Text(
               parsedDob != null ? _formatDate(dobStr) : 'Not set',
               style: AppTheme.bodySm.copyWith(
-                color: AppColors.onSurfaceVariant,
+                color: context.appTextSecondary,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],
@@ -498,13 +522,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.outline.withValues(alpha: 0.1)),
+        border: Border.all(color: context.appOutlineVariant),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: value,
-          icon: Icon(Icons.keyboard_arrow_down, color: AppColors.primary),
+          dropdownColor: Theme.of(context).colorScheme.surface,
+          icon: Icon(Icons.keyboard_arrow_down, color: context.appPrimary),
           isExpanded: true,
           onChanged: (newValue) {
             if (newValue != null) {
@@ -516,9 +541,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               value: option,
               child: Row(
                 children: [
-                  Icon(icon, size: 20, color: AppColors.primary),
+                  Icon(icon, size: 20, color: context.appPrimary),
                   const SizedBox(width: 12),
-                  Text(option, style: AppTheme.bodyMd),
+                  Text(
+                    option,
+                    style: AppTheme.bodyMd.copyWith(
+                      color: context.appTextPrimary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ],
               ),
             );
@@ -539,7 +570,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.outline.withValues(alpha: 0.1)),
+        border: Border.all(color: context.appOutlineVariant),
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -547,9 +578,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         children: [
           Row(
             children: [
-              Icon(icon, color: AppColors.primary),
+              Icon(icon, color: context.appPrimary),
               const SizedBox(width: 12),
-              Text(label, style: AppTheme.bodyMd),
+              Text(
+                label,
+                style: AppTheme.bodyMd.copyWith(
+                  color: context.appTextPrimary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 12),
@@ -575,13 +612,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   ),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? AppColors.primary.withValues(alpha: 0.1)
-                        : AppColors.surfaceContainer,
+                        ? context.appPrimary.withValues(alpha: 0.15)
+                        : context.appSurfaceElevated,
                     borderRadius: BorderRadius.circular(100),
                     border: Border.all(
                       color: isSelected
-                          ? AppColors.primary
-                          : AppColors.outline.withValues(alpha: 0.2),
+                          ? context.appPrimary
+                          : context.appOutlineVariant,
                     ),
                   ),
                   child: Row(
@@ -591,8 +628,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         option,
                         style: AppTheme.bodySm.copyWith(
                           color: isSelected
-                              ? AppColors.primary
-                              : AppColors.onSurfaceVariant,
+                              ? context.appPrimary
+                              : context.appTextSecondary,
                           fontWeight: isSelected
                               ? FontWeight.w600
                               : FontWeight.normal,
@@ -618,7 +655,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.outline.withValues(alpha: 0.1)),
+        border: Border.all(color: context.appOutlineVariant),
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -626,9 +663,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         children: [
           Row(
             children: [
-              Icon(Icons.straighten, color: AppColors.primary),
+              Icon(Icons.straighten, color: context.appPrimary),
               const SizedBox(width: 12),
-              Text('Units', style: AppTheme.bodyMd),
+              Text(
+                'Units',
+                style: AppTheme.bodyMd.copyWith(
+                  color: context.appTextPrimary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 16),
@@ -683,8 +726,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         Text(
           label,
           style: AppTheme.labelCaps.copyWith(
-            color: AppColors.onSurfaceVariant,
+            color: context.appTextSecondary,
             fontSize: 11,
+            fontWeight: FontWeight.w600,
           ),
         ),
         const SizedBox(height: 8),
@@ -698,13 +742,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   decoration: BoxDecoration(
                     color: current == option1
-                        ? AppColors.primary.withValues(alpha: 0.1)
-                        : AppColors.surfaceContainer,
+                        ? context.appPrimary.withValues(alpha: 0.15)
+                        : context.appSurfaceElevated,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: current == option1
-                          ? AppColors.primary
-                          : AppColors.outline.withValues(alpha: 0.2),
+                          ? context.appPrimary
+                          : context.appOutlineVariant,
                     ),
                   ),
                   child: Column(
@@ -716,13 +760,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               ? FontWeight.bold
                               : FontWeight.normal,
                           color: current == option1
-                              ? AppColors.primary
-                              : AppColors.onSurfaceVariant,
+                              ? context.appPrimary
+                              : context.appTextSecondary,
                         ),
                       ),
                       if (current == option1) ...[
                         const SizedBox(height: 4),
-                        Icon(Icons.check, size: 14, color: AppColors.primary),
+                        Icon(Icons.check, size: 14, color: context.appPrimary),
                       ],
                     ],
                   ),
@@ -737,13 +781,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   decoration: BoxDecoration(
                     color: current == option2
-                        ? AppColors.primary.withValues(alpha: 0.1)
-                        : AppColors.surfaceContainer,
+                        ? context.appPrimary.withValues(alpha: 0.15)
+                        : context.appSurfaceElevated,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: current == option2
-                          ? AppColors.primary
-                          : AppColors.outline.withValues(alpha: 0.2),
+                          ? context.appPrimary
+                          : context.appOutlineVariant,
                     ),
                   ),
                   child: Column(
@@ -755,13 +799,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               ? FontWeight.bold
                               : FontWeight.normal,
                           color: current == option2
-                              ? AppColors.primary
-                              : AppColors.onSurfaceVariant,
+                              ? context.appPrimary
+                              : context.appTextSecondary,
                         ),
                       ),
                       if (current == option2) ...[
                         const SizedBox(height: 4),
-                        Icon(Icons.check, size: 14, color: AppColors.primary),
+                        Icon(Icons.check, size: 14, color: context.appPrimary),
                       ],
                     ],
                   ),
@@ -781,7 +825,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.outline.withValues(alpha: 0.1)),
+        border: Border.all(color: context.appOutlineVariant),
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -789,9 +833,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         children: [
           Row(
             children: [
-              Icon(Icons.card_membership, color: AppColors.primary),
+              Icon(Icons.card_membership, color: context.appPrimary),
               const SizedBox(width: 12),
-              Text('Subscription Plan', style: AppTheme.bodyMd),
+              Text(
+                'Subscription Plan',
+                style: AppTheme.bodyMd.copyWith(
+                  color: context.appTextPrimary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 16),
@@ -848,13 +898,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     bool isPopular = false,
   }) {
     Color cardBg = isSelected
-        ? AppColors.primaryFixed.withValues(alpha: 0.08)
-        : AppColors.surfaceContainer;
+        ? context.appPrimary.withValues(alpha: 0.1)
+        : context.appSurfaceElevated;
     Color borderColor = isSelected
-        ? AppColors.primary
+        ? context.appPrimary
         : (isPopular
-              ? AppColors.tertiary.withValues(alpha: 0.4)
-              : AppColors.outline.withValues(alpha: 0.2));
+              ? AppColors.tertiary.withValues(alpha: 0.5)
+              : context.appOutlineVariant);
     double borderWidth = (isSelected || isPopular) ? 2 : 1;
 
     return GestureDetector(
@@ -933,8 +983,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       title,
                       style: AppTheme.headlineMd.copyWith(
                         color: isSelected
-                            ? AppColors.primary
-                            : AppColors.onSurface,
+                            ? context.appPrimary
+                            : context.appTextPrimary,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
@@ -987,16 +1037,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   ),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? AppColors.primary.withValues(alpha: 0.15)
-                        : AppColors.surfaceVariant,
+                        ? context.appPrimary.withValues(alpha: 0.15)
+                        : context.appSurfaceElevated,
                     borderRadius: BorderRadius.circular(100),
                   ),
                   child: Text(
                     price,
                     style: AppTheme.bodySm.copyWith(
                       color: isSelected
-                          ? AppColors.primary
-                          : AppColors.onSurfaceVariant,
+                          ? context.appPrimary
+                          : context.appTextSecondary,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -1012,7 +1062,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     Icon(
                       Icons.check_circle,
                       size: 14,
-                      color: isSelected ? AppColors.primary : AppColors.outline,
+                      color: isSelected ? context.appPrimary : context.appOutlineVariant,
                     ),
                     const SizedBox(width: 8),
                     Expanded(
@@ -1020,8 +1070,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         feature,
                         style: AppTheme.bodySm.copyWith(
                           color: isSelected
-                              ? AppColors.primary
-                              : AppColors.onSurfaceVariant,
+                              ? context.appPrimary
+                              : context.appTextSecondary,
                         ),
                       ),
                     ),
@@ -1045,7 +1095,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.outline.withValues(alpha: 0.1)),
+        border: Border.all(color: context.appOutlineVariant),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
@@ -1053,15 +1103,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         children: [
           Row(
             children: [
-              Icon(icon, color: AppColors.primary),
+              Icon(icon, color: context.appPrimary),
               const SizedBox(width: 12),
-              Text(label, style: AppTheme.bodyMd),
+              Text(
+                label,
+                style: AppTheme.bodyMd.copyWith(
+                  color: context.appTextPrimary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ],
           ),
           Switch(
             value: value,
             onChanged: onChanged,
-            activeThumbColor: AppColors.primary,
+            activeThumbColor: context.appPrimary,
           ),
         ],
       ),

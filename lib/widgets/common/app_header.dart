@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../app_theme.dart';
+import 'app_loading_state.dart';
 
 enum AppHeaderVariant { standard, back, centered }
 
@@ -71,7 +72,7 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
     return SafeArea(
       bottom: false,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
         color: Colors.transparent,
         child: switch (variant) {
           AppHeaderVariant.standard => _buildStandardHeader(context),
@@ -86,33 +87,51 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
     return Row(
       children: [
         // Left Avatar Circle
-        GestureDetector(
-          onTap: onAvatarTap,
-          child: Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.primaryContainer.withValues(alpha: 0.3),
-              border: Border.all(color: AppColors.primary, width: 1.5),
-              image: avatarUrl != null && avatarUrl!.isNotEmpty
-                  ? DecorationImage(
-                      image: NetworkImage(avatarUrl!),
-                      fit: BoxFit.cover,
-                    )
-                  : null,
+        Semantics(
+          button: true,
+          label: 'User profile avatar',
+          enabled: onAvatarTap != null,
+          child: GestureDetector(
+            onTap: onAvatarTap,
+            child: Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.primaryContainer.withValues(alpha: 0.3),
+                border: Border.all(color: AppColors.primary, width: 1.5),
+              ),
+              alignment: Alignment.center,
+              child: ClipOval(
+                child: avatarUrl != null && avatarUrl!.isNotEmpty
+                    ? Image.network(
+                        avatarUrl!,
+                        width: 44,
+                        height: 44,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return const AppSkeletonBox.circle(size: 44);
+                        },
+                        errorBuilder: (context, error, stackTrace) => Text(
+                          userInitials,
+                          style: AppTheme.labelCaps.copyWith(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      )
+                    : Text(
+                        userInitials,
+                        style: AppTheme.labelCaps.copyWith(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.primary,
+                        ),
+                      ),
+              ),
             ),
-            alignment: Alignment.center,
-            child: avatarUrl == null || avatarUrl!.isEmpty
-                ? Text(
-                    userInitials,
-                    style: AppTheme.labelCaps.copyWith(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.primary,
-                    ),
-                  )
-                : null,
           ),
         ),
         const SizedBox(width: 12),
@@ -255,12 +274,21 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
     VoidCallback? onPressed,
     double iconSize = 20,
     bool badge = false,
+    String? tooltip,
   }) {
+    final defaultTooltip = icon == Icons.chevron_left_rounded
+        ? 'Back'
+        : (icon == Icons.notifications_outlined
+            ? 'Notifications'
+            : (icon == Icons.settings_outlined ? 'Settings' : 'Action'));
+    final effectiveTooltip = tooltip ?? defaultTooltip;
+
     return IconButton(
       onPressed: onPressed,
+      tooltip: effectiveTooltip,
       visualDensity: VisualDensity.compact,
       padding: EdgeInsets.zero,
-      constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+      constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
       icon: Stack(
         alignment: Alignment.center,
         children: [

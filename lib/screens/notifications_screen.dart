@@ -8,6 +8,8 @@ import '../widgets/common/app_card.dart';
 import '../widgets/common/app_header.dart';
 import '../widgets/common/app_list_tile.dart';
 
+import '../widgets/common/app_empty_state.dart';
+
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
 
@@ -75,17 +77,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       ),
       body: _notifications.isEmpty
           ? const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.notifications_none,
-                    size: 64,
-                    color: AppColors.outline,
-                  ),
-                  SizedBox(height: 16),
-                  Text('No notifications yet'),
-                ],
+              child: Padding(
+                padding: EdgeInsets.all(20),
+                child: AppEmptyState(
+                  icon: Icons.notifications_none_rounded,
+                  title: 'No Notifications Yet',
+                  subtitle: 'You are all caught up! System updates and workout alerts will appear here.',
+                  cardFramed: false,
+                ),
               ),
             )
           : ListView.builder(

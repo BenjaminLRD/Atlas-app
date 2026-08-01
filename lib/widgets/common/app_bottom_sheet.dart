@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../app_theme.dart';
 
@@ -12,9 +13,9 @@ class AppBottomSheet {
     return showModalBottomSheet<T>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: context.appSurface,
+      backgroundColor: Colors.transparent,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadii.xl)),
       ),
       builder: (context) {
         return SafeArea(
@@ -22,77 +23,86 @@ class AppBottomSheet {
             constraints: BoxConstraints(
               maxHeight: MediaQuery.of(context).size.height * 0.85,
             ),
-            child: SingleChildScrollView(
-              padding: EdgeInsets.only(
-                top: 12,
-                left: 20,
-                right: 20,
-                bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Top Drag Handle Bar
-                  Center(
-                    child: Container(
-                      width: 36,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: context.appOutlineVariant.withValues(alpha: 0.5),
-                        borderRadius: BorderRadius.circular(2),
-                      ),
+            child: ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadii.xl)),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                child: Container(
+                  color: context.appSurface.withValues(alpha: context.isDarkMode ? 0.88 : 0.92),
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.only(
+                      top: AppSpacing.md,
+                      left: AppSpacing.xl,
+                      right: AppSpacing.xl,
+                      bottom: MediaQuery.of(context).viewInsets.bottom + AppSpacing.xl,
                     ),
-                  ),
-                  const SizedBox(height: 16),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Top Drag Handle Bar
+                        Center(
+                          child: Container(
+                            width: 36,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: context.appOutlineVariant.withValues(alpha: 0.5),
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
 
-                  // Title & Close Button Row
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        // Title & Close Button Row
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              title,
-                              style: AppTheme.headlineLg.copyWith(
-                                fontSize: 18,
-                                color: context.appTextPrimary,
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    title,
+                                    style: AppTheme.headlineLg.copyWith(
+                                      fontSize: 18,
+                                      color: context.appTextPrimary,
+                                    ),
+                                  ),
+                                  if (subtitle != null && subtitle.isNotEmpty) ...[
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      subtitle,
+                                      style: AppTheme.bodySm.copyWith(
+                                        fontSize: 12,
+                                        color: context.appTextSecondary,
+                                      ),
+                                    ),
+                                  ],
+                                ],
                               ),
                             ),
-                            if (subtitle != null && subtitle.isNotEmpty) ...[
-                              const SizedBox(height: 2),
-                              Text(
-                                subtitle,
-                                style: AppTheme.bodySm.copyWith(
-                                  fontSize: 12,
-                                  color: context.appTextSecondary,
+                            IconButton(
+                              visualDensity: VisualDensity.compact,
+                              icon: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: context.appSurfaceElevated,
+                                  shape: BoxShape.circle,
                                 ),
+                                child: const Icon(Icons.close, size: 18),
                               ),
-                            ],
+                              onPressed: () => Navigator.pop(context),
+                            ),
                           ],
                         ),
-                      ),
-                      IconButton(
-                        visualDensity: VisualDensity.compact,
-                        icon: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: context.appSurfaceElevated,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.close, size: 18),
-                        ),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 14),
+                        const SizedBox(height: 14),
 
-                  // Sheet Content Body
-                  child,
-                ],
+                        // Sheet Content Body
+                        child,
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
           ),

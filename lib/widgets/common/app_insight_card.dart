@@ -24,17 +24,17 @@ class AppInsightCard extends StatelessWidget {
     final color = accentColor ?? AppColors.primary;
 
     return AppCard(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.lg),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppRadii.borderMd,
           border: Border.all(
             color: color.withValues(alpha: 0.25),
             width: 1,
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(AppSpacing.md),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

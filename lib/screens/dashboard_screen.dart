@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../app_theme.dart';
 import '../data/app_dependencies.dart';
 import '../data/nutrition_service.dart';
@@ -290,8 +291,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             label: 'Start Workout',
             icon: Icons.play_arrow_rounded,
             isFullWidth: false,
-            onPressed: () {
-              Navigator.push(
+            onPressed: () async {
+              await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => const WorkoutSessionScreen(
@@ -300,6 +301,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
               );
+              if (context.mounted) {
+                setState(() {});
+              }
             },
           ),
         ],
@@ -313,24 +317,71 @@ class _DashboardScreenState extends State<DashboardScreen> {
       onTap: _showActivityRingsModal,
       child: Column(
         children: [
-          Text(
-            'Daily Activity',
-            style: AppTheme.headlineMd.copyWith(
-              fontSize: 16,
-              color: context.appTextPrimary,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Daily Activity',
+                style: AppTheme.headlineMd.copyWith(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: context.appTextPrimary,
+                ),
+              ),
+              const SizedBox(width: 6),
+              const Icon(
+                Icons.auto_awesome,
+                size: 14,
+                color: AppColors.primaryContainer,
+              ),
+            ],
           ),
           const SizedBox(height: 12),
-          ProgressRing.activityRings(
-            size: 130,
-            streakProgress: 0.80,
-            caloriesProgress: 0.65,
-            proteinProgress: (_proteinConsumed / _proteinGoal).clamp(0.0, 1.0),
-            centerChild: const Icon(
-              Icons.bolt,
-              color: AppColors.primary,
-              size: 26,
-            ),
+          TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0.0, end: 1.0),
+            duration: const Duration(milliseconds: 1000),
+            curve: Curves.easeOutCubic,
+            builder: (context, animVal, child) {
+              return Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primaryContainer.withValues(
+                        alpha: context.isDarkMode ? 0.25 : 0.1,
+                      ),
+                      blurRadius: 20,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+                child: ProgressRing.activityRings(
+                  size: 130,
+                  streakProgress: 0.80 * animVal,
+                  caloriesProgress: 0.65 * animVal,
+                  proteinProgress:
+                      ((_proteinConsumed / _proteinGoal) * animVal).clamp(0.0, 1.0),
+                  centerChild: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.primaryContainer.withValues(alpha: 0.15),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primaryContainer.withValues(alpha: 0.3),
+                          blurRadius: 10,
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.bolt,
+                      color: AppColors.primaryContainer,
+                      size: 24,
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
           const SizedBox(height: 12),
           Row(
@@ -388,9 +439,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       builder: (context, constraints) {
         final isWide = constraints.maxWidth >= 600;
         final weightCard = MetricCard(
-          icon: Icons.monitor_weight_outlined,
-          iconBgColor: AppColors.primaryContainer.withValues(alpha: 0.2),
-          iconColor: AppColors.primary,
+          iconAsset: 'assets/icons/weight.svg',
+          iconBgColor: AppColors.primaryContainer,
+          iconColor: Colors.white,
           label: 'Weight',
           value: _profileProvider.weight,
           unit: _profileProvider.massUnit,
@@ -419,9 +470,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         );
 
         final stepsCard = MetricCard(
-          icon: Icons.directions_walk_rounded,
-          iconBgColor: AppColors.secondaryContainer.withValues(alpha: 0.4),
-          iconColor: AppColors.secondary,
+          iconAsset: 'assets/icons/steps.svg',
+          iconBgColor: AppColors.primaryContainer,
+          iconColor: Colors.white,
           label: 'Steps',
           value: '7,248',
           unit: '/ 10K',
@@ -432,9 +483,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         );
 
         final waterCard = MetricCard(
-          icon: Icons.water_drop_outlined,
-          iconBgColor: AppColors.primaryContainer.withValues(alpha: 0.2),
-          iconColor: AppColors.primary,
+          iconAsset: 'assets/icons/water.svg',
+          iconBgColor: AppColors.primaryContainer,
+          iconColor: Colors.white,
           label: 'Water',
           value: (_waterGlasses * 0.25).toStringAsFixed(1),
           unit: 'L',
@@ -493,9 +544,42 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
+  int _selectedDayIndex = DateTime.now().weekday - 1;
+
   Widget _buildPerformanceTrendChart(BuildContext context) {
+    final todayIndex = DateTime.now().weekday - 1;
     final days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+    final fullDates = [
+      'Jul 28',
+      'Jul 29',
+      'Jul 30',
+      'Jul 31',
+      'Aug 1',
+      'Aug 2',
+      'Aug 3',
+    ];
+    final fullDays = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday'
+    ];
     final heights = [0.40, 0.55, 0.78, 0.30, 0.65, 0.85, 0.92];
+    final intensities = [40, 55, 78, 30, 65, 85, 92];
+    final volumes = ['3,450 kg', '4,800 kg', '6,240 kg', '2,100 kg', '5,400 kg', '7,100 kg', '7,850 kg'];
+    final durations = ['35 min', '48 min', '62 min', '25 min', '55 min', '70 min', '75 min'];
+    final workouts = [1, 1, 2, 1, 1, 2, 2];
+
+    final selectedIndex = _selectedDayIndex.clamp(0, 6);
+    final selectedDayName = fullDays[selectedIndex];
+    final selectedDateStr = fullDates[selectedIndex];
+    final selectedIntensity = intensities[selectedIndex];
+    final selectedVolume = volumes[selectedIndex];
+    final selectedDuration = durations[selectedIndex];
+    final selectedWorkouts = workouts[selectedIndex];
 
     return AppCard(
       padding: const EdgeInsets.all(18),
@@ -510,27 +594,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 style: AppTheme.bodySm.copyWith(
                   color: context.appTextSecondary,
                   fontSize: 13,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryContainer.withValues(alpha: 0.25),
+                  color: AppColors.primaryContainer.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(999),
+                  border: Border.all(
+                    color: AppColors.primaryContainer.withValues(alpha: 0.5),
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primaryContainer.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      spreadRadius: 0,
+                    ),
+                  ],
                 ),
                 child: Row(
                   children: [
                     const Icon(
-                      Icons.trending_up_rounded,
-                      size: 14,
-                      color: AppColors.primary,
+                      Icons.arrow_upward_rounded,
+                      size: 13,
+                      color: AppColors.primaryContainer,
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      '+12% THIS WEEK',
+                      '↑ 12% vs last week',
                       style: AppTheme.labelCaps.copyWith(
-                        color: AppColors.primary,
-                        fontSize: 10,
+                        color: context.isDarkMode ? AppColors.primaryContainer : AppColors.primary,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ],
@@ -538,68 +635,271 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 20),
+
+          // Bar Chart with Dynamic Selection, Glows, and Animations
           SizedBox(
-            height: 120,
+            height: 140,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.end,
-              children: List.generate(7, (i) {
-                final isToday = i == 6;
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 500),
-                      width: 22,
-                      height: 85 * heights[i],
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: isToday
-                              ? [
-                                  AppColors.primary,
-                                  AppColors.primary.withValues(alpha: 0.6),
-                                ]
-                              : [
-                                  context.appPrimary.withValues(alpha: 0.75),
-                                  context.appSurfaceElevated,
-                                ],
+              children: [
+                // Y-Axis Labels
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: ['100', '75', '50', '25', '0']
+                      .map(
+                        (val) => Text(
+                          val,
+                          style: AppTheme.labelCaps.copyWith(
+                            fontSize: 9,
+                            color: context.appTextSecondary.withValues(alpha: 0.6),
+                          ),
                         ),
-                        borderRadius: BorderRadius.circular(6),
+                      )
+                      .toList(),
+                ),
+                const SizedBox(width: 8),
+
+                // Grid & Bars Stack
+                Expanded(
+                  child: Stack(
+                    alignment: Alignment.bottomCenter,
+                    children: [
+                      // Horizontal Background Grid Lines
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: List.generate(5, (index) {
+                          return Divider(
+                            height: 1,
+                            thickness: 0.8,
+                            color: context.appOutlineVariant.withValues(alpha: 0.3),
+                          );
+                        }),
+                      ),
+
+                      // Bars Row
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: List.generate(7, (i) {
+                          final isSelected = i == selectedIndex;
+                          final isToday = i == todayIndex;
+
+                          return GestureDetector(
+                            onTap: () {
+                              HapticFeedback.lightImpact();
+                              setState(() {
+                                _selectedDayIndex = i;
+                              });
+                            },
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                // White Glow Indicator Dot on Selected Bar
+                                AnimatedOpacity(
+                                  duration: const Duration(milliseconds: 250),
+                                  opacity: isSelected ? 1.0 : 0.0,
+                                  child: Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.white,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: AppColors.primaryContainer,
+                                          blurRadius: 8,
+                                          spreadRadius: 2,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+
+                                // Dynamic Height Animated Bar
+                                TweenAnimationBuilder<double>(
+                                  tween: Tween(begin: 0.0, end: heights[i]),
+                                  duration: Duration(milliseconds: 600 + (i * 80)),
+                                  curve: Curves.easeOutCubic,
+                                  builder: (context, animValue, child) {
+                                    return AnimatedContainer(
+                                      duration: const Duration(milliseconds: 250),
+                                      width: isSelected ? 24 : 20,
+                                      height: 90 * animValue,
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                          colors: isSelected
+                                              ? [
+                                                  AppColors.primaryContainer,
+                                                  AppColors.primary,
+                                                ]
+                                              : isToday
+                                                  ? [
+                                                      context.appPrimary.withValues(alpha: 0.9),
+                                                      context.appPrimary.withValues(alpha: 0.5),
+                                                    ]
+                                                  : [
+                                                      context.appPrimary.withValues(alpha: 0.5),
+                                                      context.appSurfaceElevated,
+                                                    ],
+                                        ),
+                                        borderRadius: BorderRadius.circular(6),
+                                        boxShadow: isSelected
+                                            ? [
+                                                BoxShadow(
+                                                  color: AppColors.primaryContainer.withValues(alpha: 0.6),
+                                                  blurRadius: 12,
+                                                  spreadRadius: 2,
+                                                ),
+                                              ]
+                                            : null,
+                                      ),
+                                    );
+                                  },
+                                ),
+                                const SizedBox(height: 6),
+
+                                // Day Label Pill
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 2,
+                                  ),
+                                  decoration: isSelected
+                                      ? BoxDecoration(
+                                          color: AppColors.primaryContainer,
+                                          borderRadius: BorderRadius.circular(4),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: AppColors.primaryContainer.withValues(alpha: 0.4),
+                                              blurRadius: 6,
+                                            ),
+                                          ],
+                                        )
+                                      : isToday
+                                          ? BoxDecoration(
+                                              color: AppColors.primaryContainer.withValues(
+                                                alpha: 0.2,
+                                              ),
+                                              borderRadius: BorderRadius.circular(4),
+                                            )
+                                          : null,
+                                  child: Text(
+                                    days[i],
+                                    style: AppTheme.labelCaps.copyWith(
+                                      fontSize: 10,
+                                      fontWeight: (isSelected || isToday)
+                                          ? FontWeight.w700
+                                          : FontWeight.w500,
+                                      color: isSelected
+                                          ? Colors.white
+                                          : isToday
+                                              ? AppColors.primaryContainer
+                                              : context.appTextSecondary,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 18),
+          const Divider(height: 1),
+          const SizedBox(height: 14),
+
+          // Selected Day Insights Panel
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: context.appSurfaceElevated,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: context.isDarkMode
+                    ? AppColors.primaryContainer.withValues(alpha: 0.2)
+                    : context.appOutlineVariant.withValues(alpha: 0.5),
+              ),
+            ),
+            child: Row(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '$selectedDayName ($selectedDateStr)',
+                      style: AppTheme.labelCaps.copyWith(
+                        color: AppColors.primaryContainer,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
-                    const SizedBox(height: 6),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
-                      ),
-                      decoration: isToday
-                          ? BoxDecoration(
-                              color: AppColors.primaryContainer.withValues(
-                                alpha: 0.25,
-                              ),
-                              borderRadius: BorderRadius.circular(4),
-                            )
-                          : null,
-                      child: Text(
-                        days[i],
-                        style: AppTheme.labelCaps.copyWith(
-                          fontSize: 10,
-                          fontWeight: isToday
-                              ? FontWeight.w700
-                              : FontWeight.w500,
-                          color: isToday
-                              ? AppColors.primary
-                              : context.appTextSecondary,
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Text(
+                          '$selectedIntensity',
+                          style: AppTheme.headlineLg.copyWith(
+                            fontSize: 26,
+                            fontWeight: FontWeight.w800,
+                            color: context.appTextPrimary,
+                          ),
                         ),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Relative Intensity',
+                          style: AppTheme.bodySm.copyWith(
+                            fontSize: 11,
+                            color: context.appTextSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const Spacer(),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      'Volume: $selectedVolume',
+                      style: AppTheme.bodySm.copyWith(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: context.appTextPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Duration: $selectedDuration',
+                      style: AppTheme.bodySm.copyWith(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: context.appTextPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Workouts: $selectedWorkouts',
+                      style: AppTheme.bodySm.copyWith(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryContainer,
                       ),
                     ),
                   ],
-                );
-              }),
+                ),
+              ],
             ),
           ),
         ],

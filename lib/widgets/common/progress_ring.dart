@@ -66,18 +66,24 @@ class ProgressRing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: size,
-      height: size,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          CustomPaint(
-            size: Size(size, size),
-            painter: _ProgressRingsPainter(rings: rings),
-          ),
-          ?centerChild,
-        ],
+    final primaryProgress = rings.isNotEmpty ? (rings.first.progress * 100).toInt() : 0;
+
+    return Semantics(
+      label: 'Progress ring indicator',
+      value: '$primaryProgress percent',
+      child: SizedBox(
+        width: size,
+        height: size,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            CustomPaint(
+              size: Size(size, size),
+              painter: _ProgressRingsPainter(rings: rings),
+            ),
+            ?centerChild,
+          ],
+        ),
       ),
     );
   }

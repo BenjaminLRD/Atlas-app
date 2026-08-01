@@ -3,6 +3,7 @@ import '../app_theme.dart';
 import '../data/app_dependencies.dart';
 import '../widgets/common/app_header.dart';
 import '../widgets/common/app_chip.dart';
+import '../widgets/common/app_empty_state.dart';
 import '../data/ai_chat_service.dart';
 import '../models/chat_message.dart';
 
@@ -97,34 +98,49 @@ class _AiCoachChatScreenState extends State<AiCoachChatScreen> {
           // Suggested prompts list
           _buildSuggestedPromptsList(),
 
-          // Chat messages
+          // Chat messages or Empty State
           Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.all(20),
-              itemCount: _messages.length,
-              itemBuilder: (context, index) {
-                final msg = _messages[index];
-                final isBot = msg['sender'] == 'bot';
-                if (isBot) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 24),
-                    child: _buildBotMessage(
-                      msg['text'] ?? '',
-                      tags: (msg['tags'] as List?)
-                          ?.map((e) => e.toString())
-                          .toList(),
-                      routineCard: msg['routineCard'] == true,
+            child: _messages.isEmpty
+                ? Center(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(20),
+                      child: AppEmptyState(
+                        icon: Icons.auto_awesome_rounded,
+                        title: 'AI Gym Coach Online',
+                        subtitle:
+                            'Ask for personalized workout routines, nutrition advice, or exercise form tips to start chatting!',
+                        actionLabel: "Generate Today's Workout",
+                        onActionPressed: () => _sendMessage("Generate today's workout"),
+                        cardFramed: false,
+                      ),
                     ),
-                  );
-                } else {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 24),
-                    child: _buildUserMessage(msg['text'] ?? ''),
-                  );
-                }
-              },
-            ),
+                  )
+                : ListView.builder(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.all(20),
+                    itemCount: _messages.length,
+                    itemBuilder: (context, index) {
+                      final msg = _messages[index];
+                      final isBot = msg['sender'] == 'bot';
+                      if (isBot) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 24),
+                          child: _buildBotMessage(
+                            msg['text'] ?? '',
+                            tags: (msg['tags'] as List?)
+                                ?.map((e) => e.toString())
+                                .toList(),
+                            routineCard: msg['routineCard'] == true,
+                          ),
+                        );
+                      } else {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 24),
+                          child: _buildUserMessage(msg['text'] ?? ''),
+                        );
+                      }
+                    },
+                  ),
           ),
 
           // Input bar
