@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../app_theme.dart';
-import 'app_loading_state.dart';
+import 'app_image.dart';
 
 enum AppHeaderVariant { standard, back, centered }
 
@@ -102,34 +102,10 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
                 border: Border.all(color: AppColors.primary, width: 1.5),
               ),
               alignment: Alignment.center,
-              child: ClipOval(
-                child: avatarUrl != null && avatarUrl!.isNotEmpty
-                    ? Image.network(
-                        avatarUrl!,
-                        width: 44,
-                        height: 44,
-                        fit: BoxFit.cover,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return const AppSkeletonBox.circle(size: 44);
-                        },
-                        errorBuilder: (context, error, stackTrace) => Text(
-                          userInitials,
-                          style: AppTheme.labelCaps.copyWith(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                      )
-                    : Text(
-                        userInitials,
-                        style: AppTheme.labelCaps.copyWith(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.primary,
-                        ),
-                      ),
+              child: AppImage.avatar(
+                imageUrl: avatarUrl,
+                radius: 22,
+                name: userInitials,
               ),
             ),
           ),

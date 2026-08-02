@@ -7,6 +7,7 @@ import '../models/active_workout_session.dart';
 import '../models/workout_history.dart';
 import '../widgets/common/app_card.dart';
 import '../widgets/common/app_button.dart';
+import '../widgets/common/app_image.dart';
 import '../widgets/common/progress_ring.dart';
 
 class WorkoutSessionScreen extends StatefulWidget {
@@ -1093,96 +1094,33 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
     );
   }
 
-  /// Dynamic Exercise Image Widget with Missing Image Fallback
+  /// Dynamic Exercise Image Widget using scalable AppImage architecture
   Widget _buildExerciseImageWidget(
     BuildContext context,
     Map<String, dynamic> exercise,
   ) {
     final String exerciseId = exercise['id']?.toString() ?? exercise['name']?.toString() ?? 'exercise';
+    final String exerciseName = exercise['name']?.toString() ?? 'Exercise';
     final String? imagePath = exercise['imagePath']?.toString();
     final String? imageUrl = exercise['imageUrl']?.toString();
-
-    Widget imageContent;
-
-    if (imagePath != null && imagePath.isNotEmpty) {
-      imageContent = Image.asset(
-        imagePath,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          if (imageUrl != null && imageUrl.isNotEmpty) {
-            return Image.network(
-              imageUrl,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return _buildFallbackImageCard(context, exercise);
-              },
-            );
-          }
-          return _buildFallbackImageCard(context, exercise);
-        },
-      );
-    } else if (imageUrl != null && imageUrl.isNotEmpty) {
-      imageContent = Image.network(
-        imageUrl,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return _buildFallbackImageCard(context, exercise);
-        },
-      );
-    } else {
-      imageContent = _buildFallbackImageCard(context, exercise);
-    }
 
     return Container(
       key: ValueKey('${exerciseId}_$_currentExerciseIndex'),
       width: 76,
       height: 76,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
-        color: context.appSurfaceElevated,
+        color: context.appCardBg,
+        borderRadius: BorderRadius.circular(AppRadii.lg),
         border: Border.all(
-          color: context.isDarkMode
-              ? AppColors.primaryContainer.withValues(alpha: 0.4)
-              : context.appOutlineVariant,
-          width: 1.2,
+          color: context.appCardBorder,
+          width: 1,
         ),
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(13),
-        child: imageContent,
-      ),
-    );
-  }
-
-  Widget _buildFallbackImageCard(
-    BuildContext context,
-    Map<String, dynamic> exercise,
-  ) {
-    final String exName = exercise['name'] as String? ?? 'EX';
-    final String initial = exName.isNotEmpty ? exName.substring(0, 1).toUpperCase() : 'E';
-
-    return Container(
-      color: AppColors.primaryContainer.withValues(alpha: 0.15),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.fitness_center_rounded,
-              color: AppColors.primaryContainer,
-              size: 26,
-            ),
-            const SizedBox(height: 2),
-            Text(
-              initial,
-              style: AppTheme.labelCaps.copyWith(
-                fontSize: 11,
-                fontWeight: FontWeight.w800,
-                color: AppColors.primaryContainer,
-              ),
-            ),
-          ],
-        ),
+      child: AppImage.exercise(
+        imageUrl: imageUrl,
+        assetPath: imagePath,
+        size: 76,
+        exerciseName: exerciseName,
       ),
     );
   }

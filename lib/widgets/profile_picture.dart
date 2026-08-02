@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../app_theme.dart';
+import 'common/app_image.dart';
 
 class ProfileImage extends StatelessWidget {
   final String? path;
@@ -46,26 +47,22 @@ class ProfileImage extends StatelessWidget {
     if (path!.startsWith('http://') ||
         path!.startsWith('https://') ||
         path!.startsWith('blob:')) {
-      return Image.network(
-        path!,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => Icon(
-          Icons.person,
-          size: iconSize,
-          color: AppColors.primary,
-        ),
+      return AppImage(
+        imageUrl: path,
+        width: size,
+        height: size,
+        borderRadius: size / 2,
+        fallbackIcon: Icons.person,
       );
     }
 
     if (path!.startsWith('assets/')) {
-      return Image.asset(
-        path!,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => Icon(
-          Icons.person,
-          size: iconSize,
-          color: AppColors.primary,
-        ),
+      return AppImage(
+        assetPath: path,
+        width: size,
+        height: size,
+        borderRadius: size / 2,
+        fallbackIcon: Icons.person,
       );
     }
 

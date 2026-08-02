@@ -5,6 +5,7 @@ import '../data/nutrition_service.dart';
 import '../models/daily_nutrition.dart';
 import '../models/food_item.dart';
 import '../models/meal_entry.dart';
+import '../providers/fitness_provider.dart';
 import '../widgets/common/app_bottom_sheet.dart';
 import '../widgets/common/app_button.dart';
 import '../widgets/common/app_card.dart';
@@ -32,12 +33,28 @@ class _DietPlanScreenState extends State<DietPlanScreen> {
   void initState() {
     super.initState();
     _nutritionService = AppDependencies.instance.nutritionService;
+    FitnessProvider.instance.addListener(_onFitnessStateChanged);
     _loadNutritionData();
+  }
+
+  @override
+  void dispose() {
+    FitnessProvider.instance.removeListener(_onFitnessStateChanged);
+    _proteinInputController.dispose();
+    super.dispose();
+  }
+
+  void _onFitnessStateChanged() {
+    if (mounted) {
+      setState(() {
+        _dailyNutrition = FitnessProvider.instance.todayNutrition;
+      });
+    }
   }
 
   void _loadNutritionData() {
     setState(() {
-      _dailyNutrition = _nutritionService.getDailyNutrition();
+      _dailyNutrition = FitnessProvider.instance.todayNutrition;
       _proteinInputController.text = _dailyNutrition.totalProteinConsumed
           .toStringAsFixed(0);
     });
@@ -133,12 +150,6 @@ class _DietPlanScreenState extends State<DietPlanScreen> {
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _proteinInputController.dispose();
-    super.dispose();
   }
 
   @override

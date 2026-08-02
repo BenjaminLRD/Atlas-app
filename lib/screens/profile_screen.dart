@@ -13,6 +13,7 @@ import '../widgets/common/app_header.dart';
 import '../widgets/common/app_bottom_sheet.dart';
 import '../widgets/common/app_list_tile.dart';
 import '../widgets/common/app_button.dart';
+import '../widgets/common/app_image.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -1482,6 +1483,7 @@ class _MotivationalQuote {
   final String avatarSymbol;
   final String powerTag;
   final String assetName;
+  final String? imageUrl;
 
   const _MotivationalQuote({
     required this.characterName,
@@ -1491,6 +1493,7 @@ class _MotivationalQuote {
     required this.avatarSymbol,
     required this.powerTag,
     required this.assetName,
+    this.imageUrl,
   });
 
   String get imagePath => 'assets/quotes/$assetName.png';
@@ -1507,6 +1510,7 @@ const List<_MotivationalQuote> _motivationalQuotes = [
     avatarSymbol: '悟',
     powerTag: 'LIMITLESS POTENTIAL',
     assetName: 'goku',
+    imageUrl: null,
   ),
   _MotivationalQuote(
     characterName: 'Naruto',
@@ -1517,6 +1521,7 @@ const List<_MotivationalQuote> _motivationalQuotes = [
     avatarSymbol: '忍',
     powerTag: 'NEVER GIVE UP',
     assetName: 'naruto',
+    imageUrl: null,
   ),
   _MotivationalQuote(
     characterName: 'Saitama',
@@ -1527,6 +1532,7 @@ const List<_MotivationalQuote> _motivationalQuotes = [
     avatarSymbol: '👊',
     powerTag: 'UNSTOPPABLE DISCIPLINE',
     assetName: 'saitama',
+    imageUrl: null,
   ),
   _MotivationalQuote(
     characterName: 'Garou',
@@ -1537,6 +1543,7 @@ const List<_MotivationalQuote> _motivationalQuotes = [
     avatarSymbol: '狼',
     powerTag: 'EVOLUTION THROUGH STRUGGLE',
     assetName: 'garou',
+    imageUrl: null,
   ),
 ];
 
@@ -1785,150 +1792,16 @@ class __MotivationalQuoteBottomSheetState
           ),
         ],
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(18),
-        child: Image.asset(
-          quote.imagePath,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return Image.asset(
-              quote.imagePathJpg,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return _buildFallbackArtworkContainer(context, quote);
-              },
-            );
-          },
-        ),
+      child: AppImage(
+        imageUrl: quote.imageUrl,
+        assetPath: quote.imagePath,
+        width: double.infinity,
+        height: double.infinity,
+        fit: BoxFit.cover,
+        borderRadius: 18,
+        fallbackIcon: Icons.format_quote_rounded,
+        fallbackText: quote.characterName,
       ),
-    );
-  }
-
-  Widget _buildFallbackArtworkContainer(
-      BuildContext context, _MotivationalQuote quote) {
-    final isDark = context.isDarkMode;
-
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        // Dark surface base with subtle green ambient background gradient
-        Container(
-          decoration: BoxDecoration(
-            color: context.appSurfaceElevated,
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                context.appSurfaceElevated,
-                AppColors.primaryContainer.withValues(alpha: 0.12),
-              ],
-            ),
-          ),
-        ),
-
-        // Background ambient green aura circles
-        Positioned(
-          top: -24,
-          right: -24,
-          child: Container(
-            width: 110,
-            height: 110,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.primaryContainer.withValues(alpha: 0.12),
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: -30,
-          left: -20,
-          child: Container(
-            width: 120,
-            height: 120,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.primaryContainer.withValues(alpha: 0.08),
-            ),
-          ),
-        ),
-
-        // Central Hero Character Artwork & Emblem Frame
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Character Emblem Badge Circle
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isDark ? const Color(0xFF0F1412) : context.appSurface,
-                  border: Border.all(
-                    color: AppColors.primaryContainer,
-                    width: 2.5,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primaryContainer.withValues(alpha: 0.45),
-                      blurRadius: 14,
-                      spreadRadius: 1,
-                    ),
-                  ],
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  quote.avatarSymbol,
-                  style: TextStyle(
-                    fontSize: quote.avatarSymbol.length > 2 ? 14 : 26,
-                    fontWeight: FontWeight.w900,
-                    color: AppColors.primaryContainer,
-                    height: 1.0,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-
-              // Character Name Pill
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryContainer.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(999),
-                  border: Border.all(
-                    color: AppColors.primaryContainer.withValues(alpha: 0.5),
-                  ),
-                ),
-                child: Text(
-                  quote.characterName.toUpperCase(),
-                  style: AppTheme.labelCaps.copyWith(
-                    fontSize: 11,
-                    letterSpacing: 1.2,
-                    fontWeight: FontWeight.w900,
-                    color: isDark
-                        ? AppColors.primaryContainer
-                        : AppColors.primary,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 6),
-
-              // Power Tag Badge
-              Text(
-                quote.powerTag,
-                style: AppTheme.labelCaps.copyWith(
-                  fontSize: 9,
-                  letterSpacing: 0.8,
-                  fontWeight: FontWeight.w700,
-                  color: context.appTextSecondary,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 

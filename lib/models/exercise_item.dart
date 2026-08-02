@@ -34,11 +34,16 @@ class ExerciseItem {
         ? rawTips.map((e) => e.toString()).toList()
         : [];
 
+    final rawImagePath = json['imagePath'] as String?;
+    final sanitizedPath = rawImagePath != null && rawImagePath.startsWith('assets/assets/')
+        ? rawImagePath.replaceFirst('assets/assets/', 'assets/')
+        : rawImagePath;
+
     return ExerciseItem(
       id: json['id'] as String? ?? json['name']?.toString().toLowerCase().replaceAll(' ', '_') ?? '',
       name: json['name'] as String? ?? 'Exercise',
       primaryTarget: json['primaryTarget'] as String? ?? 'Target Muscle Group',
-      imagePath: json['imagePath'] as String?,
+      imagePath: sanitizedPath,
       imageUrl: json['imageUrl'] as String?,
       tips: tipsList,
       defaultSets: (json['defaultSets'] as num?)?.toInt() ?? setsList.length,

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import '../app_theme.dart';
-import '../data/app_dependencies.dart';
-import '../data/workout_service.dart';
 import '../models/workout_history.dart';
+import '../providers/fitness_provider.dart';
 import '../widgets/common/app_card.dart';
 import '../widgets/common/app_header.dart';
 import '../widgets/common/section_header.dart';
@@ -18,25 +17,24 @@ class WorkoutHistoryScreen extends StatefulWidget {
 
 class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen>
     with SingleTickerProviderStateMixin {
-  late final WorkoutService _workoutService;
-  late List<WorkoutHistory> _history;
+  List<WorkoutHistory> _history = [];
   late final AnimationController _glowController;
 
   @override
   void initState() {
     super.initState();
-    _workoutService = AppDependencies.instance.workoutService;
     _glowController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
     );
-    _loadHistory();
+    _history = FitnessProvider.instance.workoutHistory;
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _updateAnimationState();
+    _history = FitnessProvider.instance.workoutHistory;
   }
 
   void _updateAnimationState() {
@@ -58,12 +56,6 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen>
   void dispose() {
     _glowController.dispose();
     super.dispose();
-  }
-
-  void _loadHistory() {
-    setState(() {
-      _history = _workoutService.getWorkoutHistory();
-    });
   }
 
   String _formatDate(DateTime dt) {
@@ -122,9 +114,12 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen>
 
   @override
   Widget build(BuildContext context) {
-    _history = _workoutService.getWorkoutHistory();
-    return Scaffold(
-      backgroundColor: context.appBackground,
+    return ListenableBuilder(
+      listenable: FitnessProvider.instance,
+      builder: (context, _) {
+        _history = FitnessProvider.instance.workoutHistory;
+        return Scaffold(
+          backgroundColor: context.appBackground,
       body: Stack(
         children: [
           // Background ambient green glow highlights with animated pulse
@@ -200,7 +195,9 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen>
         ],
       ),
     );
-  }
+  },
+);
+}
 
   Widget _buildHeaderBar(BuildContext context) {
     return AppHeader.standard(

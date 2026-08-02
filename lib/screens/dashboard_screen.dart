@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../app_theme.dart';
 import '../data/app_dependencies.dart';
-import '../data/nutrition_service.dart';
 import '../data/profile_provider.dart';
+import '../providers/fitness_provider.dart';
 import '../widgets/common/app_card.dart';
 import '../widgets/common/app_header.dart';
 import '../widgets/common/app_hero_card.dart';
@@ -27,7 +27,6 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  late final NutritionService _nutritionService;
   late final ProfileProvider _profileProvider;
 
   double _proteinConsumed = 0.0;
@@ -37,16 +36,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     super.initState();
-    _nutritionService = AppDependencies.instance.nutritionService;
     _profileProvider = AppDependencies.instance.profileProvider;
     _profileProvider.addListener(_onProfileChanged);
+    FitnessProvider.instance.addListener(_onFitnessChanged);
     _loadState();
   }
 
   @override
   void dispose() {
+    FitnessProvider.instance.removeListener(_onFitnessChanged);
     _profileProvider.removeListener(_onProfileChanged);
     super.dispose();
+  }
+
+  void _onFitnessChanged() {
+    if (mounted) {
+      _loadState();
+    }
   }
 
   void _onProfileChanged() {
@@ -55,8 +61,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void _loadState() {
     setState(() {
-      _proteinConsumed = _nutritionService.getProteinConsumed();
-      _proteinGoal = _nutritionService.getProteinGoal();
+      _proteinConsumed = FitnessProvider.instance.proteinConsumed;
+      _proteinGoal = FitnessProvider.instance.proteinGoal;
     });
   }
 

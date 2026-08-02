@@ -4,6 +4,7 @@ import 'app_theme.dart';
 import 'data/app_dependencies.dart';
 import 'data/local_storage.dart';
 import 'data/profile_provider.dart';
+import 'providers/fitness_provider.dart';
 import 'widgets/common/ambient_background.dart';
 import 'widgets/top_app_bar.dart';
 import 'widgets/ai_chat_button.dart';
@@ -64,6 +65,7 @@ class MainShell extends StatefulWidget {
 class _MainShellState extends State<MainShell> {
   int _currentIndex = 0;
   final ProfileProvider _profileProvider = AppDependencies.instance.profileProvider;
+  final FitnessProvider _fitnessProvider = FitnessProvider.instance;
 
   final List<Widget> _screens = const [
     DashboardScreen(),
@@ -87,14 +89,20 @@ class _MainShellState extends State<MainShell> {
   @override
   void initState() {
     super.initState();
-    // Listen for profile changes to rebuild the shell (top bar, etc.)
+    // Listen for profile and central fitness state changes
     _profileProvider.addListener(_onProfileChanged);
+    _fitnessProvider.addListener(_onFitnessChanged);
   }
 
   @override
   void dispose() {
+    _fitnessProvider.removeListener(_onFitnessChanged);
     _profileProvider.removeListener(_onProfileChanged);
     super.dispose();
+  }
+
+  void _onFitnessChanged() {
+    if (mounted) setState(() {});
   }
 
   void _onProfileChanged() {

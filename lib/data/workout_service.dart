@@ -1,5 +1,6 @@
 import '../models/active_workout_session.dart';
 import '../models/workout_history.dart';
+import '../providers/fitness_provider.dart';
 import 'workout_repository.dart';
 
 /// High-level service handling workout operations for UI screens.
@@ -34,6 +35,7 @@ class WorkoutService {
   /// Record a completed workout entry in history
   Future<void> saveWorkoutCompletion(WorkoutHistory entry) async {
     await _repository.saveWorkoutCompletion(entry);
+    FitnessProvider.instance.refreshWorkoutHistory();
   }
 
   /// Alias for saving workout completion to history
