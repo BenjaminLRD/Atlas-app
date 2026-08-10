@@ -18,6 +18,13 @@ import 'notifications_screen.dart';
 import 'settings_screen.dart';
 import 'workout_session_screen.dart';
 import 'weekly_workout_plan_screen.dart';
+import '../widgets/coach/coach_summary_card.dart';
+import '../widgets/common/readiness_card.dart';
+import '../widgets/common/recovery_dashboard_card.dart';
+import '../widgets/common/deload_alert_card.dart';
+import '../widgets/common/adaptive_workout_card.dart';
+import '../widgets/common/daily_motivation_card.dart';
+import '../widgets/common/animated_rank_progress_card.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -226,6 +233,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
             const SizedBox(height: 16),
+            const DailyMotivationCard(),
+            const SizedBox(height: 14),
+            Builder(
+              builder: (context) {
+                final progress = FitnessProvider.instance.userProgress;
+                return AnimatedRankProgressCard(
+                  currentRank: progress.currentRank,
+                  nextRank: 'Silver',
+                  currentXp: progress.totalXP,
+                  targetXp: 1000,
+                );
+              },
+            ),
+            const SizedBox(height: 14),
 
             // Bento Layout: Active Protocol + Daily Activity Rings
             LayoutBuilder(
@@ -254,6 +275,47 @@ class _DashboardScreenState extends State<DashboardScreen> {
               },
             ),
             const SizedBox(height: 14),
+
+            // AI Coach Summary Card
+            const CoachSummaryCard(),
+            const SizedBox(height: 14),
+
+            // Readiness, Recovery & Adaptive Workout Intelligence Section
+            Builder(
+              builder: (context) {
+                final provider = FitnessProvider.instance;
+                final recoveryState = provider.recoveryState;
+                final recommendation = provider.todaysRecommendation;
+
+                return Column(
+                  children: [
+                    ReadinessCard(state: provider.trainingState),
+                    const SizedBox(height: 14),
+                    if (recoveryState?.isDeloadRecommended ?? false) ...[
+                      const DeloadAlertCard(),
+                      const SizedBox(height: 14),
+                    ],
+                    RecoveryDashboardCard(state: recoveryState),
+                    const SizedBox(height: 14),
+                    AdaptiveWorkoutCard(
+                      workout: recommendation,
+                      onStartWorkout: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => WorkoutSessionScreen(
+                              workoutName: recommendation?.title ?? 'Adaptive Workout',
+                              workoutId: recommendation?.id ?? 'rec_adaptive_01',
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 14),
+                  ],
+                );
+              },
+            ),
 
             // Responsive Health Metric Section (2-Column Bento Grid on Mobile)
             _buildResponsiveMetricsGrid(context),

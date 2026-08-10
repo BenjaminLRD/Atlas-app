@@ -55,6 +55,12 @@ class DailyNutrition {
     return (targets.calories - totalCaloriesConsumed).clamp(0.0, targets.calories);
   }
 
+  /// Helper getter evaluating whether daily target goals have been achieved
+  bool get isGoalAchieved =>
+      totalCaloriesConsumed >= targets.calories ||
+      totalProteinConsumed >= targets.proteinGrams ||
+      (meals.isNotEmpty && meals.every((m) => m.isCompleted));
+
   factory DailyNutrition.defaultForDate(String date, [MacroTarget? target]) {
     final t = target ?? MacroTarget.defaultTarget();
     return DailyNutrition(

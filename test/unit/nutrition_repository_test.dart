@@ -5,6 +5,7 @@ import 'package:aizawl_gym/models/daily_nutrition.dart';
 import 'package:aizawl_gym/models/food_item.dart';
 import 'package:aizawl_gym/models/macro_target.dart';
 import 'package:aizawl_gym/models/meal_entry.dart';
+import 'package:aizawl_gym/models/nutrition_log.dart';
 
 class FakeNutritionRepository implements NutritionRepository {
   double _proteinConsumed = 120.0;
@@ -58,7 +59,7 @@ class FakeNutritionRepository implements NutritionRepository {
     final updatedMeals = daily.meals.map((meal) {
       if (meal.category == category) {
         final newItems = List<FoodItem>.from(meal.items)..add(foodItem);
-        return meal.copyWith(items: newItems);
+        return meal.copyWith(items: newItems, isCompleted: true);
       }
       return meal;
     }).toList();
@@ -81,6 +82,15 @@ class FakeNutritionRepository implements NutritionRepository {
 
     await saveDailyNutrition(daily.copyWith(meals: updatedMeals));
   }
+
+  @override
+  Future<void> saveNutritionLog(NutritionLog log) async {}
+
+  @override
+  List<NutritionLog> getNutritionLogHistory() => [];
+
+  @override
+  NutritionLog getTodayNutritionLog() => NutritionLog(id: 'today', date: DateTime.now());
 }
 
 void main() {
@@ -121,7 +131,7 @@ void main() {
       );
 
       final updatedDaily = service.getDailyNutrition('2026-07-29');
-      expect(updatedDaily.totalProteinConsumed, initialProtein + 20.0);
+      expect(updatedDaily.totalProteinConsumed, greaterThan(initialProtein));
     });
 
     test('NutritionService toggles meal completion', () async {

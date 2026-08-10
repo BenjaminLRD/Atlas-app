@@ -31,7 +31,7 @@ void main() {
     });
 
     test('MealEntry derived macro calculation and category parsing', () {
-      const meal = MealEntry(
+      final meal = MealEntry(
         id: 'm1',
         name: 'Post-Workout Lunch',
         category: MealCategory.lunch,

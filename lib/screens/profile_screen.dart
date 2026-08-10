@@ -14,6 +14,8 @@ import '../widgets/common/app_bottom_sheet.dart';
 import '../widgets/common/app_list_tile.dart';
 import '../widgets/common/app_button.dart';
 import '../widgets/common/app_image.dart';
+import '../widgets/common/achievement_gallery.dart';
+import '../providers/fitness_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -338,6 +340,15 @@ class _ProfileScreenState extends State<ProfileScreen>
 
             // 5. Body Composition Bento Section
             _buildBodyCompositionSection(context),
+            const SizedBox(height: 20),
+
+            // 6. Achievements Gallery Section
+            Builder(
+              builder: (context) {
+                final unlocked = FitnessProvider.instance.userProgress.achievements;
+                return AchievementGallery(unlockedBadgeIds: unlocked);
+              },
+            ),
           ],
         ),
       ),

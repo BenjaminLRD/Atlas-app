@@ -2,6 +2,7 @@ import '../models/daily_nutrition.dart';
 import '../models/food_item.dart';
 import '../models/macro_target.dart';
 import '../models/meal_entry.dart';
+import '../models/nutrition_log.dart';
 import 'local_storage.dart';
 
 /// Abstract interface for nutrition data operations.
@@ -26,6 +27,11 @@ abstract class NutritionRepository {
     required String date,
     required String mealId,
   });
+
+  // NutritionLog tracking operations
+  Future<void> saveNutritionLog(NutritionLog log);
+  List<NutritionLog> getNutritionLogHistory();
+  NutritionLog getTodayNutritionLog();
 }
 
 /// Default implementation of NutritionRepository backed by LocalStorage.
@@ -104,5 +110,20 @@ class LocalNutritionRepository implements NutritionRepository {
 
     final updatedDaily = daily.copyWith(meals: updatedMeals);
     await saveDailyNutrition(updatedDaily);
+  }
+
+  @override
+  Future<void> saveNutritionLog(NutritionLog log) async {
+    await LocalStorage.saveNutritionLog(log);
+  }
+
+  @override
+  List<NutritionLog> getNutritionLogHistory() {
+    return LocalStorage.getNutritionLogHistory();
+  }
+
+  @override
+  NutritionLog getTodayNutritionLog() {
+    return LocalStorage.getTodayNutritionLog();
   }
 }

@@ -4,6 +4,7 @@ import '../app_theme.dart';
 import '../data/app_dependencies.dart';
 import '../data/local_storage.dart';
 import '../main.dart';
+import '../widgets/common/app_animation.dart';
 import '../widgets/common/app_card.dart';
 import '../widgets/common/app_button.dart';
 
@@ -579,63 +580,66 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     required bool isSelected,
     required VoidCallback onTap,
   }) {
-    return AppCard(
-      onTap: onTap,
-      padding: const EdgeInsets.all(16),
-      borderColor: isSelected
-          ? AppColors.primaryContainer
-          : context.appOutlineVariant.withValues(alpha: 0.3),
-      backgroundColor: isSelected
-          ? AppColors.secondaryContainer.withValues(alpha: 0.25)
-          : null,
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: isSelected
-                  ? context.appPrimary
-                  : context.appSurfaceElevated,
-              shape: BoxShape.circle,
+    return AppAnimation.scaleBounce(
+      active: isSelected,
+      child: AppCard(
+        onTap: onTap,
+        padding: const EdgeInsets.all(16),
+        borderColor: isSelected
+            ? AppColors.primaryContainer
+            : context.appOutlineVariant.withValues(alpha: 0.3),
+        backgroundColor: isSelected
+            ? AppColors.secondaryContainer.withValues(alpha: 0.25)
+            : null,
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? context.appPrimary
+                    : context.appSurfaceElevated,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                color: isSelected
+                    ? AppColors.onPrimary
+                    : context.appTextSecondary,
+                size: 22,
+              ),
             ),
-            child: Icon(
-              icon,
-              color: isSelected
-                  ? AppColors.onPrimary
-                  : context.appTextSecondary,
-              size: 22,
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: AppTheme.headlineMd.copyWith(
-                    fontSize: 16,
-                    color: context.appTextPrimary,
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: AppTheme.headlineMd.copyWith(
+                      fontSize: 16,
+                      color: context.appTextPrimary,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  subtitle,
-                  style: AppTheme.bodySm.copyWith(
-                    fontSize: 12,
-                    color: context.appTextSecondary,
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: AppTheme.bodySm.copyWith(
+                      fontSize: 12,
+                      color: context.appTextSecondary,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          if (isSelected)
-            const Icon(
-              Icons.check_circle_rounded,
-              color: AppColors.primary,
-              size: 22,
-            ),
-        ],
+            if (isSelected)
+              const Icon(
+                Icons.check_circle_rounded,
+                color: AppColors.primary,
+                size: 22,
+              ),
+          ],
+        ),
       ),
     );
   }

@@ -15,6 +15,7 @@ import 'screens/workout_history_screen.dart';
 import 'screens/profile_screen.dart';
 
 import 'screens/login_screen.dart';
+import 'screens/onboarding/user_goal_setup_flow.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,7 +49,13 @@ class AizawlGymApp extends StatelessWidget {
           darkTheme: AppTheme.darkTheme,
           themeMode: currentMode,
           debugShowCheckedModeBanner: false,
-          home: LocalStorage.isLoggedIn() ? const MainShell() : const LoginScreen(),
+          home: (LocalStorage.isLoggedIn() || FitnessProvider.instance.isAuthenticated)
+              ? (LocalStorage.isGoalOnboardingCompleted() ||
+                      LocalStorage.getGoal() != null ||
+                      FitnessProvider.instance.currentGoal != null
+                  ? const MainShell()
+                  : const UserGoalSetupFlow())
+              : const LoginScreen(),
         );
       },
     );

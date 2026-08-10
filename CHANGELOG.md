@@ -3,6 +3,41 @@
 ## Current
 
 ### Added
+- AI Coach User Experience (`lib/widgets/coach/` & `lib/screens/ai_coach_screen.dart`):
+  - `CoachMessage` Model ([coach_message.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/models/coach_message.dart)): Chat data model supporting `id`, `role` (`CoachRole.user`, `CoachRole.assistant`), `content`, and `timestamp`.
+  - `CoachSummaryCard` Widget ([coach_summary_card.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/widgets/coach/coach_summary_card.dart)): Dashboard summary card featuring AI avatar, active recommendations count badge, top priority advice preview, and "VIEW ADVICE" button.
+  - `RecommendationCard` Widget ([recommendation_card.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/widgets/coach/recommendation_card.dart)): Recommendation item card with category badges (`TRAINING`, `NUTRITION`, `RECOVERY`, `GAMIFICATION`, `MINDSET`), priority styling, "Why this advice" reasoning box, metric trigger chip, primary action button, and dismissal handler.
+  - `CoachActionHandler` ([coach_action_handler.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/widgets/coach/coach_action_handler.dart)): Centralized recommendation action routing (`open_nutrition`, `open_workout`, `open_progress`, `open_goals`).
+  - `AICoachScreen` ([ai_coach_screen.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/screens/ai_coach_screen.dart)): Dedicated AI Coach screen with Header, Recommendations feed, empty state, and Ask Coach chat UI placeholder with starter question chips.
+  - Dashboard Integration ([dashboard_screen.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/screens/dashboard_screen.dart)): Embedded `CoachSummaryCard` reactively listening to `FitnessProvider`.
+- AI Coach Foundation:
+  - `FitnessContext` Model ([fitness_context.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/models/fitness_context.dart)): Aggregates `UserGoal`, `UserProfile`, `workoutHistory`, `nutritionSummary`, `progressSummary`, `userProgress`, and `nutritionProgress`.
+  - `Recommendation` Model ([recommendation.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/models/recommendation.dart)): Strongly-typed recommendation model with `RecommendationCategory` (*training*, *nutrition*, *recovery*, *gamification*, *mindset*) and `RecommendationPriority` (*high*, *medium*, *low*).
+  - `RecommendationService` & `RuleBasedRecommendationEngine` ([recommendation_service.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/services/recommendation_service.dart)): Pluggable rule engine evaluating Goal Alignment, Training, Nutrition, and Gamification rank progress with anti-spam and expiration filtering.
+  - `FitnessProvider` Integration ([fitness_provider.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/providers/fitness_provider.dart)): Added `buildFitnessContext()`, `recommendations`, `refreshRecommendations()`, and `dismissRecommendation()`.
+- User Goal Setup Onboarding Flow (`lib/screens/onboarding/`):
+  - `UserGoalSetupFlow` ([user_goal_setup_flow.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/screens/onboarding/user_goal_setup_flow.dart)): Orchestrates 5-step onboarding with `PageController`, top progress indicator, smooth page transitions, and back navigation.
+  - 5 Setup Step Screens:
+    - Step 1: `GoalSelectionScreen` ([goal_selection_screen.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/screens/onboarding/goal_selection_screen.dart)) for Muscle Gain, Fat Loss, Maintenance, Strength, Endurance.
+    - Step 2: `FitnessLevelScreen` ([fitness_level_screen.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/screens/onboarding/fitness_level_screen.dart)) for Beginner, Intermediate, Advanced with explanations.
+    - Step 3: `BodyMetricsScreen` ([body_metrics_screen.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/screens/onboarding/body_metrics_screen.dart)) for Age, Height cm, Weight kg, Target Weight kg with input validation.
+    - Step 4: `ActivityLevelScreen` ([activity_level_screen.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/screens/onboarding/activity_level_screen.dart)) for daily activity levels with descriptions.
+    - Step 5: `GoalSummaryScreen` ([goal_summary_screen.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/screens/onboarding/goal_summary_screen.dart)) displaying derived calories/macros, plan compilation state, and **CREATE PLAN** button saving to `FitnessProvider` and `LocalStorage`.
+- User Fitness Goals Foundation:
+  - `UserGoal` Model ([user_goal.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/models/user_goal.dart)): Strongly-typed model with `FitnessGoalType`, `FitnessLevel`, and `ActivityLevel` enums, biometrics (age, height, weight, target weight), and calculated macro targets.
+  - `GoalCalculationService` ([goal_calculation_service.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/services/goal_calculation_service.dart)): Implemented BMR (Mifflin-St Jeor) and TDEE (activity level multiplier) calculations with goal-specific calorie surpluses/deficits and macro allocations.
+  - `GoalRepository` & `LocalGoalRepository` ([goal_repository.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/repositories/goal_repository.dart)): Clean repository abstraction backed by `LocalStorage`.
+  - State Integration & Composition Root: Registered `GoalRepository` in `AppDependencies` and exposed `currentGoal`, `saveGoal()`, `updateGoal()`, and `clearGoal()` on `FitnessProvider`.
+- Nutrition Gamification Foundation:
+  - `NutritionGamificationService` ([nutrition_gamification_service.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/services/nutrition_gamification_service.dart)): Evaluates nutrition events and awards rewards (+10 XP for meal completed, +25 XP for daily nutrition completed, +50 XP for protein goal achieved) and tracks nutrition streaks.
+  - `NutritionProgress` Model ([nutrition_progress.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/models/nutrition_progress.dart)): Stores metrics for `currentNutritionStreak`, `longestNutritionStreak`, `totalMealsCompleted`, `totalProteinGoalsAchieved`, and `lastNutritionDate`.
+  - Registered 5 Nutrition Achievements in `AchievementService` ([achievement_service.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/services/achievement_service.dart)):
+    - *First Meal Logged* (`first_meal`)
+    - *10 Meals Completed* (`meals_10`)
+    - *Protein Master* (`protein_master`)
+    - *7 Day Nutrition Streak* (`nutrition_streak_7`)
+    - *30 Day Nutrition Streak* (`nutrition_streak_30`)
+  - Integration with `FitnessProvider` and `LocalStorage`: Seamlessly updates `UserProgress.totalXP`, competitive ranks, and nutrition streak, persisting progress locally.
 - Production Polish Sprint — Loading States:
   - Reusable Loading & Skeleton Components: Created [app_loading_state.dart](file:///c:/Users/Lalramdina/Desktop/workou/aizawl_gym/lib/widgets/common/app_loading_state.dart) featuring:
     - `AppSkeletonBox`: Animated pulse/shimmer skeleton container with accessibility pause control (`disableAnimations` & `TickerMode`).

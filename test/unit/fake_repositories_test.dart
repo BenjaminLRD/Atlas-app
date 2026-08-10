@@ -17,6 +17,7 @@ import 'package:aizawl_gym/models/daily_nutrition.dart';
 import 'package:aizawl_gym/models/food_item.dart';
 import 'package:aizawl_gym/models/macro_target.dart';
 import 'package:aizawl_gym/models/meal_entry.dart';
+import 'package:aizawl_gym/models/nutrition_log.dart';
 import 'package:aizawl_gym/models/chat_message.dart';
 import 'package:aizawl_gym/models/notification_model.dart';
 
@@ -139,6 +140,15 @@ class FakeNutritionRepository implements NutritionRepository {
 
     await saveDailyNutrition(daily.copyWith(meals: updatedMeals));
   }
+
+  @override
+  Future<void> saveNutritionLog(NutritionLog log) async {}
+
+  @override
+  List<NutritionLog> getNutritionLogHistory() => [];
+
+  @override
+  NutritionLog getTodayNutritionLog() => NutritionLog(id: 'today', date: DateTime.now());
 }
 
 class FakeAIChatRepository implements AIChatRepository {

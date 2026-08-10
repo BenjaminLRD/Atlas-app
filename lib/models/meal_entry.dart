@@ -1,3 +1,4 @@
+import 'consumed_food.dart';
 import 'food_item.dart';
 
 enum MealCategory {
@@ -16,85 +17,167 @@ enum MealCategory {
   }
 }
 
+/// Alias for MealCategory matching required spec
+typedef MealType = MealCategory;
+
+/// Model representing a logged meal containing a list of consumed food items.
 class MealEntry {
   final String id;
-  final String name;
-  final MealCategory category;
+  final DateTime date;
+  final MealCategory mealType;
+  final List<ConsumedFood> consumedFoods;
+  final bool completed;
+  final String _customName;
   final String timeLabel;
-  final List<FoodItem> items;
-  final bool isCompleted;
 
-  const MealEntry({
+  MealEntry({
     required this.id,
-    required this.name,
-    required this.category,
-    required this.timeLabel,
-    required this.items,
-    this.isCompleted = false,
-  });
+    DateTime? date,
+    MealCategory? mealType,
+    MealCategory? category,
+    List<ConsumedFood>? consumedFoods,
+    List<FoodItem>? items,
+    List<FoodItem>? foods,
+    bool? completed,
+    bool? isCompleted,
+    String name = '',
+    this.timeLabel = '12:00 PM',
+  })  : date = date ?? DateTime.now(),
+        mealType = mealType ?? category ?? MealCategory.snack,
+        consumedFoods = consumedFoods ??
+            ((items ?? foods)
+                    ?.map((f) => ConsumedFood(food: f, quantity: 100.0, unit: 'grams'))
+                    .toList() ??
+                const []),
+        completed = completed ?? isCompleted ?? false,
+        _customName = name;
+
+  MealCategory get category => mealType;
+  bool get isCompleted => completed;
+
+  String get name {
+    if (_customName.isNotEmpty) return _customName;
+    switch (mealType) {
+      case MealCategory.breakfast:
+        return 'Breakfast';
+      case MealCategory.lunch:
+        return 'Lunch';
+      case MealCategory.dinner:
+        return 'Dinner';
+      case MealCategory.snack:
+        return 'Snack';
+    }
+  }
+
+  /// List of raw FoodItems for backwards compatibility
+  List<FoodItem> get foods => consumedFoods.map((cf) => cf.food).toList();
+  List<FoodItem> get items => foods;
 
   double get totalCalories {
-    return items.fold(0.0, (sum, item) => sum + item.calories);
+    return consumedFoods.fold(0.0, (sum, item) => sum + item.calories);
   }
 
   double get totalProtein {
-    return items.fold(0.0, (sum, item) => sum + item.proteinGrams);
+    return consumedFoods.fold(0.0, (sum, item) => sum + item.protein);
   }
 
-  double get totalCarbs {
-    return items.fold(0.0, (sum, item) => sum + item.carbsGrams);
+  double get totalCarbohydrates {
+    return consumedFoods.fold(0.0, (sum, item) => sum + item.carbohydrates);
   }
 
-  double get totalFat {
-    return items.fold(0.0, (sum, item) => sum + item.fatGrams);
+  double get totalCarbs => totalCarbohydrates;
+
+  double get totalFats {
+    return consumedFoods.fold(0.0, (sum, item) => sum + item.fats);
   }
+
+  double get totalFat => totalFats;
 
   String get macrosSummary {
-    return 'P: ${totalProtein.toStringAsFixed(0)}g · C: ${totalCarbs.toStringAsFixed(0)}g · F: ${totalFat.toStringAsFixed(0)}g';
+    return 'P: ${totalProtein.toStringAsFixed(0)}g · C: ${totalCarbohydrates.toStringAsFixed(0)}g · F: ${totalFats.toStringAsFixed(0)}g';
   }
 
   factory MealEntry.fromJson(Map<String, dynamic> json) {
-    final rawItems = json['items'] as List?;
-    final itemList = rawItems != null
-        ? rawItems.map((e) => FoodItem.fromJson(Map<String, dynamic>.from(e))).toList()
-        : <FoodItem>[];
+    final rawConsumed = json['consumedFoods'] as List?;
+    List<ConsumedFood> consumedList = [];
+
+    if (rawConsumed != null) {
+      consumedList = rawConsumed
+          .map((e) => ConsumedFood.fromJson(Map<String, dynamic>.from(e)))
+          .toList();
+    } else {
+      final rawItems = json['items'] as List?;
+      if (rawItems != null) {
+        consumedList = rawItems
+            .map((e) => ConsumedFood(
+                  food: FoodItem.fromJson(Map<String, dynamic>.from(e)),
+                  quantity: 100.0,
+                  unit: 'grams',
+                ))
+            .toList();
+      }
+    }
 
     return MealEntry(
       id: json['id'] as String? ?? '',
-      name: json['name'] as String? ?? 'Meal',
-      category: MealCategory.fromJson(json['category'] as String? ?? 'snack'),
+      date: json['date'] != null
+          ? DateTime.parse(json['date'] as String)
+          : DateTime.now(),
+      mealType: MealCategory.fromJson(
+          json['mealType'] as String? ?? json['category'] as String? ?? 'snack'),
+      consumedFoods: consumedList,
+      completed: json['completed'] as bool? ?? json['isCompleted'] as bool? ?? false,
+      name: json['name'] as String? ?? '',
       timeLabel: json['timeLabel'] as String? ?? '12:00 PM',
-      items: itemList,
-      isCompleted: json['isCompleted'] as bool? ?? false,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'name': name,
-      'category': category.toJson(),
-      'timeLabel': timeLabel,
+      'date': date.toIso8601String(),
+      'mealType': mealType.toJson(),
+      'category': mealType.toJson(),
+      'consumedFoods': consumedFoods.map((e) => e.toJson()).toList(),
       'items': items.map((e) => e.toJson()).toList(),
+      'completed': completed,
       'isCompleted': isCompleted,
+      'name': name,
+      'timeLabel': timeLabel,
+      'totalCalories': totalCalories,
+      'totalProtein': totalProtein,
+      'totalCarbohydrates': totalCarbohydrates,
+      'totalFats': totalFats,
     };
   }
 
   MealEntry copyWith({
     String? id,
-    String? name,
+    DateTime? date,
+    MealCategory? mealType,
     MealCategory? category,
-    String? timeLabel,
+    List<ConsumedFood>? consumedFoods,
     List<FoodItem>? items,
+    List<FoodItem>? foods,
+    bool? completed,
     bool? isCompleted,
+    String? name,
+    String? timeLabel,
   }) {
     return MealEntry(
       id: id ?? this.id,
-      name: name ?? this.name,
-      category: category ?? this.category,
+      date: date ?? this.date,
+      mealType: mealType ?? category ?? this.mealType,
+      consumedFoods: consumedFoods ??
+          ((items ?? foods)
+              ?.map((f) => ConsumedFood(food: f, quantity: 100.0, unit: 'grams'))
+              .toList() ??
+          List.from(this.consumedFoods)),
+      completed: completed ?? isCompleted ?? this.completed,
+      name: name ?? _customName,
       timeLabel: timeLabel ?? this.timeLabel,
-      items: items ?? List.from(this.items),
-      isCompleted: isCompleted ?? this.isCompleted,
     );
   }
 }
+
+

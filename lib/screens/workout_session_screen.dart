@@ -5,10 +5,12 @@ import '../data/app_dependencies.dart';
 import '../data/workout_service.dart';
 import '../models/active_workout_session.dart';
 import '../models/workout_history.dart';
+import '../providers/fitness_provider.dart';
 import '../widgets/common/app_card.dart';
 import '../widgets/common/app_button.dart';
 import '../widgets/common/app_image.dart';
 import '../widgets/common/progress_ring.dart';
+import '../widgets/common/workout_completion_celebration.dart';
 
 class WorkoutSessionScreen extends StatefulWidget {
   final String workoutName;
@@ -532,36 +534,87 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
     _isTimerRunning = false;
     await _workoutService.clearActiveSession();
 
+    // Calculate detailed workout metrics
+    int totalCompletedSets = 0;
+    int totalCompletedReps = 0;
+    double totalVolumeKg = 0.0;
+    final List<String> personalRecords = [];
+
+    for (final ex in _exercises) {
+      final name = ex['name'] as String? ?? 'Exercise';
+      final setsList = ex['sets'] as List? ?? [];
+      double maxWeightInExercise = 0.0;
+
+      for (final s in setsList) {
+        if (s['completed'] == true) {
+          totalCompletedSets++;
+          final reps = (s['reps'] as num?)?.toInt() ?? 0;
+          final weight = (s['weight'] as num?)?.toDouble() ?? 0.0;
+          totalCompletedReps += reps;
+          totalVolumeKg += (reps * weight);
+          if (weight > maxWeightInExercise) {
+            maxWeightInExercise = weight;
+          }
+        }
+      }
+
+      if (maxWeightInExercise >= 80.0) {
+        personalRecords.add('$name: ${maxWeightInExercise.toStringAsFixed(1)} kg');
+      }
+    }
+
+    final double durationMinutes = _elapsedSeconds / 60.0;
+    final double caloriesBurned = (durationMinutes * 6.5) * (totalCompletedSets > 0 ? 1.0 : 0.5);
+    final int xpEarned = ((100 * _completionPercentage) + (totalCompletedSets * 15) + (totalVolumeKg / 100)).toInt();
+
     final completedHistory = WorkoutHistory(
       workoutName: widget.workoutName,
       dateCompleted: DateTime.now(),
       durationSeconds: _elapsedSeconds,
       exercisesCompleted: _completedExercisesCount,
       completionPercentage: _completionPercentage,
+      totalSets: totalCompletedSets,
+      totalReps: totalCompletedReps,
+      totalVolume: totalVolumeKg,
+      caloriesBurned: caloriesBurned,
+      personalRecords: personalRecords,
+      xpEarned: xpEarned,
     );
 
-    await _workoutService.addHistory(completedHistory);
+    await FitnessProvider.instance.saveWorkoutCompletion(completedHistory);
 
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Workout Saved! ${widget.workoutName} completed in ${_formatDuration(_elapsedSeconds)}.',
-            style: AppTheme.bodySm.copyWith(
-              color: AppColors.onPrimary,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          backgroundColor: AppColors.primary,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+    if (!mounted) return;
+
+    await WorkoutCompletionCelebration.show(
+      context,
+      workoutTitle: widget.workoutName,
+      durationMinutes: (_elapsedSeconds / 60).round(),
+      exercisesCompleted: _completedExercisesCount,
+      caloriesBurned: caloriesBurned.round(),
+      xpEarned: xpEarned,
+      isPersonalRecord: personalRecords.isNotEmpty,
+    );
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Workout Saved! ${widget.workoutName} completed in ${_formatDuration(_elapsedSeconds)}.',
+          style: AppTheme.bodySm.copyWith(
+            color: AppColors.onPrimary,
+            fontWeight: FontWeight.w600,
           ),
         ),
-      );
-      if (Navigator.canPop(context)) {
-        Navigator.pop(context);
-      }
+        backgroundColor: AppColors.primary,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
     }
   }
 

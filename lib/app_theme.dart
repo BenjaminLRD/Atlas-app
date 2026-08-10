@@ -31,6 +31,97 @@ abstract class AppDurations {
   static const Duration fast = Duration(milliseconds: 150);
   static const Duration medium = Duration(milliseconds: 300);
   static const Duration slow = Duration(milliseconds: 500);
+  static const Duration microBounce = Duration(milliseconds: 200);
+  static const Duration countUp = Duration(milliseconds: 1200);
+  static const Duration celebrationOverlay = Duration(milliseconds: 600);
+  static const Duration shimmer = Duration(milliseconds: 1500);
+}
+
+/// Semantic gradient tokens for premium UX surfaces and badge accents.
+abstract class AppGradients {
+  static const LinearGradient vitalityGreen = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF006E1C), Color(0xFF32D74B)],
+  );
+
+  static const LinearGradient goldRank = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFFFFE082), Color(0xFFFFD700), Color(0xFFFF8F00)],
+  );
+
+  static const LinearGradient emeraldGlow = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF00E676), Color(0xFF00B0FF)],
+  );
+
+  static const LinearGradient neonXp = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF7C4DFF), Color(0xFF00E5FF)],
+  );
+
+  static final LinearGradient darkGlass = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      const Color(0xFF1E2228).withValues(alpha: 0.9),
+      const Color(0xFF14171C).withValues(alpha: 0.75),
+    ],
+  );
+
+  static final LinearGradient lightGlass = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Colors.white.withValues(alpha: 0.95),
+      const Color(0xFFF0FDF4).withValues(alpha: 0.85),
+    ],
+  );
+
+  static const RadialGradient trophyGold = RadialGradient(
+    colors: [Color(0xFFFFF176), Color(0xFFFFB300)],
+  );
+}
+
+/// Semantic shadow tokens for card elevations, glows, and badges.
+abstract class AppShadows {
+  static final BoxShadow ambientGlow = BoxShadow(
+    color: AppColors.primaryContainer.withValues(alpha: 0.25),
+    blurRadius: 24,
+    spreadRadius: 4,
+    offset: const Offset(0, 4),
+  );
+
+  static final BoxShadow goldGlow = BoxShadow(
+    color: const Color(0xFFFFD700).withValues(alpha: 0.35),
+    blurRadius: 28,
+    spreadRadius: 6,
+    offset: const Offset(0, 4),
+  );
+
+  static final BoxShadow softCard = BoxShadow(
+    color: Colors.black.withValues(alpha: 0.08),
+    blurRadius: 16,
+    spreadRadius: 0,
+    offset: const Offset(0, 4),
+  );
+
+  static final BoxShadow rankBadge = BoxShadow(
+    color: const Color(0xFFFFB300).withValues(alpha: 0.3),
+    blurRadius: 20,
+    spreadRadius: 2,
+  );
+}
+
+/// Semantic animation curve tokens for natural spring and bounce physics.
+abstract class AppCurves {
+  static const Curve spring = Curves.elasticOut;
+  static const Curve smoothOut = Curves.easeOutCubic;
+  static const Curve bounce = Curves.bounceOut;
+  static const Curve standard = Curves.easeInOut;
 }
 
 /// Semantic design tokens for the Aizawl Gym Vitality Design System.
@@ -116,6 +207,7 @@ extension AppThemeContext on BuildContext {
   Color get appSurface => isDarkMode ? const Color(0xFF1B1E20) : AppColors.surface;
   Color get appSurfaceElevated => isDarkMode ? const Color(0xFF25292C) : AppColors.surfaceElevated;
   Color get appSurfaceContainerLow => isDarkMode ? const Color(0xFF171A1C) : AppColors.surfaceContainerLow;
+  Color get appSurfaceVariant => isDarkMode ? const Color(0xFF25292C) : const Color(0xFFF3F3F8);
   Color get appTextPrimary => isDarkMode ? const Color(0xFFFFFFFF) : AppColors.textPrimary;
   Color get appTextSecondary => isDarkMode ? const Color(0xFFCCCCCC) : AppColors.textSecondary;
   Color get appPrimary => isDarkMode ? const Color(0xFF32D74B) : AppColors.primary;

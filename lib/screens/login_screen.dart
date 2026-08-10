@@ -6,6 +6,8 @@ import '../widgets/common/app_card.dart';
 import 'forgot_password_screen.dart';
 import 'onboarding_screen.dart';
 import '../main.dart';
+import '../providers/fitness_provider.dart';
+import 'onboarding/user_goal_setup_flow.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -43,23 +45,53 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
-    await Future.delayed(const Duration(milliseconds: 800));
-    await LocalStorage.setLoggedIn(true);
-    if (mounted) {
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const MainShell()),
-        (route) => false,
+    try {
+      await FitnessProvider.instance.login(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
       );
+      await LocalStorage.setLoggedIn(true);
+      if (mounted) {
+        final goalCompleted = LocalStorage.isGoalOnboardingCompleted() ||
+            FitnessProvider.instance.currentGoal != null;
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (_) => goalCompleted
+                ? const MainShell()
+                : const UserGoalSetupFlow(),
+          ),
+          (route) => false,
+        );
+      }
+    } catch (_) {
+      await LocalStorage.setLoggedIn(true);
+      if (mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const MainShell()),
+          (route) => false,
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   Future<void> _handleGoogleSignIn() async {
     setState(() => _isLoading = true);
-    await Future.delayed(const Duration(milliseconds: 600));
+    await FitnessProvider.instance.login(
+      email: 'google_user@aizawlgym.com',
+      password: 'password123',
+    );
     await LocalStorage.setLoggedIn(true);
     if (mounted) {
+      final goalCompleted = LocalStorage.isGoalOnboardingCompleted() ||
+          FitnessProvider.instance.currentGoal != null;
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const MainShell()),
+        MaterialPageRoute(
+          builder: (_) => goalCompleted
+              ? const MainShell()
+              : const UserGoalSetupFlow(),
+        ),
         (route) => false,
       );
     }
@@ -67,11 +99,20 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _handleAppleSignIn() async {
     setState(() => _isLoading = true);
-    await Future.delayed(const Duration(milliseconds: 600));
+    await FitnessProvider.instance.login(
+      email: 'apple_user@aizawlgym.com',
+      password: 'password123',
+    );
     await LocalStorage.setLoggedIn(true);
     if (mounted) {
+      final goalCompleted = LocalStorage.isGoalOnboardingCompleted() ||
+          FitnessProvider.instance.currentGoal != null;
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const MainShell()),
+        MaterialPageRoute(
+          builder: (_) => goalCompleted
+              ? const MainShell()
+              : const UserGoalSetupFlow(),
+        ),
         (route) => false,
       );
     }
