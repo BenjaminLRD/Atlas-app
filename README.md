@@ -1,17 +1,14 @@
-# aizawl_gym
+# Atlas
 
-A new Flutter project.
+AI-powered fitness platform for workouts, nutrition, community, and intelligent form coaching.
 
-## Getting Started
+## Features
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- 🏋️ Personalized workouts
+- 🥗 Nutrition planning and food tracking
+- 🤖 Atlas AI
+- 🎥 AI Form Coach with uploaded-video exercise analysis
+- 📊 Progress and achievements
+- 😴 Sleep & recovery tracking
+- 👥 Fitness community
+- 📱 Flutter mobile application
