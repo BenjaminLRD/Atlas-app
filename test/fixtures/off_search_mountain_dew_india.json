@@ -1,0 +1,269 @@
+{
+ "count": 11,
+ "page": 1,
+ "page_size": 15,
+ "hits": [
+  {
+   "code": "8902080364060",
+   "brands": [
+    "Pepsi"
+   ],
+   "quantity": "1l",
+   "categories_tags": [
+    "en:beverages-and-beverages-preparations",
+    "en:beverages",
+    "en:waters"
+   ],
+   "countries_tags": [
+    "en:india"
+   ],
+   "product_name": "Mountain dew"
+  },
+  {
+   "code": "8902080364565",
+   "brands": [
+    "MEWATI 🔔"
+   ],
+   "quantity": "1.25 l",
+   "categories_tags": [
+    "en:beverages",
+    "en:carbonated-drinks",
+    "en:sodas",
+    "en:sweetened-beverages"
+   ],
+   "countries_tags": [
+    "en:india"
+   ],
+   "nutriments": {
+    "carbohydrates_100g": 12.3,
+    "saturated-fat_100g": 0,
+    "salt_100g": 0.02,
+    "energy-kcal_100g": 49,
+    "sodium_100g": 0.008,
+    "fat_100g": 0,
+    "proteins_100g": 0,
+    "sugars_100g": 12.3
+   },
+   "product_name": "Mountain Dew"
+  },
+  {
+   "code": "8902080364022",
+   "brands": [
+    "PepsiCo"
+   ],
+   "quantity": "250 ml",
+   "categories_tags": [
+    "en:beverages",
+    "en:carbonated-drinks",
+    "en:waters",
+    "en:sodas",
+    "en:carbonated-waters",
+    "en:energy-drinks",
+    "en:sweetened-beverages"
+   ],
+   "labels_tags": [
+    "en:vegetarian",
+    "en:green-dot-india"
+   ],
+   "countries_tags": [
+    "en:india"
+   ],
+   "nutriments": {
+    "carbohydrates_100g": 12.3,
+    "energy-kcal_100g": 49,
+    "energy-kj_100g": 205,
+    "fat_100g": 0,
+    "fiber_100g": 0,
+    "proteins_100g": 0,
+    "salt_100g": 0.02,
+    "saturated-fat_100g": 0,
+    "sodium_100g": 0.008,
+    "sugars_100g": 12.3
+   },
+   "product_name": "Mountain Dew",
+   "generic_name": "Sweetened Carbonated drink"
+  },
+  {
+   "code": "8902080364091",
+   "brands": [
+    "PepsiCo"
+   ],
+   "categories_tags": [
+    "en:beverages",
+    "en:carbonated-drinks",
+    "en:carbonated-fruit-soft-drink",
+    "en:carbonated-fruit-soft-drink-with-sugar"
+   ],
+   "countries_tags": [
+    "en:india"
+   ],
+   "product_name": "Mountain Dew"
+  },
+  {
+   "code": "8902080364589",
+   "brands": [
+    "PepsiCo"
+   ],
+   "quantity": "400 ml",
+   "categories_tags": [
+    "en:beverages-and-beverages-preparations",
+    "en:beverages",
+    "en:carbonated-drinks",
+    "en:sodas",
+    "en:sweetened-beverages"
+   ],
+   "labels_tags": [
+    "en:vegetarian",
+    "en:green-dot-india"
+   ],
+   "countries_tags": [
+    "en:india"
+   ],
+   "nutriments": {
+    "carbohydrates_100g": 12.3,
+    "energy-kcal_100g": 49,
+    "fat_100g": 0,
+    "proteins_100g": 0,
+    "salt_100g": 0.02,
+    "saturated-fat_100g": 0,
+    "sodium_100g": 0.008,
+    "sugars_100g": 12.3
+   },
+   "product_name": "Mountain Dew",
+   "generic_name": "Carbonated drink"
+  },
+  {
+   "code": "8902080364596",
+   "brands": [
+    "Dew"
+   ],
+   "quantity": "1",
+   "categories_tags": [
+    "en:cold-drink"
+   ],
+   "labels_tags": [
+    "en:carbonated"
+   ],
+   "countries_tags": [
+    "en:india"
+   ],
+   "nutriments": {
+    "saturated-fat_100g": 0,
+    "salt_100g": 0.04064,
+    "fat_100g": 0,
+    "fiber_100g": 0,
+    "sodium_100g": 0.016256,
+    "proteins_100g": 0,
+    "energy-kcal_100g": 49,
+    "carbohydrates_100g": 12.3,
+    "sugars_100g": 12.3
+   },
+   "product_name": "Mountain Dew",
+   "generic_name": "Dew"
+  },
+  {
+   "code": "8902080364343",
+   "brands": [
+    "mountaindew",
+    "Pepsico"
+   ],
+   "quantity": "2.25",
+   "categories_tags": [
+    "en:beverages-and-beverages-preparations",
+    "en:beverages"
+   ],
+   "labels_tags": [
+    "en:vegetarian",
+    "en:green-dot-india"
+   ],
+   "countries_tags": [
+    "en:india"
+   ],
+   "nutriments": {
+    "carbohydrates_100g": 12.3,
+    "energy-kcal_100g": 49,
+    "fat_100g": 0,
+    "proteins_100g": 0,
+    "salt_100g": 0.02,
+    "saturated-fat_100g": 0,
+    "sodium_100g": 0.008,
+    "sugars_100g": 12.3
+   },
+   "product_name": "Mountain dew 2ltr"
+  },
+  {
+   "code": "8902080365029",
+   "brands": [
+    "pepsi"
+   ],
+   "quantity": "6",
+   "categories_tags": [
+    "en:beverages",
+    "en:carbonated-drinks",
+    "en:waters",
+    "en:sodas",
+    "en:carbonated-waters",
+    "en:sweetened-beverages"
+   ],
+   "countries_tags": [
+    "en:india"
+   ],
+   "nutriments": {
+    "carbohydrates_100g": 12.3,
+    "salt_100g": 0.04,
+    "sugars_100g": 12.3,
+    "saturated-fat_100g": 0,
+    "sodium_100g": 0.016,
+    "energy-kcal_100g": 49,
+    "proteins_100g": 0,
+    "fat_100g": 0
+   },
+   "product_name": "Mountain dew 250ml"
+  },
+  {
+   "code": "8902080364053",
+   "brands": [
+    "Pepsico"
+   ],
+   "quantity": "3",
+   "categories_tags": [
+    "en:beverages-and-beverages-preparations",
+    "en:beverages",
+    "en:sweetened-beverages"
+   ],
+   "countries_tags": [
+    "en:india"
+   ],
+   "product_name": "Mountain Dew 750 ml"
+  },
+  {
+   "code": "9909205010818",
+   "brands": [
+    "Yardley"
+   ],
+   "quantity": "100g",
+   "categories_tags": [
+    "en:non-food-products",
+    "en:open-beauty-facts"
+   ],
+   "countries_tags": [
+    "en:india"
+   ],
+   "product_name": "Yardley London Morning Dew"
+  },
+  {
+   "code": "8901777082669",
+   "countries_tags": [
+    "en:india"
+   ],
+   "nutriments": {
+    "carbohydrates_100g": 56.7307692307692,
+    "energy-kcal_100g": 326.923076923077,
+    "fat_100g": 0.961538461538461,
+    "fiber_100g": 4.80769230769231,
+    "proteins_100g": 24.0384615384615
+   },
+   "product_name": "Vadilal moth dew bean sprouts"
+  }
+ ]
+}

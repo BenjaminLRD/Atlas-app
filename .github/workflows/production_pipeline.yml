@@ -1,0 +1,67 @@
+name: Atlas Production CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, production ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  quality_and_tests:
+    name: Code Analysis & Comprehensive Testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter Environment
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.x'
+          channel: 'stable'
+          cache: true
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Verify Code Formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Run Static Analysis
+        run: dart analyze --fatal-infos
+
+      - name: Run Full Test Suite
+        run: flutter test
+
+  security_scan:
+    name: Security Vulnerability & Dependency Audit
+    needs: quality_and_tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Audit Pub Dependencies
+        run: flutter pub outdated --dependency-overrides
+
+  build_and_deploy:
+    name: Production Release Build
+    needs: [quality_and_tests, security_scan]
+    if: github.ref == 'refs/heads/production'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.x'
+
+      - name: Build Android App Bundle (AAB)
+        # Client-safe config only. The Gemini key lives in Supabase secrets.
+        run: >
+          flutter build appbundle --release --obfuscate --split-debug-info=./debug-info
+          --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL }}
+          --dart-define=SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
+          --dart-define=REVENUECAT_ANDROID_KEY=${{ secrets.REVENUECAT_ANDROID_KEY }}

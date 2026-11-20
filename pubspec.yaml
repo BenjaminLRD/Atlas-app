@@ -1,0 +1,59 @@
+name: atlas
+description: "Atlas — AI-Powered Fitness, Workout Tracking & Form Coach."
+
+publish_to: 'none'
+
+version: 1.1.0+2
+
+environment:
+  sdk: '^3.12.2'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  google_fonts: ^8.1.0
+  fl_chart: ^1.2.0
+  shared_preferences: ^2.5.5
+  intl: ^0.20.3
+  image_picker: ^1.2.3
+  flutter_svg: ^2.0.17
+  http: ^1.2.0
+  cached_network_image: ^3.4.1
+  flutter_secure_storage: ^9.2.4
+  mobile_scanner: ^7.4.0
+  google_mlkit_pose_detection: ^0.16.1
+  fc_native_video_thumbnail: ^3.0.1
+  video_player: ^2.9.2
+  supabase_flutter: ^2.17.2
+  health: ^13.3.1
+  camera: ^0.12.1
+  purchases_flutter: ^10.15.0
+  url_launcher: ^6.3.3
+  pedometer: ^4.2.0
+  geolocator: ^14.0.2
+  flutter_map: ^8.3.2
+  latlong2: ^0.10.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.3
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/icons/
+    - assets/quotes/
+    - assets/exercises/
+    - assets/community/photos/
+    - assets/community/videos/
+    - supabase/functions/_shared/ranked_milestones.json
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: assets/icon/app_icon.png

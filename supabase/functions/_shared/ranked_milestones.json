@@ -1,0 +1,109 @@
+{
+  "version": 1,
+  "notes": "Single source of truth for Ranked mode, read by the app (as a Flutter asset) and by the ranked-sync Edge Function. Strength targets are bodyweight multiples of an estimated one-rep max (Epley, from sets of 1-5 reps), so they work in kg or lbs. Levels 1-5 roughly follow novice to elite strength standards; tune with real data.",
+  "tiers": ["Bronze", "Silver", "Gold", "Platinum", "Diamond", "Champion"],
+  "divisions": ["III", "II", "I"],
+  "levelsPerStat": 5,
+  "videoRequiredFromLevel": 4,
+  "consistencyWindowDays": 28,
+  "stats": [
+    {
+      "id": "strength",
+      "name": "Strength",
+      "rule": "second_best",
+      "description": "Reach a level on any two of the four lifts.",
+      "milestones": [
+        {
+          "id": "bench_press",
+          "title": "Bench press",
+          "measure": "bodyweight_multiple",
+          "exercisePatterns": ["bench press", "bench"],
+          "requiresVideo": true,
+          "male": [0.5, 0.75, 1.0, 1.25, 1.5],
+          "female": [0.35, 0.5, 0.65, 0.8, 1.0]
+        },
+        {
+          "id": "squat",
+          "title": "Squat",
+          "measure": "bodyweight_multiple",
+          "exercisePatterns": ["back squat", "front squat", "squat"],
+          "excludePatterns": ["split", "goblet", "jump", "bulgarian"],
+          "requiresVideo": true,
+          "male": [0.75, 1.0, 1.5, 1.75, 2.25],
+          "female": [0.5, 0.75, 1.0, 1.25, 1.75]
+        },
+        {
+          "id": "deadlift",
+          "title": "Deadlift",
+          "measure": "bodyweight_multiple",
+          "exercisePatterns": ["deadlift"],
+          "excludePatterns": ["romanian", "stiff", "single"],
+          "requiresVideo": true,
+          "male": [1.0, 1.5, 2.0, 2.25, 2.75],
+          "female": [0.75, 1.0, 1.5, 1.75, 2.25]
+        },
+        {
+          "id": "overhead_press",
+          "title": "Overhead press",
+          "measure": "bodyweight_multiple",
+          "exercisePatterns": ["overhead press", "shoulder press", "military press", "ohp"],
+          "excludePatterns": ["machine"],
+          "requiresVideo": true,
+          "male": [0.4, 0.5, 0.65, 0.8, 1.0],
+          "female": [0.25, 0.35, 0.45, 0.55, 0.7]
+        }
+      ]
+    },
+    {
+      "id": "endurance",
+      "name": "Endurance",
+      "rule": "best",
+      "description": "Most push-ups in one set.",
+      "milestones": [
+        {
+          "id": "push_ups",
+          "title": "Push-ups in one set",
+          "measure": "max_reps",
+          "exercisePatterns": ["push-up", "push up", "pushup"],
+          "excludePatterns": ["knee", "incline"],
+          "requiresVideo": true,
+          "male": [15, 30, 50, 75, 100],
+          "female": [5, 15, 30, 45, 60]
+        }
+      ]
+    },
+    {
+      "id": "cardio",
+      "name": "Cardio",
+      "rule": "best",
+      "description": "Fastest 5 km, from a run of at least 5 km.",
+      "milestones": [
+        {
+          "id": "run_5k",
+          "title": "5 km run",
+          "measure": "time_5k_minutes",
+          "exercisePatterns": ["run", "jog"],
+          "requiresVideo": false,
+          "male": [35, 30, 27, 24, 21],
+          "female": [40, 34, 30, 27, 24]
+        }
+      ]
+    },
+    {
+      "id": "consistency",
+      "name": "Consistency",
+      "rule": "best",
+      "description": "Workouts completed in the last 28 days.",
+      "milestones": [
+        {
+          "id": "workouts_28d",
+          "title": "Workouts in 28 days",
+          "measure": "workouts_in_window",
+          "requiresVideo": false,
+          "male": [4, 8, 12, 16, 20],
+          "female": [4, 8, 12, 16, 20]
+        }
+      ]
+    }
+  ]
+}
